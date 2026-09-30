@@ -1,0 +1,409 @@
+{
+  "scan_date": "2026-10-01",
+  "scanned_at": "2026-10-01T00:11:25+05:30",
+  "timezone": "Asia/Kolkata",
+  "preferences": {
+    "roles": [
+      "data-analyst",
+      "sql",
+      "power-bi",
+      "analytics",
+      "any-analyst",
+      "data-scientist"
+    ],
+    "locations": [
+      "Hyderabad",
+      "Bengaluru",
+      "Chennai",
+      "Remote India"
+    ],
+    "types": [
+      "jobs",
+      "internships"
+    ]
+  },
+  "summary": {
+    "total": 9,
+    "fresh": 5,
+    "backup": 4,
+    "internships": 0,
+    "duplicates_suppressed": 10
+  },
+  "jobs": [
+    {
+      "id": "10565269",
+      "company": "Amazon",
+      "title": "Business Intel Engineer I, AOP",
+      "location": "Hyderabad",
+      "date": "2026-09-30",
+      "days": 1,
+      "window": "fresh",
+      "score": 95,
+      "type": "full-time",
+      "exp": "2+ years",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "Excel",
+        "Power BI",
+        "Tableau",
+        "Python",
+        "Statistics",
+        "Visualization",
+        "ETL"
+      ],
+      "fit": "Junior fit (2+ years); verified keywords: Excel, Power BI, Tableau, Python, Statistics, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10565269/business-intel-engineer-i-aop",
+      "apply": "https://account.amazon.jobs/jobs/10565269/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true
+    },
+    {
+      "id": "10563248",
+      "company": "Amazon",
+      "title": "Business Analyst Support, IN Supply Chain - Speed",
+      "location": "Bengaluru",
+      "date": "2026-09-29",
+      "days": 2,
+      "window": "fresh",
+      "score": 98,
+      "type": "full-time",
+      "exp": "1+ years",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Excel",
+        "Tableau",
+        "Statistics",
+        "Dashboards",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Excel, Tableau, Statistics, Dashboards, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10563248/business-analyst-support-in-supply-chain-speed",
+      "apply": "https://account.amazon.jobs/jobs/10563248/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true
+    },
+    {
+      "id": "R00359644",
+      "company": "Accenture",
+      "title": "S&C Global Network - AI - Hi Tech - Data Science Associate",
+      "location": "Bengaluru",
+      "date": "2026-09-29",
+      "days": 2,
+      "window": "fresh",
+      "score": 85,
+      "type": "Full-time",
+      "exp": "2+ years · official tag 0–2",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Python",
+        "Statistics"
+      ],
+      "fit": "Junior fit (2+ years); verified keywords: SQL, Python, Statistics.",
+      "detail": "https://www.accenture.com/in-en/careers/jobdetails?id=R00359644_en&title=S%26C+Global+Network+-+AI+-+Hi+Tech+-+Data+Science+Associate",
+      "apply": "https://mycareer.accenture.com/?source=careers&JRID=R00359644",
+      "source": "Accenture Careers official API",
+      "verified": true
+    },
+    {
+      "id": "AIOC-S01661070",
+      "company": "Accenture",
+      "title": "Measurement and Reporting Associate",
+      "location": "Bengaluru",
+      "date": "2026-09-29",
+      "days": 2,
+      "window": "fresh",
+      "score": 83,
+      "type": "Full-time",
+      "exp": "1+ years · official tag 0–2",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "Excel",
+        "Reporting"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: Excel, Reporting.",
+      "detail": "https://www.accenture.com/in-en/careers/jobdetails?id=AIOC-S01661070_en&title=Measurement+and+Reporting+Associate",
+      "apply": "https://mycareer.accenture.com/?source=careers&JRID=AIOC-S01661070",
+      "source": "Accenture Careers official API",
+      "verified": true
+    },
+    {
+      "id": "10561075",
+      "company": "Amazon",
+      "title": "Business Analyst I, CMT",
+      "location": "Bengaluru",
+      "date": "2026-09-28",
+      "days": 3,
+      "window": "fresh",
+      "score": 95,
+      "type": "full-time",
+      "exp": "2+ years",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Excel",
+        "Power BI",
+        "Tableau",
+        "Statistics",
+        "Dashboards",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (2+ years); verified keywords: SQL, Excel, Power BI, Tableau, Statistics, Dashboards.",
+      "detail": "https://www.amazon.jobs/en/jobs/10561075/business-analyst-i-cmt",
+      "apply": "https://account.amazon.jobs/jobs/10561075/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true
+    },
+    {
+      "id": "AIOC-S01656754",
+      "company": "Accenture",
+      "title": "Analytics and Modeling Associate",
+      "location": "Bengaluru",
+      "date": "2026-09-24",
+      "days": 7,
+      "window": "backup",
+      "score": 88,
+      "type": "Full-time",
+      "exp": "1+ years · official tag 0–2",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "Power BI",
+        "Data cleaning",
+        "Dashboards",
+        "Reporting"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: Power BI, Data cleaning, Dashboards, Reporting.",
+      "detail": "https://www.accenture.com/in-en/careers/jobdetails?id=AIOC-S01656754_en&title=Analytics+and+Modeling+Associate",
+      "apply": "https://mycareer.accenture.com/?source=careers&JRID=AIOC-S01656754",
+      "source": "Accenture Careers official API",
+      "verified": true
+    },
+    {
+      "id": "10557492",
+      "company": "Amazon",
+      "title": "Business Analyst, Catalog Support and Operations, GCO",
+      "location": "Bengaluru",
+      "date": "2026-09-23",
+      "days": 8,
+      "window": "backup",
+      "score": 90,
+      "type": "full-time",
+      "exp": "2+ years",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Excel",
+        "Tableau",
+        "Python",
+        "Statistics",
+        "Data cleaning",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (2+ years); verified keywords: SQL, Excel, Tableau, Python, Statistics, Data cleaning.",
+      "detail": "https://www.amazon.jobs/en/jobs/10557492/business-analyst-catalog-support-and-operations-gco",
+      "apply": "https://account.amazon.jobs/jobs/10557492/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true
+    },
+    {
+      "id": "AIOC-S01663615",
+      "company": "Accenture",
+      "title": "Measurement and Reporting Associate",
+      "location": "Hyderabad",
+      "date": "2026-09-21",
+      "days": 10,
+      "window": "backup",
+      "score": 93,
+      "type": "Full-time",
+      "exp": "1+ years · official tag 0–2",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Excel",
+        "Power BI",
+        "Tableau",
+        "Dashboards",
+        "Visualization",
+        "Reporting"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Excel, Power BI, Tableau, Dashboards, Visualization.",
+      "detail": "https://www.accenture.com/in-en/careers/jobdetails?id=AIOC-S01663615_en&title=Measurement+and+Reporting+Associate",
+      "apply": "https://mycareer.accenture.com/?source=careers&JRID=AIOC-S01663615",
+      "source": "Accenture Careers official API",
+      "verified": true
+    },
+    {
+      "id": "10554403",
+      "company": "Amazon",
+      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+      "location": "Bengaluru",
+      "date": "2026-09-21",
+      "days": 10,
+      "window": "backup",
+      "score": 93,
+      "type": "full-time",
+      "exp": "1+ years",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Python",
+        "Data cleaning",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Power BI, Tableau, Python, Data cleaning, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10554403/business-analyst-global-solutions-risk-compliance-gsrc",
+      "apply": "https://account.amazon.jobs/jobs/10554403/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true
+    }
+  ],
+  "duplicate_groups": [
+    {
+      "kept_job_id": "R00359644",
+      "company": "Accenture",
+      "title": "S&C Global Network - AI - Hi Tech - Data Science Associate",
+      "suppressed_job_ids": [
+        "R00359651",
+        "R00359649"
+      ]
+    },
+    {
+      "kept_job_id": "AIOC-S01661070",
+      "company": "Accenture",
+      "title": "Measurement and Reporting Associate",
+      "suppressed_job_ids": [
+        "AIOC-S01661069",
+        "AIOC-S01659409",
+        "AIOC-S01659112",
+        "AIOC-S01667140"
+      ]
+    },
+    {
+      "kept_job_id": "10554403",
+      "company": "Amazon",
+      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+      "suppressed_job_ids": [
+        "10554404",
+        "10554405",
+        "10554406",
+        "10554407"
+      ]
+    }
+  ],
+  "source_stats": [
+    {
+      "source": "Amazon",
+      "query": "data analyst",
+      "received": 90,
+      "eligible": 0,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "data analyst",
+      "received": 100,
+      "eligible": 10,
+      "error": null
+    },
+    {
+      "source": "Amazon",
+      "query": "SQL analyst",
+      "received": 0,
+      "eligible": 0,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "SQL analyst",
+      "received": 100,
+      "eligible": 9,
+      "error": null
+    },
+    {
+      "source": "Amazon",
+      "query": "Power BI analyst",
+      "received": 0,
+      "eligible": 0,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "Power BI analyst",
+      "received": 100,
+      "eligible": 10,
+      "error": null
+    },
+    {
+      "source": "Amazon",
+      "query": "analytics reporting",
+      "received": 100,
+      "eligible": 5,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "analytics reporting",
+      "received": 100,
+      "eligible": 10,
+      "error": null
+    },
+    {
+      "source": "Amazon",
+      "query": "business analyst",
+      "received": 100,
+      "eligible": 9,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "business analyst",
+      "received": 100,
+      "eligible": 5,
+      "error": null
+    },
+    {
+      "source": "Amazon",
+      "query": "data scientist",
+      "received": 100,
+      "eligible": 0,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "data scientist",
+      "received": 100,
+      "eligible": 10,
+      "error": null
+    },
+    {
+      "source": "Amazon",
+      "query": "data analytics intern",
+      "received": 0,
+      "eligible": 0,
+      "error": null
+    },
+    {
+      "source": "Accenture",
+      "query": "data analytics intern",
+      "received": 100,
+      "eligible": 10,
+      "error": null
+    }
+  ],
+  "sources": [
+    "Amazon Jobs",
+    "Accenture Careers"
+  ],
+  "policy": "Official company sources only; dates explicit; 0–15 days; minimum experience <=2; no senior titles; 2+ target skills."
+}
