@@ -1,86 +1,151 @@
-# Analytics Job Scout — Free GitHub Pages Deployment
+# Analytics Job Scout v2 — Free Career Workspace & Verified Job Intelligence
 
-A free, permanent, daily-updating job dashboard for junior analytics roles and internships.
+> **Production URL**: [https://charankumarda01.github.io/analytics-job-scout/](https://charankumarda01.github.io/analytics-job-scout/)  
+> **Hosting**: 100% Free Static GitHub Pages under the repository subpath `/analytics-job-scout/`  
+> **Scheduled Scanner**: Every day at **08:30 IST** via GitHub Actions
 
-## How the free deployment works
+Analytics Job Scout v2 turns the daily verified junior analytics job dashboard into a comprehensive, privacy-first career workspace featuring **Resume AI** and the **Daily Interview Coach**.
 
-- **GitHub Actions** runs the strict official-source scanner every day at **08:30 IST**.
-- It checks Amazon Jobs and Accenture Careers for junior Data Analyst, SQL, Power BI, reporting/analytics, analyst, and junior Data Scientist roles plus internships.
-- The workflow rebuilds and publishes the web app to **GitHub Pages**.
-- Opening the site or clicking **Refresh latest verified jobs** loads the most recently published scan.
-- Saved jobs, ATS progress and application statuses stay in your browser using local storage.
+---
 
-The site never stores company credentials and never submits applications automatically.
+## What's New in v2
 
-## Free deployment steps
+### 1. Resume AI & Explainable ATS Analyzer
+- **Local Browser-Based Parsing**: Drag-and-drop or select `.pdf`, `.docx`, or `.txt` resumes (up to 5MB) with an instant paste-text fallback. Files are parsed entirely within the browser via client-side libraries (PDF.js and Mammoth.js). No raw files or sensitive personal data are ever uploaded to any custom server.
+- **Explainable 0–100 Deterministic ATS Scoring**: Transparent point-by-point breakdown across Contact & Links, Standard Resume Sections, Analytics Hard Skills (SQL, Excel, Power BI, Tableau, Python, Statistics, ETL, Junior ML), Quantified Metrics, Strong Action Verbs, Conciseness, and Cliché Phrase deductions.
+- **Role-Aware Job Matcher**: Compare your resume against any live verified job opening from `latest.json` to calculate match percentages, matched technical keywords, and missing skill checklists.
+- **Optional AI Enhancements (Puter.js)**: After explicit consent, generate recruiter-style reviews, bullet rewrites using Google's XYZ formula, tailored cover letters, professional summaries, and job-specific interview questions.
+- **Zero-AI Offline Fallback**: If offline, CDN-blocked, or if the user declines AI, all evaluations seamlessly fallback to deterministic rule engines.
 
-### 1. Create the repository
+### 2. Daily Interview Coach
+- **10 Curated Practice Tracks**:
+  1. HR & Fresher Introduction
+  2. Behavioural / STAR
+  3. Spoken English & Communication
+  4. Data Analyst Fundamentals
+  5. SQL (Joins, CTEs, Window Functions)
+  6. Advanced Excel (PivotTables, XLOOKUP, Power Query)
+  7. Power BI & DAX
+  8. Python / pandas
+  9. Analytics Case Study & Business Metrics
+  10. Junior Data Science / Statistics / ML
+- **Job-Specific Practice Flow**: Click **"Practice for this job"** on any job card to practice with questions tailored specifically to that job's required tools and company context.
+- **Speech & Voice Integration**: Feature-detected speech recognition (`webkitSpeechRecognition`) for voice answers and interviewer read-aloud via `speechSynthesis`, with a typed textarea fallback. Audio is never recorded or retained.
+- **Transcript Metrics & Offline Rubric**: Real-time words-per-minute (WPM) pacing assessment, filler-word counting (*um, uh, like, actually, basically*), STAR component detection, and key concept matching. Strong answer guidance is revealed *after* candidate response.
+- **6 Focused Communication Drills**: 60-second self-introduction, explaining a project to a non-technical stakeholder, presenting a dashboard insight, clarifying vague requests, standup updates, and asking questions at interview close.
+- **Daily Streak Tracking**: Persistent local streak counter (calendar-date aware to prevent timezone breaks), 7-day activity chart, rolling score averages, and JSON progress export.
 
-1. Sign in to GitHub.
-2. Create a new **public** repository named `analytics-job-scout`.
-3. Do not add a README or other starter files.
+### 3. Non-Negotiable Core Job Intelligence
+- **100% Official Company Career Portals**: Only direct company listings (e.g. Amazon Jobs, Accenture Careers). Zero unverified aggregators or scraped third parties.
+- **Strict Quality Rules**:
+  - Explicit posting date required (0–15 days old; 0–5 days fresh, 6–15 days backup).
+  - True junior/entry level (minimum experience ≤ 2 years; senior/lead/manager titles eliminated).
+  - Minimum of 2 verified analytics skills per job.
+  - Live HTTP 200 application link.
+  - Apply-first ordering and duplicate suppression.
 
-### 2. Upload this project
+---
 
-**Windows shortcut:** after extracting the ZIP, double-click `DEPLOY_GITHUB_WINDOWS.bat`. It asks for your GitHub username and pushes the project. Git may open a browser so you can authorize GitHub securely.
+## Free AI Architecture & Privacy Guarantees
 
-Using GitHub Desktop is also easy:
+Analytics Job Scout adheres to a strict privacy and zero-cost design:
 
-1. Extract the deployment ZIP.
-2. In GitHub Desktop choose **File → Add local repository** and select the extracted folder.
-3. If prompted, choose **create a repository here**.
-4. Commit all files, then choose **Publish repository**.
-5. Confirm that the repository name is `analytics-job-scout` and that it is public.
+1. **Progressive Enhancement via Puter.js**:
+   - Uses the official keyless browser SDK (`puter.ai.chat(...)`).
+   - Does **not** require any paid API key (no OpenAI, Gemini, or GitHub token needed in client or server).
+   - Graceful timeout (22s) and fallback if the script is blocked by an ad-blocker or CDN outage.
+2. **Explicit Consent Gate**:
+   - File selection alone never transmits data.
+   - An explicit consent dialog is required before any prompt is dispatched to third-party AI.
+   - Users can decline and use 100% deterministic local scoring.
+3. **Prompt Injection & Data Isolation**:
+   - Resume and job data are enclosed in `<<<UNTRUSTED_CONTENT>>>` delimiters with strict system directives instructing the model to treat the text strictly as passive data.
+   - Output is rendered safely using text sanitization to protect against XSS.
+4. **Data Ownership & Storage**:
+   - By default, resumes are held in temporary **page memory only**.
+   - Resumes are only persisted if the user explicitly checks **"Remember on this device"**.
+   - Includes **"Forget resume"** and **"Delete all career data"** one-click actions.
+   - Namespaced keys (`ajs.v2.*`) with automatic migration from v1 keys and localStorage quota protection.
 
-Or use Git from a terminal:
+---
 
+## Project Structure
+
+```text
+analytics-job-scout/
+├── .github/
+│   └── workflows/
+│       └── daily-scan-pages.yml     # Scheduled daily scan (08:30 IST) & Pages deployment
+├── docs/
+│   ├── index.html                   # Main single-page web app
+│   ├── assets/
+│   │   └── app.css                  # Master stylesheet (theme, responsive, print media)
+│   ├── js/
+│   │   ├── storage.js               # Namespaced ajs.v2.* storage, migration & memory fallback
+│   │   ├── ai-client.js             # Puter.js progressive AI wrapper & prompt-injection guards
+│   │   ├── resume-agent.js          # File parsers, 0-100 ATS scoring, and job matcher
+│   │   ├── interview-coach.js       # Speech API, transcript metrics, 10 tracks, and streak
+│   │   └── app.js                   # Application coordinator & event bindings
+│   └── data/
+│       ├── latest.json              # Published daily scan data (updated automatically)
+│       └── interview-questions.json # Curated question bank (120 questions across 10 tracks)
+├── server.py                        # Python scanner and local verification test server
+├── requirements.txt                 # Dependencies for GitHub Actions scanner
+└── README.md                        # Documentation
+```
+
+---
+
+## Local Verification & Development
+
+### 1. Prerequisites
+- Python 3.10+
+- Modern Web Browser (Chrome, Edge, Firefox, Safari)
+
+### 2. Run Local Server
+To test the web app with the exact GitHub Pages `/analytics-job-scout/` subpath:
 ```bash
-git init
-git add .
-git commit -m "Deploy Analytics Job Scout"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/analytics-job-scout.git
-git push -u origin main
+python server.py --port 8000
 ```
-
-### 3. Enable GitHub Pages
-
-1. Open the repository on GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, select **GitHub Actions** as the source.
-4. Open the **Actions** tab and select **Daily verified job scan and Pages deploy**.
-5. Click **Run workflow** once if the push did not start it automatically.
-
-After the green check appears, the permanent URL is:
-
+Open your browser to:
 ```text
-https://YOUR_USERNAME.github.io/analytics-job-scout/
+http://localhost:8000/analytics-job-scout/
 ```
 
-## Daily schedule
-
-The workflow runs at **08:30 IST**. To change the time, edit the cron expression in:
-
-```text
-.github/workflows/daily-scan-pages.yml
+### 3. Run Scanner in Dry-Run Mode
+To execute the scanner locally and verify data ingestion without a browser:
+```bash
+python server.py --scan-only --output docs/data/latest.json
 ```
 
-You can also run it at any time from **GitHub → Actions → Daily verified job scan and Pages deploy → Run workflow**.
+---
 
-## Strict filters
+## GitHub Pages Setup & Deployment
 
-A role is displayed only when it has:
+1. Push changes to the `main` branch:
+   ```bash
+   git add .
+   git commit -m "Add free resume AI and daily interview coach"
+   git push origin main
+   ```
+2. Enable GitHub Pages:
+   - Navigate to **Settings → Pages** in your GitHub repository.
+   - Under **Build and deployment**, select **GitHub Actions** as the source.
+   - Go to the **Actions** tab, select **Daily verified job scan and Pages deploy**, and click **Run workflow**.
+3. Once deployed, the live site is permanently available at:
+   ```text
+   https://charankumarda01.github.io/analytics-job-scout/
+   ```
 
-- An official company source and application URL
-- A date no older than 15 days
-- No senior/lead/manager/director title
-- A minimum experience requirement of no more than 2 years, or internship/entry-level evidence
-- At least two relevant analytics skills
+---
 
-## Project structure
+## Browser Compatibility
 
-- `docs/index.html` — GitHub Pages application
-- `docs/data/latest.json` — latest bundled scan (replaced at deployment time)
-- `server.py` — official-source scanner and optional local server
-- `.github/workflows/daily-scan-pages.yml` — scheduled scan and deployment workflow
-- `requirements.txt` — Python dependency
+| Feature | Chrome / Edge | Firefox | Safari | Offline / CDN Blocked |
+| :--- | :--- | :--- | :--- | :--- |
+| **Verified Job Directory** | Supported | Supported | Supported | Supported |
+| **Deterministic ATS Analysis** | Supported | Supported | Supported | Supported |
+| **PDF/DOCX Local Parsing** | Supported | Supported | Supported | Paste-text fallback |
+| **Speech Recognition** | Supported (Webkit) | Fallback to Typed | Fallback to Typed | Fallback to Typed |
+| **Speech Synthesis (Voice)** | Supported | Supported | Supported | Fallback to Text |
+| **Optional AI (Puter.js)** | Supported | Supported | Supported | Deterministic fallback |

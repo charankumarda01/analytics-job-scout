@@ -1,6 +1,6 @@
 {
   "scan_date": "2026-10-01",
-  "scanned_at": "2026-10-01T00:11:25+05:30",
+  "scanned_at": "2026-10-01T01:34:44+05:30",
   "timezone": "Asia/Kolkata",
   "preferences": {
     "roles": [
@@ -274,8 +274,8 @@
       "company": "Accenture",
       "title": "S&C Global Network - AI - Hi Tech - Data Science Associate",
       "suppressed_job_ids": [
-        "R00359651",
-        "R00359649"
+        "R00359649",
+        "R00359651"
       ]
     },
     {
@@ -283,9 +283,9 @@
       "company": "Accenture",
       "title": "Measurement and Reporting Associate",
       "suppressed_job_ids": [
+        "AIOC-S01659112",
         "AIOC-S01661069",
         "AIOC-S01659409",
-        "AIOC-S01659112",
         "AIOC-S01667140"
       ]
     },

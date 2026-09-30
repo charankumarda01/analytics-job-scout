@@ -425,7 +425,8 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self):
-        path = urlparse(self.path).path
+        parsed = urlparse(self.path)
+        path = parsed.path
         if path == "/api/health":
             latest = latest_scan()
             self.send_json({"ok": True, "date": now_local().date().isoformat(), "latest_scan": latest.get("scan_date") if latest else None})
@@ -434,6 +435,21 @@ class Handler(SimpleHTTPRequestHandler):
             latest = latest_scan()
             self.send_json({"found": bool(latest), "data": latest})
             return
+        # Support GitHub Pages subpath /analytics-job-scout/ and root routing
+        if path == "/" or path == "/analytics-job-scout":
+            self.send_response(302)
+            self.send_header("Location", "/analytics-job-scout/")
+            self.end_headers()
+            return
+        if path == "/analytics-job-scout/":
+            self.path = "/docs/index.html"
+            if parsed.query:
+                self.path += "?" + parsed.query
+        elif path.startswith("/analytics-job-scout/"):
+            rel = path[len("/analytics-job-scout/"):]
+            self.path = "/docs/" + rel
+            if parsed.query:
+                self.path += "?" + parsed.query
         return super().do_GET()
 
     def do_POST(self):

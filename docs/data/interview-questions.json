@@ -1,0 +1,3424 @@
+{
+  "version": "2.0.0",
+  "updated_at": "2026-10-01",
+  "total_questions": 120,
+  "tracks": {
+    "hr-fresher": {
+      "title": "HR & Fresher Introduction",
+      "icon": "user",
+      "description": "Core introductory and motivational questions for junior analytics applicants."
+    },
+    "behavioral-star": {
+      "title": "Behavioural / STAR",
+      "icon": "target",
+      "description": "Scenario-based questions evaluated on Situation, Task, Action, and Result."
+    },
+    "communication": {
+      "title": "Communication & Stakeholders",
+      "icon": "message",
+      "description": "Translating data insights, managing ambiguity, and non-technical stakeholder communication."
+    },
+    "da-fundamentals": {
+      "title": "Data Analyst Fundamentals",
+      "icon": "database",
+      "description": "Data lifecycle, validation, metrics definition, and data quality assurance."
+    },
+    "sql": {
+      "title": "SQL & Relational Databases",
+      "icon": "terminal",
+      "description": "Queries, joins, aggregations, window functions, CTEs, and schema logic."
+    },
+    "excel": {
+      "title": "Advanced Excel & MIS",
+      "icon": "table",
+      "description": "Formulas, XLOOKUP, PivotTables, Power Query, and reporting pipelines."
+    },
+    "power-bi": {
+      "title": "Power BI & DAX",
+      "icon": "bar-chart",
+      "description": "Data modeling, star schema, DAX measures, visualizations, and report refresh."
+    },
+    "python-pandas": {
+      "title": "Python & Pandas",
+      "icon": "code",
+      "description": "Data manipulation, EDA, handling missing values, and analytics libraries."
+    },
+    "case-study": {
+      "title": "Case Study & Business Metrics",
+      "icon": "briefcase",
+      "description": "Root-cause diagnostics, CAC/LTV, conversion funnels, and churn analysis."
+    },
+    "data-scientist": {
+      "title": "Junior Data Science & Statistics",
+      "icon": "activity",
+      "description": "Hypothesis testing, descriptive statistics, baseline modeling, and evaluation."
+    }
+  },
+  "questions": [
+    {
+      "id": "hr_01",
+      "track": "hr-fresher",
+      "difficulty": "junior-easy",
+      "question": "Tell me about yourself and what sparked your interest in data analytics?",
+      "key_concepts": [
+        "educational background",
+        "curiosity for data",
+        "core tools (SQL/Power BI)",
+        "junior career aspiration"
+      ],
+      "sample_answer_points": [
+        "Give a concise academic/professional summary emphasizing analytical coursework or projects.",
+        "Highlight a specific moment where solving a problem with data felt rewarding.",
+        "State your target toolset (SQL, Power BI, Excel/Python) and enthusiasm for this junior role."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "sql",
+          "power bi",
+          "excel",
+          "project",
+          "data",
+          "insights",
+          "problem",
+          "learn"
+        ]
+      }
+    },
+    {
+      "id": "hr_02",
+      "track": "hr-fresher",
+      "difficulty": "junior-easy",
+      "question": "Why do you want to join our organization specifically for an entry-level analytics role?",
+      "key_concepts": [
+        "company mission",
+        "scale of data",
+        "learning culture",
+        "value delivery"
+      ],
+      "sample_answer_points": [
+        "Reference the company's domain or scale of operations (e.g. e-commerce, cloud, enterprise consulting).",
+        "Explain how the team's data environment matches your skill growth goals.",
+        "Articulate how your disciplined work ethic adds immediate value to daily reporting."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "scale",
+          "learn",
+          "value",
+          "growth",
+          "data",
+          "team",
+          "impact"
+        ]
+      }
+    },
+    {
+      "id": "hr_03",
+      "track": "hr-fresher",
+      "difficulty": "junior-medium",
+      "question": "How do you stay up-to-date with emerging tools and best practices in data analytics?",
+      "key_concepts": [
+        "continuous learning",
+        "documentation",
+        "hands-on projects",
+        "community"
+      ],
+      "sample_answer_points": [
+        "Mention following technical blogs, Microsoft Power BI release notes, or SQL challenges.",
+        "Share an example of a tool or feature you learned recently on your own (e.g. Power Query or Window Functions).",
+        "Describe testing new techniques on public datasets (like Kaggle or government open data)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "practice",
+          "project",
+          "documentation",
+          "learning",
+          "courses",
+          "skills"
+        ]
+      }
+    },
+    {
+      "id": "hr_04",
+      "track": "hr-fresher",
+      "difficulty": "junior-easy",
+      "question": "What are your top three technical strengths, and what is one skill you are actively improving?",
+      "key_concepts": [
+        "self-awareness",
+        "core tools",
+        "active improvement plan"
+      ],
+      "sample_answer_points": [
+        "Pick three concrete tools you have built projects with (e.g. SQL queries, Power BI dashboards, Excel formulas).",
+        "Name one relevant area you are developing (e.g. statistical hypothesis testing or Python automation).",
+        "Explain the exact steps or course you are taking to bridge that gap."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "sql",
+          "power bi",
+          "excel",
+          "python",
+          "improving",
+          "practice",
+          "strength"
+        ]
+      }
+    },
+    {
+      "id": "hr_05",
+      "track": "hr-fresher",
+      "difficulty": "junior-medium",
+      "question": "Walk me through the day-to-day workflow you envision as a junior data analyst.",
+      "key_concepts": [
+        "data extraction",
+        "validation",
+        "cleaning",
+        "dashboard update",
+        "stakeholder sync"
+      ],
+      "sample_answer_points": [
+        "Start with reviewing scheduled pipelines and verifying daily metric feeds.",
+        "Describe prioritizing ad-hoc data extraction requests using SQL.",
+        "Include collaborating with senior analysts to review logic and document business definitions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "extract",
+          "clean",
+          "validate",
+          "report",
+          "stakeholder",
+          "query",
+          "accuracy"
+        ]
+      }
+    },
+    {
+      "id": "hr_06",
+      "track": "hr-fresher",
+      "difficulty": "junior-easy",
+      "question": "Where do you see yourself in two to three years in the analytics field?",
+      "key_concepts": [
+        "ownership",
+        "domain expertise",
+        "advanced BI or modeling",
+        "mentorship"
+      ],
+      "sample_answer_points": [
+        "Express commitment to mastering foundational data pipelines and reporting cadences in Year 1.",
+        "Aim for taking end-to-end ownership of specific business metric dashboards by Year 2.",
+        "Expand into advanced diagnostic analytics and mentoring fresher team members by Year 3."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "growth",
+          "ownership",
+          "analytics",
+          "business",
+          "value",
+          "skills"
+        ]
+      }
+    },
+    {
+      "id": "hr_07",
+      "track": "hr-fresher",
+      "difficulty": "scenario",
+      "question": "If you are assigned a reporting task with an urgent deadline and incomplete guidelines, how do you proceed?",
+      "key_concepts": [
+        "clarification",
+        "scoping",
+        "iterative delivery",
+        "time management"
+      ],
+      "sample_answer_points": [
+        "Promptly identify core ambiguities: which decision the report supports and who is the audience.",
+        "Schedule a brief 5-minute alignment with the stakeholder or senior analyst.",
+        "Deliver a minimum viable preliminary cut to confirm alignment before polishing visuals."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "clarify",
+          "prioritize",
+          "deadline",
+          "communication",
+          "deliver",
+          "draft"
+        ]
+      }
+    },
+    {
+      "id": "hr_08",
+      "track": "hr-fresher",
+      "difficulty": "junior-medium",
+      "question": "Describe an analytics project where you worked under time pressure. How did you organize your work?",
+      "key_concepts": [
+        "planning",
+        "milestones",
+        "validation under pressure",
+        "outcome"
+      ],
+      "sample_answer_points": [
+        "Set the context: academic project, hackathon, or internship deliverable.",
+        "Describe breaking the problem down: schema inspection -> SQL transformations -> visual layout.",
+        "State the final result and what you learned about time budgeting."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "situation",
+          "task",
+          "action",
+          "result",
+          "time",
+          "priority",
+          "deadline"
+        ]
+      }
+    },
+    {
+      "id": "hr_09",
+      "track": "hr-fresher",
+      "difficulty": "junior-easy",
+      "question": "How do you handle constructive criticism or feedback on your code and analysis?",
+      "key_concepts": [
+        "growth mindset",
+        "code review",
+        "quality assurance",
+        "humility"
+      ],
+      "sample_answer_points": [
+        "View feedback as an essential quality check rather than a personal evaluation.",
+        "Describe thanking the reviewer and asking clarifying questions on edge cases.",
+        "Document the learning in personal notes or unit checklists to prevent repeating the mistake."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "feedback",
+          "learn",
+          "review",
+          "improve",
+          "quality",
+          "team"
+        ]
+      }
+    },
+    {
+      "id": "hr_10",
+      "track": "hr-fresher",
+      "difficulty": "junior-medium",
+      "question": "What is the difference between an analytical mindset and simply knowing how to operate software like Excel or Power BI?",
+      "key_concepts": [
+        "business context",
+        "critical thinking",
+        "hypothesis",
+        "tool vs thinking"
+      ],
+      "sample_answer_points": [
+        "Software tools are execution vehicles; an analytical mindset understands 'why' a number moves.",
+        "Explain verifying source assumptions, identifying confounders, and asking what decision the data informs.",
+        "Give a quick example where clean numbers can still lead to the wrong business conclusion without domain context."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "why",
+          "decision",
+          "business",
+          "context",
+          "critical thinking",
+          "tool"
+        ]
+      }
+    },
+    {
+      "id": "hr_11",
+      "track": "hr-fresher",
+      "difficulty": "scenario",
+      "question": "You realize a report you distributed this morning had an incorrect calculation. What do you do immediately?",
+      "key_concepts": [
+        "integrity",
+        "transparency",
+        "rapid correction",
+        "root cause fix"
+      ],
+      "sample_answer_points": [
+        "Acknowledge the error immediately to stakeholders before they make decisions on flawed numbers.",
+        "Provide a clear correction timeline and share the revised numbers with a changelog.",
+        "Conduct a root-cause check (e.g. duplicate row join) and add an automated verification rule."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "transparency",
+          "immediate",
+          "correction",
+          "stakeholders",
+          "root cause",
+          "prevent"
+        ]
+      }
+    },
+    {
+      "id": "hr_12",
+      "track": "hr-fresher",
+      "difficulty": "junior-easy",
+      "question": "What questions do you have for us about this analytics team and our day-to-day stack?",
+      "key_concepts": [
+        "candidate engagement",
+        "data infrastructure",
+        "team collaboration"
+      ],
+      "sample_answer_points": [
+        "Ask about the primary data warehouse (e.g. Snowflake, Redshift, BigQuery) and daily refresh cadences.",
+        "Ask how junior analysts typically collaborate with business teams and senior mentors.",
+        "Ask what a successful first 90 days would look like in this role."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "stack",
+          "warehouse",
+          "mentorship",
+          "goals",
+          "collaboration",
+          "cadence"
+        ]
+      }
+    },
+    {
+      "id": "star_01",
+      "track": "behavioral-star",
+      "difficulty": "junior-medium",
+      "question": "Describe a time when you uncovered an unexpected pattern or anomaly in a dataset. Use the STAR method.",
+      "key_concepts": [
+        "STAR format",
+        "anomaly detection",
+        "investigation",
+        "business action"
+      ],
+      "sample_answer_points": [
+        "Situation: Detail the dataset and original objective.",
+        "Task: Identify the specific metric spike, drop, or duplicate record.",
+        "Action: Explain the SQL or Excel drill-down steps taken to verify the anomaly.",
+        "Result: Share the operational outcome or savings resulting from catching it early."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "situation",
+          "task",
+          "action",
+          "result",
+          "anomaly",
+          "investigate",
+          "resolved"
+        ]
+      }
+    },
+    {
+      "id": "star_02",
+      "track": "behavioral-star",
+      "difficulty": "junior-medium",
+      "question": "Tell me about a situation where you had to work with messy or incomplete data. How did you ensure your conclusions were valid?",
+      "key_concepts": [
+        "data cleaning",
+        "imputation vs dropping",
+        "validation checks",
+        "documentation"
+      ],
+      "sample_answer_points": [
+        "Situation: Name the project and the nature of the data issues (nulls, formats, duplicates).",
+        "Task: Determine how much data could be salvaged without skewing business KPIs.",
+        "Action: Built transformation logic in SQL/Power Query and cross-checked against independent totals.",
+        "Result: Delivered an audit report showing data quality improvements."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "messy",
+          "clean",
+          "null",
+          "validate",
+          "transformation",
+          "accuracy",
+          "result"
+        ]
+      }
+    },
+    {
+      "id": "star_03",
+      "track": "behavioral-star",
+      "difficulty": "scenario",
+      "question": "Describe a time you disagreed with a teammate or project partner regarding which metric or chart to use. How was it resolved?",
+      "key_concepts": [
+        "objective evaluation",
+        "user focus",
+        "A/B comparison",
+        "constructive alignment"
+      ],
+      "sample_answer_points": [
+        "Situation: Conflicting ideas on representing churn or conversion.",
+        "Task: Agree on the most intuitive visual that supports decision-making without distortion.",
+        "Action: Created both mockups, tested them with a mock stakeholder, and compared cognitive load.",
+        "Result: Reached unanimous agreement on the clearer visual."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "disagreement",
+          "listen",
+          "objective",
+          "mockup",
+          "stakeholder",
+          "resolution"
+        ]
+      }
+    },
+    {
+      "id": "star_04",
+      "track": "behavioral-star",
+      "difficulty": "junior-easy",
+      "question": "Tell me about a technical skill you had to teach yourself quickly to complete an analytics task.",
+      "key_concepts": [
+        "self-directed learning",
+        "rapid application",
+        "resourcefulness"
+      ],
+      "sample_answer_points": [
+        "Situation: Needed a technique not covered in class (e.g. DAX time intelligence or SQL windowing).",
+        "Task: Deliver the dashboard or report within 48 hours.",
+        "Action: Studied official documentation, completed focused tutorials, and tested against toy datasets.",
+        "Result: Successfully implemented the logic with zero calculation errors."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "learned",
+          "fast",
+          "applied",
+          "tutorial",
+          "delivered",
+          "outcome"
+        ]
+      }
+    },
+    {
+      "id": "star_05",
+      "track": "behavioral-star",
+      "difficulty": "junior-medium",
+      "question": "Give an example of when you had to prioritize multiple competing analytics requests. How did you decide what to do first?",
+      "key_concepts": [
+        "business impact",
+        "effort estimation",
+        "transparent communication"
+      ],
+      "sample_answer_points": [
+        "Situation: Simultaneously received requests for executive dashboard updates and ad-hoc extracts.",
+        "Task: Prevent bottlenecking critical operations while meeting stakeholder expectations.",
+        "Action: Evaluated impact vs effort, prioritized the decision-blocking request, and communicated ETA for the rest.",
+        "Result: Delivered all tasks without missed deadlines."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "priority",
+          "impact",
+          "effort",
+          "deadline",
+          "communicated",
+          "completed"
+        ]
+      }
+    },
+    {
+      "id": "star_06",
+      "track": "behavioral-star",
+      "difficulty": "scenario",
+      "question": "Describe a project that did not go according to plan. What happened and what did you learn?",
+      "key_concepts": [
+        "accountability",
+        "root cause reflection",
+        "preventative action"
+      ],
+      "sample_answer_points": [
+        "Situation: A dashboard load time was too slow or scope crept beyond initial agreement.",
+        "Task: Correct the trajectory before project finalization.",
+        "Action: Refactored data models (moved calculations to SQL/Power Query) and re-baselined scope.",
+        "Result: Improved load speed by 60% and instituted formal project briefs for future work."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "challenge",
+          "mistake",
+          "action",
+          "learned",
+          "performance",
+          "result"
+        ]
+      }
+    },
+    {
+      "id": "star_07",
+      "track": "behavioral-star",
+      "difficulty": "junior-medium",
+      "question": "Tell me about a time you had to present findings to someone who was skeptical of data.",
+      "key_concepts": [
+        "empathy",
+        "simplification",
+        "source transparency",
+        "actionable takeaway"
+      ],
+      "sample_answer_points": [
+        "Situation: Operational lead preferred intuition over newly calculated metrics.",
+        "Task: Build confidence in the underlying methodology.",
+        "Action: Walked through sample raw transactions side-by-side with the aggregated metrics.",
+        "Result: Secured stakeholder sign-off and adoption of the monthly tracking view."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "skeptical",
+          "trust",
+          "walkthrough",
+          "transparent",
+          "adopted",
+          "result"
+        ]
+      }
+    },
+    {
+      "id": "star_08",
+      "track": "behavioral-star",
+      "difficulty": "junior-easy",
+      "question": "Describe a time you automated a manual, repetitive data task. What was the measurable impact?",
+      "key_concepts": [
+        "automation",
+        "efficiency",
+        "time saved",
+        "error reduction"
+      ],
+      "sample_answer_points": [
+        "Situation: Weekly copy-pasting across Excel sheets taking 3 hours every Monday.",
+        "Task: Create a repeatable refresh mechanism.",
+        "Action: Built a Power Query pipeline or SQL script with automated data cleansing.",
+        "Result: Reduced task duration from 3 hours to 5 minutes with zero manual transcript errors."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "automated",
+          "power query",
+          "sql",
+          "hours",
+          "saved",
+          "error",
+          "percent"
+        ]
+      }
+    },
+    {
+      "id": "star_09",
+      "track": "behavioral-star",
+      "difficulty": "scenario",
+      "question": "Tell me about a time you noticed a data privacy or confidentiality concern. How did you respond?",
+      "key_concepts": [
+        "compliance",
+        "PII masking",
+        "escalation",
+        "data governance"
+      ],
+      "sample_answer_points": [
+        "Situation: An internal reporting export contained unhashed customer phone numbers or emails.",
+        "Task: Prevent exposure of PII without breaking reporting dependencies.",
+        "Action: Alerted the team lead, replaced plain values with synthetic surrogate keys, and restricted file permissions.",
+        "Result: Protected customer privacy and established standard masking rules for subsequent extracts."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "pii",
+          "privacy",
+          "masking",
+          "security",
+          "governance",
+          "prevent"
+        ]
+      }
+    },
+    {
+      "id": "star_10",
+      "track": "behavioral-star",
+      "difficulty": "junior-medium",
+      "question": "Describe a situation where you received conflicting instructions from two senior team members. How did you handle it?",
+      "key_concepts": [
+        "alignment",
+        "professionalism",
+        "clarifying business goals"
+      ],
+      "sample_answer_points": [
+        "Situation: One senior requested raw transaction granularity, another wanted high-level executive aggregations.",
+        "Task: Prevent delivering duplicated effort or contradictory views.",
+        "Action: Scheduled a quick sync outlining both approaches and suggested a drill-down architecture.",
+        "Result: Both seniors agreed on a single hierarchical dashboard satisfying both needs."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "conflict",
+          "clarify",
+          "communication",
+          "solution",
+          "alignment",
+          "outcome"
+        ]
+      }
+    },
+    {
+      "id": "star_11",
+      "track": "behavioral-star",
+      "difficulty": "junior-easy",
+      "question": "Tell me about a time you worked in a group where someone wasn't pulling their weight. How did you ensure the project succeeded?",
+      "key_concepts": [
+        "leadership",
+        "collaboration",
+        "empathy",
+        "delivery"
+      ],
+      "sample_answer_points": [
+        "Situation: Team member fell behind on data extraction during a capstone analytics project.",
+        "Task: Keep overall project delivery on schedule without hostility.",
+        "Action: Checked in privately, discovered they were stuck on SQL joins, paired for 45 minutes to unblock them.",
+        "Result: Met final presentation deadline and received full marks."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "team",
+          "support",
+          "unblock",
+          "deadline",
+          "collaborate",
+          "result"
+        ]
+      }
+    },
+    {
+      "id": "star_12",
+      "track": "behavioral-star",
+      "difficulty": "junior-medium",
+      "question": "Describe a time you had to justify a recommendation using numbers rather than opinions. What was the outcome?",
+      "key_concepts": [
+        "evidence-based decision",
+        "quantification",
+        "stakeholder persuasion"
+      ],
+      "sample_answer_points": [
+        "Situation: Opinion was divided on whether to promote Product Category A or B.",
+        "Task: Provide empirical data on margin, return rate, and customer lifetime value.",
+        "Action: Analyzed 24 months of order history in SQL and created an opportunity cost breakdown.",
+        "Result: Stakeholders aligned on Category B, driving 18% higher net margins."
+      ],
+      "rubric": {
+        "star_applicable": true,
+        "keywords": [
+          "data",
+          "evidence",
+          "sql",
+          "analysis",
+          "decision",
+          "percent",
+          "margin"
+        ]
+      }
+    },
+    {
+      "id": "comm_01",
+      "track": "communication",
+      "difficulty": "junior-medium",
+      "question": "How do you explain the difference between correlation and causation to a marketing executive with no statistical background?",
+      "key_concepts": [
+        "plain language",
+        "real-world analogy",
+        "business risk of false causation"
+      ],
+      "sample_answer_points": [
+        "Use an intuitive analogy (e.g. ice cream sales and sunburns both rising in summer due to temperature).",
+        "Explain that two metrics moving together does not guarantee that changing one will change the other.",
+        "Advise on running controlled experiments (A/B tests) before committing large ad budgets."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "analogy",
+          "example",
+          "experiment",
+          "cause",
+          "decision",
+          "marketing"
+        ]
+      }
+    },
+    {
+      "id": "comm_02",
+      "track": "communication",
+      "difficulty": "scenario",
+      "question": "A sales manager says: 'Our dashboard numbers are wrong. My team closed 50 deals, but your report shows 42.' How do you respond and investigate?",
+      "key_concepts": [
+        "de-escalation",
+        "active listening",
+        "definition alignment (booking vs invoiced)",
+        "collaborative check"
+      ],
+      "sample_answer_points": [
+        "Acknowledge the concern warmly and avoid defensive arguments.",
+        "Check business definition differences (e.g. signed contract date vs revenue recognized date).",
+        "Inspect filter criteria (date range, canceled orders, test accounts).",
+        "Schedule a brief screen-share to reconcile the exact 8 missing transactions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "listen",
+          "definition",
+          "date filter",
+          "reconcile",
+          "collaborate",
+          "transparency"
+        ]
+      }
+    },
+    {
+      "id": "comm_03",
+      "track": "communication",
+      "difficulty": "junior-easy",
+      "question": "What is your approach when a business user asks for 'all the data' in a giant raw Excel file?",
+      "key_concepts": [
+        "consultative questioning",
+        "understanding business goal",
+        "performance & security"
+      ],
+      "sample_answer_points": [
+        "Politely ask what business decision or specific question they are trying to answer.",
+        "Explain risks of handling multi-million-row raw extracts (crashing, outdated static numbers).",
+        "Offer a tailored dashboard or filtered summary view with drill-through capability."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "question",
+          "goal",
+          "summary",
+          "drill-down",
+          "performance",
+          "tailored"
+        ]
+      }
+    },
+    {
+      "id": "comm_04",
+      "track": "communication",
+      "difficulty": "junior-medium",
+      "question": "Give a 60-second spoken summary of how you would present a 15% drop in month-over-month app engagement.",
+      "key_concepts": [
+        "headline first",
+        "diagnosed root cause",
+        "actionable recommendation"
+      ],
+      "sample_answer_points": [
+        "State the headline clearly: 'Active user engagement dropped 15% in September.'",
+        "Present the primary root cause: '80% of the drop was concentrated in Android users following release v2.4.'",
+        "Deliver the next step: 'Engineering has identified a login latency bug; rolling back restores baseline metrics.'"
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "headline",
+          "drop",
+          "root cause",
+          "segment",
+          "recommendation",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "comm_05",
+      "track": "communication",
+      "difficulty": "junior-easy",
+      "question": "How do you choose between an interactive dashboard, an email bullet summary, and a detailed slide deck?",
+      "key_concepts": [
+        "audience persona",
+        "decision cadence",
+        "cognitive load"
+      ],
+      "sample_answer_points": [
+        "Dashboards: for operational monitoring and self-service daily/weekly exploration.",
+        "Email bullets: for immediate executive heads-up requiring instant awareness.",
+        "Slide decks: for quarterly strategic reviews and high-stakes stakeholder proposals."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "executive",
+          "operational",
+          "cadence",
+          "audience",
+          "action",
+          "dashboard"
+        ]
+      }
+    },
+    {
+      "id": "comm_06",
+      "track": "communication",
+      "difficulty": "scenario",
+      "question": "You discover that a senior manager's pet project is performing significantly worse than anticipated. How do you present this data diplomatically?",
+      "key_concepts": [
+        "objective data",
+        "no personal blame",
+        "constructive pivots",
+        "private preview"
+      ],
+      "sample_answer_points": [
+        "Preview the numbers with the manager privately before presenting to the broader leadership.",
+        "Frame the data neutrally around target KPIs vs actuals rather than labeling it a failure.",
+        "Highlight what customer behavior the data reveals and suggest constructive pivot options."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "private",
+          "objective",
+          "neutral",
+          "constructive",
+          "recommendation",
+          "pivots"
+        ]
+      }
+    },
+    {
+      "id": "comm_07",
+      "track": "communication",
+      "difficulty": "junior-easy",
+      "question": "What techniques do you use to ensure your dashboard visuals are accessible and easy to interpret for colorblind users?",
+      "key_concepts": [
+        "accessible palettes",
+        "text labels",
+        "icon cues",
+        "high contrast"
+      ],
+      "sample_answer_points": [
+        "Avoid relying solely on red/green encoding; use blue/orange or teal/amber palettes.",
+        "Pair colors with text callouts, trend arrows, or distinct shape markers.",
+        "Verify contrast ratios meet WCAG standards."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "colorblind",
+          "contrast",
+          "labels",
+          "shapes",
+          "palette",
+          "wcag"
+        ]
+      }
+    },
+    {
+      "id": "comm_08",
+      "track": "communication",
+      "difficulty": "junior-medium",
+      "question": "How do you handle documenting technical logic (like SQL scripts or DAX measures) so other analysts can maintain your work?",
+      "key_concepts": [
+        "inline comments",
+        "standard naming conventions",
+        "data dictionary",
+        "version control"
+      ],
+      "sample_answer_points": [
+        "Use explicit column naming (e.g. `order_total_inr` instead of `tot`).",
+        "Add inline comments explaining non-obvious business rules (e.g. why certain status IDs are excluded).",
+        "Maintain a shared data dictionary with metric definitions and refresh cadences."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "comments",
+          "naming",
+          "dictionary",
+          "git",
+          "maintainable",
+          "documentation"
+        ]
+      }
+    },
+    {
+      "id": "comm_09",
+      "track": "communication",
+      "difficulty": "scenario",
+      "question": "A stakeholder asks you to change a chart scale so that modest growth appears dramatically steeper. How do you respond professionally?",
+      "key_concepts": [
+        "data ethics",
+        "misleading visuals",
+        "alternative valid views"
+      ],
+      "sample_answer_points": [
+        "Explain that truncating the Y-axis distorts proportions and risks damaging team credibility with executives.",
+        "Suggest showing the percentage growth callout card prominently next to the honest zero-baseline chart.",
+        "Offer to show a secondary drill-down focusing on recent cohort acceleration."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "ethics",
+          "zero baseline",
+          "credibility",
+          "distortion",
+          "professional",
+          "callout"
+        ]
+      }
+    },
+    {
+      "id": "comm_10",
+      "track": "communication",
+      "difficulty": "junior-easy",
+      "question": "How do you prepare for an important data presentation when you know executives will only have 5 minutes?",
+      "key_concepts": [
+        "BLUF (Bottom Line Up Front)",
+        "one primary takeaway",
+        "appendix readiness"
+      ],
+      "sample_answer_points": [
+        "Put the bottom line and decision requirement on Slide 1 (no suspense build-up).",
+        "Limit presentation to 3 key numbers: Current state, Gap/Opportunity, and Recommended next action.",
+        "Place methodology and deep-dive charts in the appendix ready for questions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "headline",
+          "bottom line",
+          "decision",
+          "appendix",
+          "concise",
+          "action"
+        ]
+      }
+    },
+    {
+      "id": "comm_11",
+      "track": "communication",
+      "difficulty": "scenario",
+      "question": "During a presentation, someone asks a technical data question you do not know the answer to. What do you say?",
+      "key_concepts": [
+        "honesty",
+        "no fabricating",
+        "clear follow-up commitment"
+      ],
+      "sample_answer_points": [
+        "Acknowledge the question directly: 'That is a great question; I want to verify the exact table join before giving a definitive number.'",
+        "Avoid guessing or speculating on unverified metrics.",
+        "Commit to a concrete deadline: 'I will inspect the raw logs and follow up by 3:00 PM today.'"
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "honest",
+          "verify",
+          "follow up",
+          "timeframe",
+          "check",
+          "accuracy"
+        ]
+      }
+    },
+    {
+      "id": "comm_12",
+      "track": "communication",
+      "difficulty": "junior-medium",
+      "question": "How do you gather requirements from a business user who struggles to describe what data they need?",
+      "key_concepts": [
+        "open-ended questions",
+        "sketching mockups",
+        "decision-driven framing"
+      ],
+      "sample_answer_points": [
+        "Ask: 'What decision do you need to make on Monday morning that you cannot make right now?'",
+        "Draw quick pen-and-paper layout sketches together to confirm visual expectations.",
+        "Agree on sample mock data before writing complex production queries."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "decision",
+          "mockup",
+          "sketch",
+          "open-ended",
+          "requirements",
+          "clarify"
+        ]
+      }
+    },
+    {
+      "id": "daf_01",
+      "track": "da-fundamentals",
+      "difficulty": "junior-easy",
+      "question": "What are the core stages of the data analysis lifecycle, from raw data to business impact?",
+      "key_concepts": [
+        "ask",
+        "prepare",
+        "process/clean",
+        "analyze",
+        "share/visualize",
+        "act"
+      ],
+      "sample_answer_points": [
+        "Stage 1: Define the business question and target outcome.",
+        "Stage 2: Collect, inspect, and clean the dataset (handling nulls/duplicates).",
+        "Stage 3: Exploratory analysis and statistical modeling.",
+        "Stage 4: Visual storytelling and driving decision implementation."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "question",
+          "clean",
+          "extract",
+          "analyze",
+          "visualize",
+          "decision",
+          "impact"
+        ]
+      }
+    },
+    {
+      "id": "daf_02",
+      "track": "da-fundamentals",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between structured, semi-structured, and unstructured data? Give examples.",
+      "key_concepts": [
+        "relational tables",
+        "JSON/XML/logs",
+        "text/images/audio"
+      ],
+      "sample_answer_points": [
+        "Structured: Relational SQL tables with strict schemas and data types.",
+        "Semi-structured: JSON or XML documents with key-value pairs but flexible schema.",
+        "Unstructured: PDFs, freeform text emails, images, and audio recordings."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "structured",
+          "semi-structured",
+          "unstructured",
+          "sql",
+          "json",
+          "schema",
+          "table"
+        ]
+      }
+    },
+    {
+      "id": "daf_03",
+      "track": "da-fundamentals",
+      "difficulty": "junior-medium",
+      "question": "What is data validation, and what automated checks would you implement on a daily sales feed?",
+      "key_concepts": [
+        "data quality",
+        "null checks",
+        "range checks",
+        "duplicate keys",
+        "referential integrity"
+      ],
+      "sample_answer_points": [
+        "Primary key uniqueness check to catch duplicate ingestions.",
+        "Non-negative numeric checks on prices and quantities sold.",
+        "Foreign key referential checks against product and customer dimension tables.",
+        "Row count anomaly alerts (e.g. sudden 80% volume drop vs 30-day average)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "validate",
+          "primary key",
+          "duplicates",
+          "nulls",
+          "anomaly",
+          "integrity",
+          "range"
+        ]
+      }
+    },
+    {
+      "id": "daf_04",
+      "track": "da-fundamentals",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between primary keys, foreign keys, and surrogate keys.",
+      "key_concepts": [
+        "entity uniqueness",
+        "relational integrity",
+        "synthetic IDs"
+      ],
+      "sample_answer_points": [
+        "Primary Key: Unique identifier for each record in a table, cannot be NULL.",
+        "Foreign Key: Field matching the Primary Key in another table, enforcing referential links.",
+        "Surrogate Key: System-generated integer or GUID (like auto-increment ID) independent of business data."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "primary key",
+          "foreign key",
+          "surrogate key",
+          "unique",
+          "referential",
+          "null"
+        ]
+      }
+    },
+    {
+      "id": "daf_05",
+      "track": "da-fundamentals",
+      "difficulty": "junior-medium",
+      "question": "What is an anomaly or outlier, and how do you decide whether to remove, cap, or keep it?",
+      "key_concepts": [
+        "outlier detection",
+        "IQR / Z-score",
+        "business significance",
+        "data entry error"
+      ],
+      "sample_answer_points": [
+        "Identify outliers via visual inspection (boxplots, scatter) or statistical metrics (IQR, 3 sigma).",
+        "Determine cause: If it is an obvious system error (e.g. age = 999), correct or filter it out.",
+        "If it is a legitimate extreme event (e.g. black swan VIP order), keep it and analyze it in a separate segment."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "outlier",
+          "iqr",
+          "z-score",
+          "boxplot",
+          "segment",
+          "investigate",
+          "error"
+        ]
+      }
+    },
+    {
+      "id": "daf_06",
+      "track": "da-fundamentals",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between a KPI, a metric, and a dimension?",
+      "key_concepts": [
+        "business goals",
+        "quantifiable values",
+        "categorical attributes"
+      ],
+      "sample_answer_points": [
+        "Dimension: Qualitative context or filter category (e.g. Region, Device Type, Month).",
+        "Metric: Any quantifiable measure (e.g. Clicks, Units Sold, Page Views).",
+        "KPI: A high-priority metric tied directly to an organizational business target (e.g. Net Churn Rate < 3%)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "kpi",
+          "metric",
+          "dimension",
+          "target",
+          "measure",
+          "category",
+          "business"
+        ]
+      }
+    },
+    {
+      "id": "daf_07",
+      "track": "da-fundamentals",
+      "difficulty": "junior-medium",
+      "question": "What is ETL vs ELT, and why has modern cloud warehousing shifted toward ELT?",
+      "key_concepts": [
+        "extract transform load",
+        "cloud compute",
+        "Snowflake/BigQuery",
+        "raw data preservation"
+      ],
+      "sample_answer_points": [
+        "ETL: Transforms data before loading into the storage layer (used when storage/compute was costly).",
+        "ELT: Loads raw data directly into the cloud warehouse first, then transforms using SQL at scale.",
+        "ELT benefits: Preserves raw history, enables ad-hoc downstream transformations, leverages warehouse compute."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "etl",
+          "elt",
+          "transform",
+          "load",
+          "cloud",
+          "warehouse",
+          "raw data"
+        ]
+      }
+    },
+    {
+      "id": "daf_08",
+      "track": "da-fundamentals",
+      "difficulty": "junior-easy",
+      "question": "How do you distinguish between quantitative and qualitative data? How does that impact visualization?",
+      "key_concepts": [
+        "continuous/discrete numbers",
+        "nominal/ordinal text",
+        "chart selection"
+      ],
+      "sample_answer_points": [
+        "Quantitative: Numerical values (Continuous like revenue, Discrete like headcount) visualized via bar, line, histogram.",
+        "Qualitative: Categorical attributes (Nominal like department, Ordinal like survey ratings 1-5).",
+        "Helps prevent common mistakes like calculating the 'average' of a postal code or phone number."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "quantitative",
+          "qualitative",
+          "continuous",
+          "discrete",
+          "nominal",
+          "ordinal",
+          "chart"
+        ]
+      }
+    },
+    {
+      "id": "daf_09",
+      "track": "da-fundamentals",
+      "difficulty": "junior-medium",
+      "question": "What is Simpson's Paradox, and why is it dangerous in business reporting?",
+      "key_concepts": [
+        "aggregated vs subgroup trends",
+        "confounding variable",
+        "misleading conclusions"
+      ],
+      "sample_answer_points": [
+        "A phenomenon where a trend appears in multiple individual subgroups but reverses when combined.",
+        "Caused by an unobserved confounding variable or unequal sample sizes across groups.",
+        "Example: Conversion rate looks higher overall in Strategy A, but Strategy B wins in every individual market."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "simpson's paradox",
+          "subgroup",
+          "aggregate",
+          "confounding",
+          "trend",
+          "reversal"
+        ]
+      }
+    },
+    {
+      "id": "daf_10",
+      "track": "da-fundamentals",
+      "difficulty": "junior-easy",
+      "question": "What is data hygiene, and what are three common data entry problems you frequently find?",
+      "key_concepts": [
+        "data cleansing",
+        "whitespace",
+        "inconsistent casing",
+        "mixed date formats"
+      ],
+      "sample_answer_points": [
+        "Leading and trailing spaces (e.g. ' Delhi' vs 'Delhi').",
+        "Inconsistent text casing (e.g. 'active', 'ACTIVE', 'Active') fragmenting grouped totals.",
+        "Mixed date formats (DD/MM/YYYY vs MM/DD/YYYY) causing month-day transpositions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "hygiene",
+          "trim",
+          "casing",
+          "date format",
+          "cleaning",
+          "duplicates"
+        ]
+      }
+    },
+    {
+      "id": "daf_11",
+      "track": "da-fundamentals",
+      "difficulty": "junior-medium",
+      "question": "What is a slowly changing dimension (SCD), and how do Type 1 and Type 2 handle history?",
+      "key_concepts": [
+        "dimension history",
+        "overwrite (Type 1)",
+        "versioning (Type 2)",
+        "valid from/to dates"
+      ],
+      "sample_answer_points": [
+        "SCD handles how historical dimension changes (e.g. customer address change) are stored.",
+        "Type 1: Overwrites old data with new data (no history retained).",
+        "Type 2: Adds a new record with effective date ranges and active flags, preserving exact point-in-time history."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "scd",
+          "type 1",
+          "type 2",
+          "history",
+          "overwrite",
+          "effective date",
+          "dimension"
+        ]
+      }
+    },
+    {
+      "id": "daf_12",
+      "track": "da-fundamentals",
+      "difficulty": "scenario",
+      "question": "You are auditing a table of 100,000 orders and find 500 rows where order_date is in the future. How do you investigate?",
+      "key_concepts": [
+        "timezone mismatch",
+        "scheduled orders",
+        "system clock error",
+        "quarantine"
+      ],
+      "sample_answer_points": [
+        "Check if the system supports pre-scheduled or subscription orders where future dates are intentional.",
+        "Inspect server timezone offsets (e.g. UTC vs IST differences around midnight).",
+        "Quarantine the anomalous records and verify against payment gateway timestamps."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "future date",
+          "timezone",
+          "audit",
+          "investigate",
+          "scheduled",
+          "system error"
+        ]
+      }
+    },
+    {
+      "id": "sql_01",
+      "track": "sql",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between WHERE and HAVING in SQL? Give a clear scenario for each.",
+      "key_concepts": [
+        "row filter vs aggregate filter",
+        "execution order",
+        "GROUP BY"
+      ],
+      "sample_answer_points": [
+        "`WHERE` filters individual rows *before* aggregation takes place.",
+        "`HAVING` filters aggregated groups *after* `GROUP BY` calculation.",
+        "Example: `WHERE order_status = 'Completed'` filters rows; `HAVING SUM(amount) > 10000` filters customer totals."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "where",
+          "having",
+          "group by",
+          "aggregate",
+          "rows",
+          "before",
+          "after"
+        ]
+      }
+    },
+    {
+      "id": "sql_02",
+      "track": "sql",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between INNER JOIN, LEFT JOIN, and FULL OUTER JOIN.",
+      "key_concepts": [
+        "matching keys",
+        "preservation of unmatched rows",
+        "NULL handling"
+      ],
+      "sample_answer_points": [
+        "`INNER JOIN`: Returns only rows with matching keys in both tables.",
+        "`LEFT JOIN`: Returns all rows from the left table and matched rows from the right (filling NULLs for non-matches).",
+        "`FULL OUTER JOIN`: Returns all records when there is a match in either left or right table."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "inner",
+          "left",
+          "outer",
+          "null",
+          "keys",
+          "matching",
+          "table"
+        ]
+      }
+    },
+    {
+      "id": "sql_03",
+      "track": "sql",
+      "difficulty": "junior-medium",
+      "question": "What are SQL Window Functions, and how does ROW_NUMBER() differ from RANK() and DENSE_RANK()?",
+      "key_concepts": [
+        "OVER clause",
+        "PARTITION BY",
+        "handling ties",
+        "skipping ranks"
+      ],
+      "sample_answer_points": [
+        "Window functions perform calculations across related row sets without collapsing them into a single row.",
+        "`ROW_NUMBER()`: Always assigns unique sequential integers (1, 2, 3, 4).",
+        "`RANK()`: Ties get the same rank, but subsequent ranks skip numbers (1, 2, 2, 4).",
+        "`DENSE_RANK()`: Ties get the same rank with no skipping (1, 2, 2, 3)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "window",
+          "over",
+          "partition by",
+          "row_number",
+          "rank",
+          "dense_rank",
+          "ties"
+        ]
+      }
+    },
+    {
+      "id": "sql_04",
+      "track": "sql",
+      "difficulty": "junior-medium",
+      "question": "How do you identify and remove duplicate rows in a SQL table without a primary key?",
+      "key_concepts": [
+        "ROW_NUMBER()",
+        "CTE",
+        "PARTITION BY",
+        "DELETE join"
+      ],
+      "sample_answer_points": [
+        "Use a Common Table Expression (CTE) with `ROW_NUMBER() OVER (PARTITION BY col1, col2, col3 ORDER BY created_at)`.",
+        "Assign numbers to duplicate instances where `row_num > 1`.",
+        "Execute `DELETE FROM cte WHERE row_num > 1` or select `WHERE row_num = 1` into a clean table."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "cte",
+          "row_number",
+          "partition by",
+          "duplicate",
+          "delete",
+          "filter"
+        ]
+      }
+    },
+    {
+      "id": "sql_05",
+      "track": "sql",
+      "difficulty": "junior-medium",
+      "question": "What is a Common Table Expression (CTE) and when is it preferred over a subquery or temporary table?",
+      "key_concepts": [
+        "WITH clause",
+        "readability",
+        "modularity",
+        "recursion"
+      ],
+      "sample_answer_points": [
+        "A CTE is defined using `WITH cte_name AS (...)` to create a temporary, named result set for a single query.",
+        "Improves readability compared to deeply nested subqueries by creating sequential, self-documenting logic.",
+        "Useful for multi-step data transformations and hierarchical recursive queries."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "with",
+          "cte",
+          "subquery",
+          "readable",
+          "temporary",
+          "modularity"
+        ]
+      }
+    },
+    {
+      "id": "sql_06",
+      "track": "sql",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between UNION and UNION ALL? What are the performance implications?",
+      "key_concepts": [
+        "de-duplication",
+        "sorting overhead",
+        "performance"
+      ],
+      "sample_answer_points": [
+        "`UNION ALL` combines results keeping all rows, including duplicates, without sorting.",
+        "`UNION` runs a deduplication step equivalent to a distinct sort, making it significantly slower on large datasets.",
+        "Best practice: Use `UNION ALL` unless duplicate removal is strictly required."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "union",
+          "union all",
+          "duplicates",
+          "performance",
+          "sort",
+          "faster"
+        ]
+      }
+    },
+    {
+      "id": "sql_07",
+      "track": "sql",
+      "difficulty": "junior-medium",
+      "question": "Write or describe a SQL query to find the second highest salary from an Employee table.",
+      "key_concepts": [
+        "DENSE_RANK() or subquery",
+        "MAX with subquery",
+        "handling ties and nulls"
+      ],
+      "sample_answer_points": [
+        "Method 1: `SELECT MAX(salary) FROM Employee WHERE salary < (SELECT MAX(salary) FROM Employee);`",
+        "Method 2: Use CTE with `DENSE_RANK() OVER (ORDER BY salary DESC)` and filter `WHERE rank = 2`.",
+        "Mention why `DENSE_RANK` is safer than `LIMIT 1 OFFSET 1` if multiple employees share the highest salary."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "dense_rank",
+          "max",
+          "subquery",
+          "offset",
+          "salary",
+          "second"
+        ]
+      }
+    },
+    {
+      "id": "sql_08",
+      "track": "sql",
+      "difficulty": "junior-easy",
+      "question": "How does NULL behave in SQL comparisons and aggregate functions like COUNT() and AVG()?",
+      "key_concepts": [
+        "three-valued logic",
+        "IS NULL vs = NULL",
+        "COUNT(*) vs COUNT(column)"
+      ],
+      "sample_answer_points": [
+        "`NULL` represents missing or unknown data; comparison `= NULL` yields UNKNOWN, so `IS NULL` is required.",
+        "`COUNT(*)` counts all rows including NULLs; `COUNT(col)` counts only non-null values.",
+        "`AVG(col)` ignores NULLs in the denominator, which can skew averages if NULL represents zero."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "null",
+          "is null",
+          "count",
+          "avg",
+          "ignore",
+          "three-valued logic"
+        ]
+      }
+    },
+    {
+      "id": "sql_09",
+      "track": "sql",
+      "difficulty": "scenario",
+      "question": "A business query running against your warehouse takes 5 minutes to complete. What steps do you take to investigate and optimize it?",
+      "key_concepts": [
+        "EXPLAIN plan",
+        "indexing",
+        "avoid SELECT *",
+        "filtering early",
+        "join explosion"
+      ],
+      "sample_answer_points": [
+        "Run `EXPLAIN` or query execution profile to locate bottlenecks (table scans, large sorts).",
+        "Verify join keys and ensure filters (`WHERE`) run before joins rather than after.",
+        "Eliminate `SELECT *` by retrieving only necessary columns to reduce memory pressure."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "explain",
+          "index",
+          "filter",
+          "select *",
+          "bottleneck",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "sql_10",
+      "track": "sql",
+      "difficulty": "junior-medium",
+      "question": "How do you calculate a 7-day rolling average of daily revenue in SQL?",
+      "key_concepts": [
+        "AVG() window function",
+        "ROWS BETWEEN 6 PRECEDING AND CURRENT ROW",
+        "ORDER BY date"
+      ],
+      "sample_answer_points": [
+        "Aggregate daily revenue first by date.",
+        "Apply window function: `AVG(daily_rev) OVER (ORDER BY order_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)`.",
+        "Mention verifying whether calendar dates without sales need zero-filled dummy rows."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "rolling",
+          "average",
+          "preceding",
+          "current row",
+          "window",
+          "order by"
+        ]
+      }
+    },
+    {
+      "id": "sql_11",
+      "track": "sql",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between COALESCE() and NULLIF()? Give an example.",
+      "key_concepts": [
+        "first non-null value",
+        "nullify if equal",
+        "division by zero protection"
+      ],
+      "sample_answer_points": [
+        "`COALESCE(val1, val2, ...)`: returns the first non-null argument (e.g. `COALESCE(discount, 0)`).",
+        "`NULLIF(a, b)`: returns NULL if a = b, otherwise returns a.",
+        "Classic combo: `numerator / NULLIF(denominator, 0)` prevents division-by-zero crashes."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "coalesce",
+          "nullif",
+          "division by zero",
+          "null",
+          "fallback",
+          "default"
+        ]
+      }
+    },
+    {
+      "id": "sql_12",
+      "track": "sql",
+      "difficulty": "junior-medium",
+      "question": "What is database normalization, and why do analytical data warehouses often use denormalized star schemas instead?",
+      "key_concepts": [
+        "3NF (redundancy reduction)",
+        "OLTP vs OLAP",
+        "Star Schema (Fact and Dimension)"
+      ],
+      "sample_answer_points": [
+        "Normalization (3NF) reduces data redundancy and write anomalies in transactional systems (OLTP).",
+        "Analytical systems (OLAP) favor Star Schemas (central Fact table surrounded by Dimension tables).",
+        "Denormalization minimizes expensive joins across 15+ normalized tables during complex aggregations."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "normalization",
+          "star schema",
+          "fact",
+          "dimension",
+          "oltp",
+          "olap",
+          "joins"
+        ]
+      }
+    },
+    {
+      "id": "xl_01",
+      "track": "excel",
+      "difficulty": "junior-easy",
+      "question": "What are the advantages of XLOOKUP over VLOOKUP and INDEX-MATCH in modern Excel?",
+      "key_concepts": [
+        "leftward lookup",
+        "exact match default",
+        "custom error handling",
+        "array return"
+      ],
+      "sample_answer_points": [
+        "XLOOKUP can look to the left without reordering columns.",
+        "Defaults to exact match (no need for `, FALSE` or `, 0`).",
+        "Includes built-in `[if_not_found]` argument eliminating wrapping with `IFERROR`.",
+        "More resilient: inserting columns in the source table won't break index positions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "xlookup",
+          "vlookup",
+          "index-match",
+          "exact match",
+          "left",
+          "if_not_found"
+        ]
+      }
+    },
+    {
+      "id": "xl_02",
+      "track": "excel",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between absolute, relative, and mixed cell references ($A$1, A1, $A1).",
+      "key_concepts": [
+        "dollar sign freezing",
+        "formula dragging",
+        "row vs column locking"
+      ],
+      "sample_answer_points": [
+        "`A1` (Relative): Both column and row change when dragged across or down.",
+        "`$A$1` (Absolute): Both column and row stay fixed.",
+        "`$A1` (Mixed): Column A is locked, row changes. `A$1`: Row 1 is locked, column changes."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "absolute",
+          "relative",
+          "mixed",
+          "dollar sign",
+          "freeze",
+          "drag",
+          "formula"
+        ]
+      }
+    },
+    {
+      "id": "xl_03",
+      "track": "excel",
+      "difficulty": "junior-medium",
+      "question": "How do you build a dynamic summary report using SUMIFS, COUNTIFS, and AVERAGEIFS with multiple criteria?",
+      "key_concepts": [
+        "multi-criteria syntax",
+        "range vs criteria pairing",
+        "date range filters"
+      ],
+      "sample_answer_points": [
+        "Syntax: `SUMIFS(sum_range, criteria_range1, criteria1, criteria_range2, criteria2)`.",
+        "Can combine text and dates: `\">=\" & start_date` to summarize date windows dynamically.",
+        "Remember that SUMIFS requires all criteria ranges to have matching row and column dimensions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "sumifs",
+          "countifs",
+          "averageifs",
+          "criteria",
+          "range",
+          "filter",
+          "date"
+        ]
+      }
+    },
+    {
+      "id": "xl_04",
+      "track": "excel",
+      "difficulty": "junior-medium",
+      "question": "What is Power Query in Excel, and why is it preferred over copy-pasting and manual cell formatting for weekly MIS?",
+      "key_concepts": [
+        "ETL inside Excel",
+        "reproducible steps",
+        "unpivot",
+        "one-click refresh"
+      ],
+      "sample_answer_points": [
+        "Power Query records data ingestion, cleaning, and transformation steps into a repeatable script (M code).",
+        "Features 'Unpivot Columns' to convert wide reporting sheets into normalized tabular data.",
+        "Next week, simply dropping a new raw file and clicking 'Refresh All' updates the entire model automatically."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "power query",
+          "etl",
+          "refresh",
+          "unpivot",
+          "automated",
+          "repeatable",
+          "m code"
+        ]
+      }
+    },
+    {
+      "id": "xl_05",
+      "track": "excel",
+      "difficulty": "junior-easy",
+      "question": "How do PivotTables handle calculated fields vs calculated items?",
+      "key_concepts": [
+        "aggregate calculations",
+        "row-level vs sum-level",
+        "PivotTable limits"
+      ],
+      "sample_answer_points": [
+        "Calculated Field: Performs calculations on the sum/aggregation of existing fields (e.g. `Revenue / Units`).",
+        "Calculated Item: Applies formula logic across specific item values inside a single dimension.",
+        "Best practice: Build complex custom calculations in Power Query or Power Pivot data models."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "pivottable",
+          "calculated field",
+          "calculated item",
+          "aggregation",
+          "formula",
+          "model"
+        ]
+      }
+    },
+    {
+      "id": "xl_06",
+      "track": "excel",
+      "difficulty": "junior-medium",
+      "question": "How do you use Excel Power Pivot and the Data Model to join multiple tables without writing VLOOKUP formulas?",
+      "key_concepts": [
+        "relationships",
+        "star schema in Excel",
+        "millions of rows",
+        "DAX in Excel"
+      ],
+      "sample_answer_points": [
+        "Add tables directly to the Excel Data Model instead of pasting into a single giant flat worksheet.",
+        "Create relationships between tables in the Diagram View using Primary and Foreign Key columns.",
+        "Allows PivotTables to query millions of rows without VLOOKUP formula lag."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "power pivot",
+          "data model",
+          "relationship",
+          "diagram",
+          "dax",
+          "foreign key"
+        ]
+      }
+    },
+    {
+      "id": "xl_07",
+      "track": "excel",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between IFERROR() and IF(ISBLANK())? Give a best-practice use case.",
+      "key_concepts": [
+        "error masking",
+        "empty cells vs calculation errors (#N/A, #DIV/0!)",
+        "auditability"
+      ],
+      "sample_answer_points": [
+        "`IFERROR(val, fallback)`: Catches all Excel formula errors (#DIV/0!, #N/A, #VALUE!).",
+        "`IF(ISBLANK(cell), ...)`: Checks if a cell contains no content, which is distinct from a formula error.",
+        "Caution: Don't wrap every formula blindly with IFERROR, as it masks broken references and typo bugs."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "iferror",
+          "isblank",
+          "error",
+          "div/0",
+          "n/a",
+          "mask",
+          "audit"
+        ]
+      }
+    },
+    {
+      "id": "xl_08",
+      "track": "excel",
+      "difficulty": "junior-medium",
+      "question": "How do you split text into columns when records have inconsistent delimiters using Excel formulas?",
+      "key_concepts": [
+        "TEXTSPLIT",
+        "TEXTBEFORE / TEXTAFTER",
+        "TRIM and SUBSTITUTE"
+      ],
+      "sample_answer_points": [
+        "In modern Excel 365, use `TEXTSPLIT(text, col_delimiter, row_delimiter)`.",
+        "Use `TEXTBEFORE` and `TEXTAFTER` to extract strings before/after specific milestone tokens.",
+        "In legacy Excel, combine `TRIM(MID(SUBSTITUTE(...)))` to extract delimited tokens."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "textsplit",
+          "textbefore",
+          "textafter",
+          "delimiter",
+          "split",
+          "trim"
+        ]
+      }
+    },
+    {
+      "id": "xl_09",
+      "track": "excel",
+      "difficulty": "scenario",
+      "question": "Your Excel workbook has grown to 90 MB and freezes whenever a cell is updated. What steps do you take to optimize it?",
+      "key_concepts": [
+        "manual calculation mode",
+        "unused range reset",
+        "replace volatile formulas",
+        "Power Query load"
+      ],
+      "sample_answer_points": [
+        "Set calculation mode to Manual while working on large structural edits.",
+        "Locate the used range (`Ctrl + End`) and delete phantom blank rows and columns holding ghost formatting.",
+        "Replace volatile functions (`OFFSET`, `INDIRECT`, `TODAY`) with indexed lookups or Power Query transformations.",
+        "Save in Excel Binary format (`.xlsb`) to compress file size and speed up read times."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "freeze",
+          "manual calculation",
+          "used range",
+          "volatile",
+          "offset",
+          "xlsb",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "xl_10",
+      "track": "excel",
+      "difficulty": "junior-medium",
+      "question": "What are Excel Dynamic Arrays (e.g. FILTER, UNIQUE, SORT), and how do they eliminate legacy array formulas?",
+      "key_concepts": [
+        "spill range (#)",
+        "FILTER",
+        "UNIQUE",
+        "no Ctrl+Shift+Enter"
+      ],
+      "sample_answer_points": [
+        "Dynamic arrays automatically spill calculated results across adjacent cells without pre-selecting ranges.",
+        "`UNIQUE(range)`: Returns a deduplicated list.",
+        "`FILTER(range, criteria)`: Returns subset rows matching criteria dynamically.",
+        "Referencing the spilled array using `#` (e.g. `A2#`) makes downstream formulas automatically dynamic."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "dynamic array",
+          "spill",
+          "filter",
+          "unique",
+          "sort",
+          "formula"
+        ]
+      }
+    },
+    {
+      "id": "xl_11",
+      "track": "excel",
+      "difficulty": "junior-easy",
+      "question": "How do you apply Conditional Formatting effectively without making a spreadsheet visually cluttered?",
+      "key_concepts": [
+        "visual hierarchy",
+        "subtle color scales",
+        "highlighting exceptions only"
+      ],
+      "sample_answer_points": [
+        "Highlight exceptions and thresholds (e.g. SLA breaches > 24 hours) rather than coloring every cell.",
+        "Use muted pastel shades instead of harsh primary neon red/green fills.",
+        "Use data bars or icon arrows sparingly for at-a-glance scanning."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "conditional formatting",
+          "hierarchy",
+          "exceptions",
+          "threshold",
+          "subtle",
+          "visual"
+        ]
+      }
+    },
+    {
+      "id": "xl_12",
+      "track": "excel",
+      "difficulty": "scenario",
+      "question": "You are designing an executive KPI dashboard in Excel. What layout and formatting rules do you follow?",
+      "key_concepts": [
+        "grid layout",
+        "top-left summary cards",
+        "gridlines hidden",
+        "locked structure"
+      ],
+      "sample_answer_points": [
+        "Place high-level KPI cards at the top left where executive eyes land first.",
+        "Hide default Excel gridlines (`View -> uncheck Gridlines`) and create clean card containers.",
+        "Stick to a consistent 2-color palette (e.g. navy and slate) with one accent color for highlights.",
+        "Lock formula cells and protect the sheet to prevent accidental overwrites."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "executive",
+          "kpi card",
+          "gridlines",
+          "layout",
+          "color palette",
+          "protect",
+          "clean"
+        ]
+      }
+    },
+    {
+      "id": "pbi_01",
+      "track": "power-bi",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between a Calculated Column and a Measure in Power BI. When do you use each?",
+      "key_concepts": [
+        "row context vs filter context",
+        "RAM storage vs on-the-fly compute",
+        "performance"
+      ],
+      "sample_answer_points": [
+        "Calculated Column: Computed row-by-row during data refresh and stored in memory (RAM). Consumes model storage.",
+        "Measure: Computed dynamically at query time based on user filter selections (slicers, visuals).",
+        "Best Practice: Use measures for all aggregations (Sums, Averages, Ratios). Use columns only for slicing dimensions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "calculated column",
+          "measure",
+          "row context",
+          "filter context",
+          "memory",
+          "aggregation"
+        ]
+      }
+    },
+    {
+      "id": "pbi_02",
+      "track": "power-bi",
+      "difficulty": "junior-easy",
+      "question": "What is the Star Schema in Power BI data modeling, and why is it preferred over a single flat table?",
+      "key_concepts": [
+        "Fact tables (metrics)",
+        "Dimension tables (context)",
+        "1-to-many relationships",
+        "performance"
+      ],
+      "sample_answer_points": [
+        "Central Fact table containing measurable events/transactions (Sales, Orders).",
+        "Surrounding Dimension tables containing descriptive context (Customer, Product, Date).",
+        "Connected via single-direction 1-to-many relationships (`1:*`).",
+        "Significantly speeds up VertiPaq engine compression and avoids ambiguous filter paths."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "star schema",
+          "fact",
+          "dimension",
+          "relationships",
+          "vertipaq",
+          "performance",
+          "compression"
+        ]
+      }
+    },
+    {
+      "id": "pbi_03",
+      "track": "power-bi",
+      "difficulty": "junior-medium",
+      "question": "What does the CALCULATE() function do in DAX? Why is it considered the most powerful function?",
+      "key_concepts": [
+        "context transition",
+        "filter modification",
+        "overriding existing filters"
+      ],
+      "sample_answer_points": [
+        "`CALCULATE(expression, filter1, filter2)` evaluates an expression under modified filter context.",
+        "It is the only DAX function capable of adding, removing, or overriding existing visual filters.",
+        "Performs Context Transition: converts current row context into equivalent filter context."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "calculate",
+          "filter context",
+          "context transition",
+          "dax",
+          "override",
+          "evaluate"
+        ]
+      }
+    },
+    {
+      "id": "pbi_04",
+      "track": "power-bi",
+      "difficulty": "junior-medium",
+      "question": "How do you calculate Year-over-Year (YoY) Sales Growth in DAX?",
+      "key_concepts": [
+        "SAMEPERIODLASTYEAR or DATEADD",
+        "DIVIDE() function",
+        "dedicated Calendar table"
+      ],
+      "sample_answer_points": [
+        "Create baseline: `Total Sales = SUM(Sales[Amount])`.",
+        "Create prior year: `Sales LY = CALCULATE([Total Sales], SAMEPERIODLASTYEAR('Calendar'[Date]))`.",
+        "Calculate YoY %: `DIVIDE([Total Sales] - [Sales LY], [Sales LY], 0)`.",
+        "Crucial requirement: A contiguous, marked Date/Calendar table."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "yoy",
+          "sameperiodlastyear",
+          "divide",
+          "sales",
+          "calendar",
+          "growth",
+          "dax"
+        ]
+      }
+    },
+    {
+      "id": "pbi_05",
+      "track": "power-bi",
+      "difficulty": "junior-easy",
+      "question": "Why must you always build a dedicated Date/Calendar table in Power BI models?",
+      "key_concepts": [
+        "time intelligence functions",
+        "contiguous dates",
+        "custom fiscal calendars"
+      ],
+      "sample_answer_points": [
+        "DAX time intelligence functions (YTD, SAMEPERIODLASTYEAR) require contiguous, gap-free date ranges.",
+        "Enables slicing across multiple fact tables using one common date axis.",
+        "Supports fiscal calendar quarters, holiday flags, and week-ending definitions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "date table",
+          "calendar",
+          "time intelligence",
+          "contiguous",
+          "fiscal",
+          "relationships"
+        ]
+      }
+    },
+    {
+      "id": "pbi_06",
+      "track": "power-bi",
+      "difficulty": "junior-medium",
+      "question": "What is the difference between USERELATIONSHIP() and active vs inactive relationships in Power BI?",
+      "key_concepts": [
+        "role-playing dimensions",
+        "Order Date vs Ship Date",
+        "CALCULATE activation"
+      ],
+      "sample_answer_points": [
+        "A model can have only one active relationship between two tables to prevent ambiguity.",
+        "Secondary relationships (e.g. Orders to Calendar via `ShipDate`) are marked inactive (dashed line).",
+        "Activate on demand in measures: `CALCULATE([Total Sales], USERELATIONSHIP(Orders[ShipDate], Calendar[Date]))`."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "userelationship",
+          "active",
+          "inactive",
+          "role-playing",
+          "order date",
+          "ship date"
+        ]
+      }
+    },
+    {
+      "id": "pbi_07",
+      "track": "power-bi",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between ALL(), ALLEXCEPT(), and ALLSELECTED() in DAX.",
+      "key_concepts": [
+        "clearing filters",
+        "calculating % of total",
+        "visual slicer awareness"
+      ],
+      "sample_answer_points": [
+        "`ALL(Table/Column)`: Removes all filters from specified target (used for `% of Total = DIVIDE([Sales], CALCULATE([Sales], ALL(Sales)))`).",
+        "`ALLEXCEPT(Table, Column)`: Clears filters on the table except the specified column.",
+        "`ALLSELECTED()`: Clears visual-level filters while respecting page-level slicers chosen by the user."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "all",
+          "allexcept",
+          "allselected",
+          "percent of total",
+          "filter",
+          "slicer",
+          "dax"
+        ]
+      }
+    },
+    {
+      "id": "pbi_08",
+      "track": "power-bi",
+      "difficulty": "junior-medium",
+      "question": "What causes bidirectional relationship cross-filtering issues, and why should it generally be avoided?",
+      "key_concepts": [
+        "ambiguous filter paths",
+        "performance degradation",
+        "unexpected metric totals"
+      ],
+      "sample_answer_points": [
+        "Bidirectional filtering allows filters to flow both ways across 1-to-many relationships.",
+        "Can introduce ambiguity where multiple valid relationship paths exist between tables.",
+        "Drastically degrades performance on large datasets and produces unexpected totals in unrelated visuals."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "bidirectional",
+          "cross-filter",
+          "ambiguity",
+          "performance",
+          "single direction",
+          "best practice"
+        ]
+      }
+    },
+    {
+      "id": "pbi_09",
+      "track": "power-bi",
+      "difficulty": "scenario",
+      "question": "A Power BI report takes 12 seconds to render visual interactions. How do you troubleshoot with Performance Analyzer?",
+      "key_concepts": [
+        "Performance Analyzer",
+        "DAX Query vs Visual Display time",
+        "DAX Studio",
+        "high-cardinality columns"
+      ],
+      "sample_answer_points": [
+        "Open View -> Performance Analyzer and click 'Start Recording' to measure Visual Display vs DAX Query time.",
+        "If DAX Query is slow, copy query into DAX Studio to identify inefficient iterators (`SUMX`, nested `CALCULATE`).",
+        "Check model size: remove unnecessary high-cardinality columns (like GUIDs or raw timestamp seconds).",
+        "Reduce visual count per page (avoid 25+ tiny cards on a single report tab)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "performance analyzer",
+          "dax query",
+          "dax studio",
+          "cardinality",
+          "latency",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "pbi_10",
+      "track": "power-bi",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between SUM() and SUMX() in DAX?",
+      "key_concepts": [
+        "simple aggregate vs row iterator",
+        "expression evaluation before sum",
+        "row context"
+      ],
+      "sample_answer_points": [
+        "`SUM(Column)`: Simple aggregator that operates directly on a single column in existing filter context.",
+        "`SUMX(Table, Expression)`: Iterator function that loops through a table row-by-row, calculates the expression, then sums.",
+        "Example: `SUMX(Orders, Orders[Qty] * Orders[UnitPrice])` handles row-level math without creating calculated columns."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "sum",
+          "sumx",
+          "iterator",
+          "row-by-row",
+          "expression",
+          "column",
+          "dax"
+        ]
+      }
+    },
+    {
+      "id": "pbi_11",
+      "track": "power-bi",
+      "difficulty": "junior-medium",
+      "question": "How do Drillthrough and Tooltip pages enhance user experience in Power BI without cluttering reports?",
+      "key_concepts": [
+        "contextual detail",
+        "right-click drillthrough",
+        "hover micro-visuals"
+      ],
+      "sample_answer_points": [
+        "Drillthrough allows users to right-click a data point (like Customer A) to jump to a filtered detailed profile page.",
+        "Report Page Tooltips display rich mini-charts when hovering over a visual data point.",
+        "Prevents overwhelming users with dense tables on the primary executive summary tab."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "drillthrough",
+          "tooltip",
+          "hover",
+          "detail",
+          "context",
+          "visual hierarchy"
+        ]
+      }
+    },
+    {
+      "id": "pbi_12",
+      "track": "power-bi",
+      "difficulty": "junior-easy",
+      "question": "What is Row-Level Security (RLS) in Power BI, and how do you implement it?",
+      "key_concepts": [
+        "data access control",
+        "DAX filter rules",
+        "USERPRINCIPALNAME()"
+      ],
+      "sample_answer_points": [
+        "RLS restricts data access for specific users based on their login credentials.",
+        "Defined under Modeling -> Manage Roles using DAX filters (e.g. `[Region] = \"North\"`).",
+        "Dynamic RLS: `[EmployeeEmail] = USERPRINCIPALNAME()` ensures each manager sees only their branch numbers."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "rls",
+          "row-level security",
+          "roles",
+          "userprincipalname",
+          "permissions",
+          "security"
+        ]
+      }
+    },
+    {
+      "id": "py_01",
+      "track": "python-pandas",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between a Pandas Series and a DataFrame?",
+      "key_concepts": [
+        "1D labeled array vs 2D tabular structure",
+        "index alignment",
+        "columns"
+      ],
+      "sample_answer_points": [
+        "Series: 1-dimensional labeled array capable of holding any data type with a single index.",
+        "DataFrame: 2-dimensional tabular data structure with labeled axes (rows and columns).",
+        "Selecting a single column from a DataFrame typically yields a Series."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "series",
+          "dataframe",
+          "1d",
+          "2d",
+          "index",
+          "columns",
+          "pandas"
+        ]
+      }
+    },
+    {
+      "id": "py_02",
+      "track": "python-pandas",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between .loc[] and .iloc[] in Pandas.",
+      "key_concepts": [
+        "label-based indexing vs integer position-based indexing"
+      ],
+      "sample_answer_points": [
+        "`.loc[]`: Label-based selection using explicit row index names and column names.",
+        "`.iloc[]`: Integer position-based selection using zero-indexed positions (e.g. `df.iloc[0:5, 0:2]`).",
+        "Critical difference: `.loc` endpoint is inclusive, whereas `.iloc` endpoint is exclusive like Python slices."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "loc",
+          "iloc",
+          "label",
+          "integer",
+          "index",
+          "inclusive",
+          "exclusive"
+        ]
+      }
+    },
+    {
+      "id": "py_03",
+      "track": "python-pandas",
+      "difficulty": "junior-medium",
+      "question": "How do you detect, count, and handle missing values (NaN) in a Pandas DataFrame?",
+      "key_concepts": [
+        "isna() / isnull()",
+        "dropna()",
+        "fillna()",
+        "imputation strategies"
+      ],
+      "sample_answer_points": [
+        "Detection: `df.isna().sum()` counts missing values per column.",
+        "Dropping: `df.dropna(subset=['critical_id'])` removes rows where essential identifiers are absent.",
+        "Imputation: `df['age'].fillna(df['age'].median())` fills with median/mean or domain-specific defaults.",
+        "Always document whether missingness is random or systematic."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "isna",
+          "isnull",
+          "dropna",
+          "fillna",
+          "impute",
+          "median",
+          "missing"
+        ]
+      }
+    },
+    {
+      "id": "py_04",
+      "track": "python-pandas",
+      "difficulty": "junior-medium",
+      "question": "How does groupby() work in Pandas? Describe the Split-Apply-Combine pattern.",
+      "key_concepts": [
+        "split by keys",
+        "apply aggregation/transformation",
+        "combine into output"
+      ],
+      "sample_answer_points": [
+        "Split: Divides DataFrame into groups based on key columns (e.g. `df.groupby('region')`).",
+        "Apply: Computes aggregate functions (e.g. `.agg({'revenue': 'sum', 'order_id': 'count'})`).",
+        "Combine: Merges the calculated results back into a clean summary DataFrame or Series."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "groupby",
+          "split",
+          "apply",
+          "combine",
+          "agg",
+          "aggregation"
+        ]
+      }
+    },
+    {
+      "id": "py_05",
+      "track": "python-pandas",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between merge(), join(), and concat() in Pandas?",
+      "key_concepts": [
+        "SQL-like joins (merge)",
+        "index-based joins (join)",
+        "stacking/appending (concat)"
+      ],
+      "sample_answer_points": [
+        "`pd.merge(df1, df2, on='key', how='left')`: SQL-like joins on column keys.",
+        "`df1.join(df2)`: Joins on table index by default.",
+        "`pd.concat([df1, df2], axis=0)`: Stacks DataFrames vertically (axis=0) or side-by-side horizontally (axis=1)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "merge",
+          "join",
+          "concat",
+          "sql",
+          "axis",
+          "stack",
+          "keys"
+        ]
+      }
+    },
+    {
+      "id": "py_06",
+      "track": "python-pandas",
+      "difficulty": "junior-medium",
+      "question": "How do you handle datetime conversions and extract month, quarter, and day-of-week in Pandas?",
+      "key_concepts": [
+        "pd.to_datetime()",
+        "dt accessor",
+        "errors='coerce'"
+      ],
+      "sample_answer_points": [
+        "Convert with `pd.to_datetime(df['date_col'], errors='coerce')` to parse inconsistent strings into NaT safely.",
+        "Use `.dt` accessor to extract features: `df['date_col'].dt.month`, `.dt.quarter`, `.dt.day_name()`.",
+        "Calculate elapsed time: `(df['ship_date'] - df['order_date']).dt.days`."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "to_datetime",
+          "dt",
+          "month",
+          "quarter",
+          "day_name",
+          "date",
+          "parse"
+        ]
+      }
+    },
+    {
+      "id": "py_07",
+      "track": "python-pandas",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between apply(), map(), and vectorized operations in Pandas? Which is fastest?",
+      "key_concepts": [
+        "vectorization (C-level)",
+        "map on Series",
+        "apply overhead",
+        "performance hierarchy"
+      ],
+      "sample_answer_points": [
+        "Vectorized operations (`df['a'] + df['b']` or NumPy ufuncs) are fastest because they execute in compiled C code.",
+        "`map()`: Transforms values element-wise across a single Series using a dictionary or function.",
+        "`apply()`: General-purpose row/column iterator; flexible but slowest due to Python function call overhead."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "apply",
+          "map",
+          "vectorized",
+          "performance",
+          "fastest",
+          "numpy",
+          "c code"
+        ]
+      }
+    },
+    {
+      "id": "py_08",
+      "track": "python-pandas",
+      "difficulty": "junior-medium",
+      "question": "How do you reshape data between wide format and long/tidy format using pivot() and melt()?",
+      "key_concepts": [
+        "wide to long (melt)",
+        "long to wide (pivot/pivot_table)",
+        "tidy data principles"
+      ],
+      "sample_answer_points": [
+        "`melt(id_vars, value_vars)`: Converts wide data (e.g. columns 'Q1', 'Q2', 'Q3') into long tidy rows.",
+        "`pivot(index, columns, values)`: Converts long data back into wide columns.",
+        "`pivot_table()`: Similar to pivot but includes aggregation functions for handling duplicate entries."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "pivot",
+          "melt",
+          "wide",
+          "long",
+          "tidy",
+          "pivot_table",
+          "reshape"
+        ]
+      }
+    },
+    {
+      "id": "py_09",
+      "track": "python-pandas",
+      "difficulty": "scenario",
+      "question": "You are given a 10 GB CSV file that crashes your local machine's 8 GB RAM when calling pd.read_csv(). How do you process it in Python?",
+      "key_concepts": [
+        "chunksize parameter",
+        "dtype downcasting",
+        "usecols filter",
+        "DuckDB or Polars"
+      ],
+      "sample_answer_points": [
+        "Use `chunksize` in `pd.read_csv('file.csv', chunksize=50000)` to stream and aggregate data in batches.",
+        "Use `usecols` to load only necessary columns.",
+        "Downcast numeric types (e.g. `float64` to `float32`, `int64` to `int32`, strings to `category`).",
+        "Mention modern out-of-core alternatives like DuckDB or Polars."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "chunksize",
+          "memory",
+          "usecols",
+          "downcast",
+          "category",
+          "ram",
+          "batch"
+        ]
+      }
+    },
+    {
+      "id": "py_10",
+      "track": "python-pandas",
+      "difficulty": "junior-easy",
+      "question": "How do you identify and remove duplicate rows in a Pandas DataFrame?",
+      "key_concepts": [
+        "duplicated()",
+        "drop_duplicates()",
+        "subset parameter",
+        "keep='first'/'last'"
+      ],
+      "sample_answer_points": [
+        "Inspection: `df.duplicated().sum()` or `df[df.duplicated(subset=['email'], keep=False)]`.",
+        "Removal: `df.drop_duplicates(subset=['email'], keep='first', inplace=True)`.",
+        "Always verify whether duplicates indicate ingestion errors or legitimate repeated transactions."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "duplicated",
+          "drop_duplicates",
+          "subset",
+          "keep",
+          "first",
+          "clean"
+        ]
+      }
+    },
+    {
+      "id": "py_11",
+      "track": "python-pandas",
+      "difficulty": "junior-medium",
+      "question": "What is an Exploratory Data Analysis (EDA) workflow you follow when first opening an unfamiliar dataset?",
+      "key_concepts": [
+        "df.info()",
+        "df.describe()",
+        "shape check",
+        "distribution visualization",
+        "missingness heatmap"
+      ],
+      "sample_answer_points": [
+        "1. `df.shape` and `df.info()`: Verify row counts, column names, and data types.",
+        "2. `df.describe()`: Check summary statistics (min, max, mean, quartiles) for numeric sanity.",
+        "3. `df.isna().sum()`: Assess missingness patterns across columns.",
+        "4. Visualizations: Plot histograms for distributions and correlation heatmaps for relationship discovery."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "eda",
+          "info",
+          "describe",
+          "shape",
+          "distribution",
+          "correlation",
+          "visualize"
+        ]
+      }
+    },
+    {
+      "id": "py_12",
+      "track": "python-pandas",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between Matplotlib and Seaborn in Python analytics?",
+      "key_concepts": [
+        "low-level control (Matplotlib) vs high-level statistical visualization (Seaborn)",
+        "syntax ease"
+      ],
+      "sample_answer_points": [
+        "Matplotlib: Foundational, low-level plotting library providing granular control over every figure element.",
+        "Seaborn: Built on top of Matplotlib with modern styling and built-in statistical charts (violin, boxplot, regression).",
+        "Common practice: Use Seaborn for rapid statistical exploration, then customize axes with Matplotlib commands."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "matplotlib",
+          "seaborn",
+          "visualization",
+          "plots",
+          "statistical",
+          "charts"
+        ]
+      }
+    },
+    {
+      "id": "cs_01",
+      "track": "case-study",
+      "difficulty": "junior-medium",
+      "question": "How do you calculate Customer Acquisition Cost (CAC) and Customer Lifetime Value (LTV)? What is a healthy LTV:CAC ratio?",
+      "key_concepts": [
+        "total sales & marketing spend / new customers",
+        "average purchase value * frequency * lifespan",
+        "3:1 ratio"
+      ],
+      "sample_answer_points": [
+        "CAC = Total Sales and Marketing Expenses / Number of New Customers Acquired in the period.",
+        "LTV = (Average Order Value * Purchase Frequency * Gross Margin) / Churn Rate.",
+        "A healthy benchmark for SaaS and subscription businesses is typically around 3:1.",
+        "If ratio is < 1:1, the business is losing money acquiring users. If > 5:1, the business is likely underinvesting in growth."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "cac",
+          "ltv",
+          "ratio",
+          "marketing",
+          "churn",
+          "acquisition",
+          "lifetime value"
+        ]
+      }
+    },
+    {
+      "id": "cs_02",
+      "track": "case-study",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between Gross Margin and Net Margin. Why do investors track both?",
+      "key_concepts": [
+        "revenue minus COGS vs net profit after all expenses",
+        "unit economics vs overall profitability"
+      ],
+      "sample_answer_points": [
+        "Gross Margin = `(Revenue - COGS) / Revenue * 100`: measures production and delivery efficiency of core goods.",
+        "Net Margin = `Net Income / Revenue * 100`: reflects final profitability after all operating expenses, taxes, and interest.",
+        "A company can have high gross margin (e.g. 80% in software) but negative net margin if sales overhead is bloated."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "gross margin",
+          "net margin",
+          "cogs",
+          "revenue",
+          "profitability",
+          "expenses"
+        ]
+      }
+    },
+    {
+      "id": "cs_03",
+      "track": "case-study",
+      "difficulty": "scenario",
+      "question": "Daily active users (DAU) on our e-commerce platform dropped by 12% last week, but total revenue increased by 5%. How do you diagnose this?",
+      "key_concepts": [
+        "segmentation",
+        "average order value (AOV)",
+        "power users vs casual browsers",
+        "promotions"
+      ],
+      "sample_answer_points": [
+        "Hypothesis: Casual browsers dropped off while high-intent buyers continued making larger purchases.",
+        "Segment DAU by user tier (new vs returning, desktop vs mobile) and traffic source (organic vs paid).",
+        "Inspect Average Order Value (AOV) and conversion rate among purchasing users.",
+        "Check if a high-ticket item sale, B2B wholesale orders, or a promotional campaign launched that week."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "dau",
+          "revenue",
+          "aov",
+          "segmentation",
+          "conversion",
+          "basket size",
+          "root cause"
+        ]
+      }
+    },
+    {
+      "id": "cs_04",
+      "track": "case-study",
+      "difficulty": "junior-medium",
+      "question": "What is an E-Commerce Conversion Funnel, and how do you identify the highest-priority drop-off point?",
+      "key_concepts": [
+        "Homepage -> Product Page -> Add to Cart -> Checkout -> Payment -> Order Confirmed",
+        "step-by-step conversion rates"
+      ],
+      "sample_answer_points": [
+        "Track step-by-step visitor progression: View Item -> Add to Cart -> Initiate Checkout -> Complete Purchase.",
+        "Calculate drop-off percentage between each milestone stage.",
+        "Prioritize fixing steps with the largest absolute volume of abandoned revenue (e.g. Cart to Checkout drop due to hidden shipping fees)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "funnel",
+          "conversion",
+          "drop-off",
+          "add to cart",
+          "checkout",
+          "abandonment"
+        ]
+      }
+    },
+    {
+      "id": "cs_05",
+      "track": "case-study",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between Churn Rate and Retention Rate. How are they mathematically related?",
+      "key_concepts": [
+        "customer loss vs customer retention",
+        "churn + retention = 100% in simple cohorts"
+      ],
+      "sample_answer_points": [
+        "Retention Rate: Percentage of customers active at start of period who remain active at the end.",
+        "Churn Rate: Percentage of customers lost over the period (`Lost Customers / Starting Customers`).",
+        "For a clean cohort without mid-period reactivations: `Retention Rate + Churn Rate = 100%`."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "churn",
+          "retention",
+          "cohort",
+          "percentage",
+          "customers",
+          "loss"
+        ]
+      }
+    },
+    {
+      "id": "cs_06",
+      "track": "case-study",
+      "difficulty": "junior-medium",
+      "question": "What is Month-over-Month (MoM) vs Year-over-Year (YoY) comparison? When is MoM misleading?",
+      "key_concepts": [
+        "seasonality",
+        "holiday spikes",
+        "underlying growth trend"
+      ],
+      "sample_answer_points": [
+        "MoM measures short-term momentum between consecutive months.",
+        "YoY compares against the same month in the previous year, controlling for seasonality.",
+        "MoM is misleading in seasonal industries (e.g. retail sales jumping 80% in Diwali/December and crashing in January)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "mom",
+          "yoy",
+          "seasonality",
+          "holiday",
+          "trend",
+          "comparison"
+        ]
+      }
+    },
+    {
+      "id": "cs_07",
+      "track": "case-study",
+      "difficulty": "scenario",
+      "question": "A retail client asks you to evaluate whether offering free shipping on all orders over ₹499 is profitable. What metrics do you analyze?",
+      "key_concepts": [
+        "AOV uplift",
+        "shipping cost absorption",
+        "gross margin impact",
+        "break-even threshold"
+      ],
+      "sample_answer_points": [
+        "Analyze current basket size distribution (how many orders currently sit between ₹350 and ₹490).",
+        "Calculate incremental margin gained from customers stretching their cart to reach the ₹499 threshold.",
+        "Subtract company-absorbed carrier shipping costs from the extra gross margin to calculate net profitability."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "free shipping",
+          "aov",
+          "threshold",
+          "margin",
+          "basket size",
+          "carrier cost",
+          "profit"
+        ]
+      }
+    },
+    {
+      "id": "cs_08",
+      "track": "case-study",
+      "difficulty": "junior-easy",
+      "question": "What is Net Promoter Score (NPS), how is it calculated, and what are its limitations?",
+      "key_concepts": [
+        "Promoters (9-10) minus Detractors (0-6)",
+        "Passives (7-8) ignored",
+        "survey bias"
+      ],
+      "sample_answer_points": [
+        "NPS asks: 'How likely are you to recommend us to a friend on a scale 0-10?'",
+        "Calculation: `% Promoters (9-10) - % Detractors (0-6)` (ranges from -100 to +100).",
+        "Limitations: Cultural differences in score generosity, ignores passive ratings (7-8), and suffers from response bias."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "nps",
+          "promoter",
+          "detractor",
+          "passive",
+          "survey",
+          "loyalty",
+          "score"
+        ]
+      }
+    },
+    {
+      "id": "cs_09",
+      "track": "case-study",
+      "difficulty": "scenario",
+      "question": "A food delivery startup observes a 25% surge in customer refund requests. Walk me through your root-cause investigation framework.",
+      "key_concepts": [
+        "5 Whys / MECE framework",
+        "slicing by city/restaurant/rider/food category",
+        "operational logs"
+      ],
+      "sample_answer_points": [
+        "1. Temporal & Geographic Check: Did the surge start after an app update, in one specific city, or across all hubs?",
+        "2. Categorization: Are refund reasons recorded (late delivery, cold food, missing items, damaged packaging)?",
+        "3. Correlation with External Factors: Heavy rain, local courier strikes, or restaurant operational backlogs.",
+        "4. Action: Formulate recommendations for dispatch algorithm adjustments or vendor quality penalties."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "refund",
+          "root cause",
+          "category",
+          "geographic",
+          "investigation",
+          "dispatch",
+          "quality"
+        ]
+      }
+    },
+    {
+      "id": "cs_10",
+      "track": "case-study",
+      "difficulty": "junior-medium",
+      "question": "What is Cohort Analysis, and why is it superior to looking at a blended aggregate retention number?",
+      "key_concepts": [
+        "grouping by acquisition time/channel",
+        "decay curves",
+        "unmasking product quality changes"
+      ],
+      "sample_answer_points": [
+        "Cohort analysis groups users by a shared characteristic (usually acquisition month or sign-up channel).",
+        "Tracks user engagement over elapsed time (Month 0, Month 1, Month 2).",
+        "Superior because blended averages mask product improvements or degradation hidden by rapid new user acquisition."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "cohort",
+          "retention",
+          "acquisition month",
+          "decay curve",
+          "aggregate",
+          "trend"
+        ]
+      }
+    },
+    {
+      "id": "cs_11",
+      "track": "case-study",
+      "difficulty": "junior-easy",
+      "question": "What is Return on Ad Spend (ROAS), and how does it differ from Return on Investment (ROI)?",
+      "key_concepts": [
+        "revenue from ads / ad spend",
+        "comprehensive profit vs total investment"
+      ],
+      "sample_answer_points": [
+        "ROAS = `Revenue Generated from Ads / Total Ad Spend` (e.g. ₹50,000 revenue on ₹10,000 spend = 5.0x ROAS).",
+        "ROI = `(Net Profit - Total Costs) / Total Costs * 100` (factors in COGS, logistics, and agency fees).",
+        "A campaign can have positive ROAS (4x) but still be unprofitable if gross margins are thin."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "roas",
+          "roi",
+          "ad spend",
+          "revenue",
+          "profit",
+          "marketing"
+        ]
+      }
+    },
+    {
+      "id": "cs_12",
+      "track": "case-study",
+      "difficulty": "scenario",
+      "question": "Leadership wants to reduce subscription churn. You have access to customer usage logs, billing history, and support tickets. What analysis do you perform?",
+      "key_concepts": [
+        "lead indicators of churn",
+        "login frequency drop",
+        "unresolved ticket correlation",
+        "preventative interventions"
+      ],
+      "sample_answer_points": [
+        "Identify behavioral leading indicators of churn (e.g. login frequency falling 50% in the 30 days prior to cancellation).",
+        "Correlate churn rates with support ticket volume (customers with > 2 unresolved tickets may churn 3x faster).",
+        "Perform survival analysis by subscription tier to build proactive retention outreach triggers."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "churn",
+          "usage logs",
+          "support tickets",
+          "leading indicator",
+          "retention",
+          "intervention"
+        ]
+      }
+    },
+    {
+      "id": "ds_01",
+      "track": "data-scientist",
+      "difficulty": "junior-easy",
+      "question": "Explain the difference between Mean, Median, and Mode. Which measure is most reliable when data is skewed?",
+      "key_concepts": [
+        "central tendency",
+        "outlier sensitivity",
+        "income distributions"
+      ],
+      "sample_answer_points": [
+        "Mean: Arithmetic average, highly sensitive to extreme outliers.",
+        "Median: Middle value in sorted data, resilient and robust against extreme outliers.",
+        "Mode: Most frequently occurring value.",
+        "In skewed distributions (e.g. employee salaries or housing prices), Median is far more reliable than Mean."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "mean",
+          "median",
+          "mode",
+          "skewed",
+          "outlier",
+          "distribution"
+        ]
+      }
+    },
+    {
+      "id": "ds_02",
+      "track": "data-scientist",
+      "difficulty": "junior-easy",
+      "question": "What is Standard Deviation, and how is it related to Variance?",
+      "key_concepts": [
+        "dispersion around mean",
+        "variance as squared deviation",
+        "original measurement units"
+      ],
+      "sample_answer_points": [
+        "Variance is the average of squared deviations from the mean.",
+        "Standard Deviation is the square root of Variance, returning dispersion back into original dataset units.",
+        "Under normal distribution: ~68% of values fall within 1 SD, ~95% within 2 SD, ~99.7% within 3 SD."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "standard deviation",
+          "variance",
+          "dispersion",
+          "square root",
+          "normal distribution"
+        ]
+      }
+    },
+    {
+      "id": "ds_03",
+      "track": "data-scientist",
+      "difficulty": "junior-medium",
+      "question": "What is an A/B test (hypothesis test)? Explain Null Hypothesis, Alternative Hypothesis, and p-value.",
+      "key_concepts": [
+        "H0 vs H1",
+        "significance level (alpha=0.05)",
+        "p-value interpretation"
+      ],
+      "sample_answer_points": [
+        "Null Hypothesis (H0): No real difference exists between Control and Treatment versions.",
+        "Alternative Hypothesis (H1): A statistically significant difference exists.",
+        "p-value: The probability of observing results as extreme as ours assuming H0 is true.",
+        "If p < alpha (typically 0.05), we reject H0 in favor of H1."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "a/b test",
+          "null hypothesis",
+          "alternative hypothesis",
+          "p-value",
+          "significance",
+          "alpha"
+        ]
+      }
+    },
+    {
+      "id": "ds_04",
+      "track": "data-scientist",
+      "difficulty": "junior-medium",
+      "question": "Explain Type I error (False Positive) and Type II error (False Negative) in the context of fraud detection.",
+      "key_concepts": [
+        "alpha vs beta",
+        "flagging legitimate user as fraud",
+        "missing a real fraud transaction",
+        "business trade-offs"
+      ],
+      "sample_answer_points": [
+        "Type I error (False Positive): Rejecting true H0 (e.g. flagging an innocent customer's transaction as fraud).",
+        "Type II error (False Negative): Failing to reject false H0 (e.g. failing to detect an actual fraudster).",
+        "Business impact: Type I creates customer friction; Type II causes financial loss."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "type i",
+          "type ii",
+          "false positive",
+          "false negative",
+          "fraud",
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    {
+      "id": "ds_05",
+      "track": "data-scientist",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between Supervised and Unsupervised learning? Give two examples of each.",
+      "key_concepts": [
+        "labeled ground truth vs pattern discovery",
+        "regression/classification vs clustering"
+      ],
+      "sample_answer_points": [
+        "Supervised Learning: Uses labeled training data (inputs paired with known target outputs). Examples: House price prediction (Regression), Email spam detection (Classification).",
+        "Unsupervised Learning: Finds intrinsic patterns in unlabeled data. Examples: Customer segmentation via K-Means (Clustering), PCA (Dimensionality Reduction)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "supervised",
+          "unsupervised",
+          "labeled",
+          "classification",
+          "regression",
+          "clustering",
+          "k-means"
+        ]
+      }
+    },
+    {
+      "id": "ds_06",
+      "track": "data-scientist",
+      "difficulty": "junior-medium",
+      "question": "In a classification model, why is Accuracy alone often a misleading metric on imbalanced datasets?",
+      "key_concepts": [
+        "class imbalance",
+        "Precision, Recall, F1-score",
+        "majority class guessing"
+      ],
+      "sample_answer_points": [
+        "In a fraud dataset where 99.5% of transactions are legitimate, a dummy model guessing 'Not Fraud' achieves 99.5% accuracy.",
+        "However, it caught zero actual fraud cases (Recall = 0%).",
+        "Precision (true positives / predicted positives) and Recall (true positives / actual positives) or F1-score are necessary."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "accuracy",
+          "precision",
+          "recall",
+          "f1-score",
+          "imbalanced",
+          "fraud"
+        ]
+      }
+    },
+    {
+      "id": "ds_07",
+      "track": "data-scientist",
+      "difficulty": "junior-easy",
+      "question": "What is the difference between Linear Regression and Logistic Regression?",
+      "key_concepts": [
+        "continuous outcome vs binary classification",
+        "best-fit line vs sigmoid function"
+      ],
+      "sample_answer_points": [
+        "Linear Regression predicts a continuous numerical target (e.g. Sales in ₹) using a straight line formula `y = mx + c`.",
+        "Logistic Regression predicts probabilities of categorical outcomes (e.g. Churn Yes/No) using an S-shaped Sigmoid curve mapped between 0 and 1."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "linear regression",
+          "logistic regression",
+          "continuous",
+          "binary",
+          "sigmoid",
+          "probability"
+        ]
+      }
+    },
+    {
+      "id": "ds_08",
+      "track": "data-scientist",
+      "difficulty": "junior-medium",
+      "question": "What is Overfitting in machine learning? How do Train/Validation/Test splits help prevent it?",
+      "key_concepts": [
+        "memorizing training noise vs generalizing to unseen data",
+        "cross-validation",
+        "regularization"
+      ],
+      "sample_answer_points": [
+        "Overfitting occurs when a model learns noise and peculiarities of training data, failing on new unseen data.",
+        "Train/Test split tests generalization on data the model never saw during parameter fitting.",
+        "Validation sets assist in tuning hyperparameters without leaking test dataset answers."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "overfitting",
+          "generalization",
+          "train test split",
+          "validation",
+          "noise",
+          "hyperparameters"
+        ]
+      }
+    },
+    {
+      "id": "ds_09",
+      "track": "data-scientist",
+      "difficulty": "junior-medium",
+      "question": "Explain the Central Limit Theorem (CLT) in plain language. Why is it vital in analytics?",
+      "key_concepts": [
+        "sample means distribution",
+        "bell curve regardless of population shape",
+        "confidence intervals"
+      ],
+      "sample_answer_points": [
+        "CLT states that the distribution of sample means approaches a normal (Gaussian) distribution as sample size grows (typically n >= 30), regardless of the shape of the underlying population distribution.",
+        "Enables calculating confidence intervals and running parametric hypothesis tests on real-world skewed data."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "central limit theorem",
+          "clt",
+          "normal distribution",
+          "sample size",
+          "sample mean",
+          "hypothesis testing"
+        ]
+      }
+    },
+    {
+      "id": "ds_10",
+      "track": "data-scientist",
+      "difficulty": "junior-easy",
+      "question": "What is a Confusion Matrix, and what are its four components?",
+      "key_concepts": [
+        "True Positives (TP)",
+        "True Negatives (TN)",
+        "False Positives (FP)",
+        "False Negatives (FN)"
+      ],
+      "sample_answer_points": [
+        "A table summarizing prediction performance of a classification model.",
+        "True Positive (TP): Correctly predicted positive.",
+        "True Negative (TN): Correctly predicted negative.",
+        "False Positive (FP): Incorrectly predicted positive (Type I error).",
+        "False Negative (FN): Incorrectly predicted negative (Type II error)."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "confusion matrix",
+          "true positive",
+          "true negative",
+          "false positive",
+          "false negative"
+        ]
+      }
+    },
+    {
+      "id": "ds_11",
+      "track": "data-scientist",
+      "difficulty": "junior-medium",
+      "question": "What is Feature Engineering, and why is it considered more impactful than model tuning for junior data scientists?",
+      "key_concepts": [
+        "domain transformation",
+        "extracting date features",
+        "ratios",
+        "one-hot encoding"
+      ],
+      "sample_answer_points": [
+        "Feature Engineering creates informative inputs from raw variables (e.g. converting timestamp to `is_weekend`, or calculating `revenue_per_order`).",
+        "A simple model with well-engineered domain features almost always outperforms an over-complex model trained on raw messy inputs.",
+        "Includes handling categorical encoding (One-Hot / Target Encoding) and log transformations."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "feature engineering",
+          "domain",
+          "transformation",
+          "one-hot",
+          "input",
+          "ratios"
+        ]
+      }
+    },
+    {
+      "id": "ds_12",
+      "track": "data-scientist",
+      "difficulty": "scenario",
+      "question": "You need to segment 50,000 customers for a targeted marketing campaign. How would you choose between RFM analysis and K-Means clustering?",
+      "key_concepts": [
+        "RFM (Recency, Frequency, Monetary)",
+        "interpretability",
+        "K-Means scalability",
+        "feature scaling"
+      ],
+      "sample_answer_points": [
+        "RFM Analysis: Rule-based, business-transparent, easy to explain to sales teams without algorithmic opacity.",
+        "K-Means: Useful when exploring more than 3 behavioral dimensions (e.g. app session length, discount sensitivity, category diversity).",
+        "Prerequisite for K-Means: Feature normalization (StandardScaler) because scale differences otherwise distort Euclidean distances."
+      ],
+      "rubric": {
+        "star_applicable": false,
+        "keywords": [
+          "rfm",
+          "k-means",
+          "segmentation",
+          "clustering",
+          "scaling",
+          "interpretability"
+        ]
+      }
+    }
+  ]
+}
