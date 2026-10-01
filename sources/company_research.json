@@ -1,0 +1,97 @@
+{
+  "version": "2.0.0",
+  "updated_at": "2026-10-01",
+  "disclaimer": "Community reviews and discussion links are subjective third-party reports provided for candidate due diligence. They are never treated as official verification facts.",
+  "research_links": {
+    "amazon": {
+      "name": "Amazon",
+      "about_url": "https://www.aboutamazon.in/",
+      "careers_url": "https://www.amazon.jobs/en/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Amazon-Reviews-E6036.htm",
+      "reddit_search_url": "https://www.reddit.com/r/cscareerquestionsIN/search/?q=Amazon+data+analyst+interview",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/amazon-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/amazon/"
+    },
+    "accenture": {
+      "name": "Accenture",
+      "about_url": "https://www.accenture.com/in-en/about/company-index",
+      "careers_url": "https://www.accenture.com/in-en/careers",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Accenture-Reviews-E4138.htm",
+      "reddit_search_url": "https://www.reddit.com/r/cscareerquestionsIN/search/?q=Accenture+data+analyst+associate",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/accenture-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/accenture/"
+    },
+    "swiggy": {
+      "name": "Swiggy",
+      "about_url": "https://www.swiggy.com/about-us",
+      "careers_url": "https://careers.swiggy.com/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Swiggy-Reviews-E1020088.htm",
+      "reddit_search_url": "https://www.reddit.com/r/bangalore/search/?q=Swiggy+analytics+work+culture",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/swiggy-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/swiggy-in/"
+    },
+    "razorpay": {
+      "name": "Razorpay",
+      "about_url": "https://razorpay.com/about/",
+      "careers_url": "https://razorpay.com/jobs/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Razorpay-Reviews-E1140026.htm",
+      "reddit_search_url": "https://www.reddit.com/r/developersIndia/search/?q=Razorpay+analyst+culture",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/razorpay-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/razorpay/"
+    },
+    "zepto": {
+      "name": "Zepto",
+      "about_url": "https://www.zeptonow.com/",
+      "careers_url": "https://www.zeptonow.com/careers",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Zepto-Reviews-E5496466.htm",
+      "reddit_search_url": "https://www.reddit.com/r/developersIndia/search/?q=Zepto+culture+work",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/zepto-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/zeptonow/"
+    },
+    "cred": {
+      "name": "CRED",
+      "about_url": "https://cred.club/about",
+      "careers_url": "https://careers.cred.club/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/CRED-Reviews-E2614352.htm",
+      "reddit_search_url": "https://www.reddit.com/r/bangalore/search/?q=CRED+interview+analyst",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/cred-club-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/cred-club/"
+    },
+    "postman": {
+      "name": "Postman",
+      "about_url": "https://www.postman.com/company/about-us/",
+      "careers_url": "https://www.postman.com/careers/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Postman-Reviews-E1212267.htm",
+      "reddit_search_url": "https://www.reddit.com/r/developersIndia/search/?q=Postman+interview+analytics",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/postman-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/postman-platform/"
+    },
+    "groww": {
+      "name": "Groww",
+      "about_url": "https://groww.in/about-us",
+      "careers_url": "https://groww.in/careers",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Groww-Reviews-E1925345.htm",
+      "reddit_search_url": "https://www.reddit.com/r/developersIndia/search/?q=Groww+work+culture",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/groww-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/groww-in/"
+    },
+    "inmobi": {
+      "name": "InMobi",
+      "about_url": "https://www.inmobi.com/company/about",
+      "careers_url": "https://www.inmobi.com/company/careers/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/InMobi-Reviews-E342674.htm",
+      "reddit_search_url": "https://www.reddit.com/r/bangalore/search/?q=InMobi+culture+analyst",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/inmobi-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/inmobi/"
+    },
+    "freshworks": {
+      "name": "Freshworks",
+      "about_url": "https://www.freshworks.com/company/",
+      "careers_url": "https://www.freshworks.com/company/careers/",
+      "glassdoor_search_url": "https://www.glassdoor.co.in/Reviews/Freshworks-Reviews-E1149487.htm",
+      "reddit_search_url": "https://www.reddit.com/r/developersIndia/search/?q=Freshworks+analyst+interview",
+      "ambitionbox_search_url": "https://www.ambitionbox.com/reviews/freshworks-reviews",
+      "linkedin_search_url": "https://www.linkedin.com/company/freshworks-inc/"
+    }
+  }
+}

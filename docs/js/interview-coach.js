@@ -1,13 +1,13 @@
 /**
  * Analytics Job Scout v2 - Daily Interview Coach
- * Voice & text mock interviews, deterministic rubric scoring, filler-word analysis,
- * speech recognition/synthesis, communication drills, and streak tracking.
+ * Voice & text mock interviews, calibrated deterministic rubric scoring, filler-word analysis,
+ * speech recognition/synthesis, communication drills, streak tracking, and optional progressive AI feedback.
  */
 (function(window) {
   'use strict';
 
   const FILLER_WORDS = ['um', 'uh', 'like', 'basically', 'actually', 'you know', 'kind of', 'sort of', 'i mean', 'so yeah', 'right?'];
-  
+
   const COMMUNICATION_DRILLS = [
     {
       id: 'drill_intro',
@@ -21,7 +21,7 @@
         'Skills: Top tools mentioned naturally (e.g. SQL, Power BI)',
         'Future: Why you are passionate about data analytics'
       ],
-      sampleAnswer: 'Hello! I am a junior data analyst with a background in [Your Field] and hands-on expertise in SQL, Power BI, and Python. Recently, I built an end-to-end sales analytics project analyzing 50,000+ customer records where I designed a star schema and interactive dashboards that highlighted customer retention drop-offs. I love uncovering actionable insights from messy data, and I am excited to bring my technical skills and curiosity to your analytics team.'
+      sampleAnswer: 'Hello! I am an early-career data analyst with hands-on expertise in SQL, Power BI, and Python. Recently, I built an end-to-end sales performance project analyzing 50,000+ transaction records where I designed a star schema and interactive dashboards that highlighted customer retention patterns. I love uncovering actionable insights from messy data, and I am excited to bring my technical foundation and curiosity to your analytics team.'
     },
     {
       id: 'drill_nontech_project',
@@ -35,7 +35,7 @@
         'The Visual/Result: What the stakeholder could now see and do',
         'The Business Impact: Time saved, cost reduced, or decision enabled'
       ],
-      sampleAnswer: 'Our marketing team was unsure which customer campaigns were actually driving repeat purchases. I collected data across our email and sales channels, cleaned out duplicates, and created a simple visual dashboard. For the first time, the team could filter by customer age and see exactly which campaign led to repeat orders. This helped them reallocate 20% of their quarterly ad budget to the highest-performing channel.'
+      sampleAnswer: 'Our marketing team was unsure which customer campaigns were actually driving repeat purchases. I collected data across email and sales channels, cleaned out duplicates, and created a visual dashboard. For the first time, the team could filter by customer age and see exactly which campaign led to repeat orders, helping them reallocate 20% of their quarterly ad budget to the highest-performing channel.'
     },
     {
       id: 'drill_dashboard_insight',
@@ -49,7 +49,7 @@
         'Identify probable contributing factor or anomaly',
         'Propose an immediate next step to investigate'
       ],
-      sampleAnswer: 'Hi team, while reviewing our quarterly customer metrics, I noticed an 18% spike in churn specifically in our southern territory. Diving deeper into the product categories, the drop was concentrated among new subscribers who joined during the summer discount. I propose pulling the customer support ticket logs for this cohort today so we can identify whether this is linked to delivery delays or onboarding confusion.'
+      sampleAnswer: 'Hi team, while reviewing our quarterly customer metrics, I noticed an 18% spike in churn specifically in our southern territory. Looking deeper into the customer categories, the drop was concentrated among new subscribers who joined during the summer campaign. I propose pulling the customer support ticket logs for this cohort today so we can identify whether this is linked to delivery delays or product confusion.'
     },
     {
       id: 'drill_vague_request',
@@ -63,7 +63,7 @@
         'Clarify timeframe, granularity, and format (Excel vs Dashboard)',
         'Confirm the deadline'
       ],
-      sampleAnswer: 'I would be glad to put that together! To make sure it gives you exactly what you need for your decision: Which time period should we focus on—this month compared to last month, or year-to-date? Also, are you looking for high-level revenue figures by region, or a detailed product breakdown in Excel? Let me know your deadline so I can prioritize it accordingly.'
+      sampleAnswer: 'I would be glad to put that together! To make sure it gives you exactly what you need for your decision: Which time period should we focus on—this month compared to last month, or year-to-date? Also, are you looking for high-level revenue figures by region, or a detailed product breakdown in Excel? Let me know your target deadline so I can prioritize it accordingly.'
     },
     {
       id: 'drill_status_update',
@@ -112,7 +112,7 @@
       const recognizer = new SpeechRecognition();
       recognizer.continuous = true;
       recognizer.interimResults = true;
-      recognizer.lang = 'en-IN'; // Default to Indian English / English
+      recognizer.lang = 'en-IN';
 
       recognizer.onresult = function(event) {
         let finalTranscript = '';
@@ -125,22 +125,21 @@
             interimTranscript += event.results[i][0].transcript;
           }
         }
-        if (typeof onTranscript === 'function') {
-          onTranscript(finalTranscript, interimTranscript);
+        if (onTranscript) {
+          onTranscript({
+            final: finalTranscript.trim(),
+            interim: interimTranscript.trim()
+          });
         }
       };
 
       recognizer.onerror = function(event) {
         console.warn('[Speech] Recognition error:', event.error);
-        if (typeof onError === 'function') {
-          onError(event.error);
-        }
+        if (onError) onError(event.error);
       };
 
       recognizer.onend = function() {
-        if (typeof onEnd === 'function') {
-          onEnd();
-        }
+        if (onEnd) onEnd();
       };
 
       return recognizer;
@@ -152,7 +151,7 @@
         return;
       }
       try {
-        window.speechSynthesis.cancel(); // Stop any pending speech
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
@@ -179,18 +178,56 @@
   };
 
   // -------------------------------------------------------------
-  // Deterministic Offline Transcript & Rubric Analyzer
+  // Calibrated Deterministic Offline Rubric Analyzer
   // -------------------------------------------------------------
   function analyzeTranscript(transcript, questionObj, durationSeconds) {
     const text = (transcript || '').trim();
+    if (!text) {
+      return {
+        score: 0,
+        wordCount: 0,
+        durationSeconds: Math.round(durationSeconds || 0),
+        wpm: 0,
+        pacingAssessment: 'No answer provided',
+        totalFillers: 0,
+        fillerCounts: {},
+        matchedKeywords: [],
+        missingKeywords: (questionObj && questionObj.rubricKeywords) ? questionObj.rubricKeywords : [],
+        starCoverage: { situation: false, task: false, action: false, result: false },
+        starCount: 0,
+        metricsFound: [],
+        breakdown: { substance: 0, concepts: 0, structure: 0, metrics: 0, pacing: 0, deductions: 0 },
+        disclaimer: 'Voice pace & metrics are approximate heuristics. No accent, gender, or demographic traits are evaluated.'
+      };
+    }
+
     const words = text.split(/\s+/).filter(Boolean);
     const wordCount = words.length;
 
-    // 1. Approximate Words Per Minute
-    const minutes = Math.max(0.1, (durationSeconds || 30) / 60);
+    // 1. Words Per Minute Pacing
+    const duration = Math.max(1, durationSeconds || 30);
+    const minutes = duration / 60;
     const wpm = Math.round(wordCount / minutes);
 
-    // 2. Filler words detection
+    let pacingAssessment = 'Optimal pace';
+    let pacingPoints = 8; // Default for typed text
+    if (durationSeconds && durationSeconds > 3) {
+      if (wpm >= 110 && wpm <= 155) {
+        pacingAssessment = 'Optimal natural interview pace (110–155 WPM)';
+        pacingPoints = 10;
+      } else if ((wpm >= 85 && wpm < 110) || (wpm > 155 && wpm <= 175)) {
+        pacingAssessment = wpm < 110 ? 'Slightly deliberate / slow' : 'Slightly fast';
+        pacingPoints = 7;
+      } else if (wpm < 85) {
+        pacingAssessment = 'Too slow / hesitant (aim for 110–140 WPM)';
+        pacingPoints = 4;
+      } else {
+        pacingAssessment = 'Too fast (pause after key points for clarity)';
+        pacingPoints = 4;
+      }
+    }
+
+    // 2. Filler word detection
     const lower = text.toLowerCase();
     const fillerCounts = {};
     let totalFillers = 0;
@@ -204,13 +241,16 @@
       }
     });
 
-    // 3. Key Concepts / Rubric Keywords
-    const rubricKeywords = (questionObj && questionObj.rubricKeywords) ? questionObj.rubricKeywords : [];
+    // 3. Rubric Keywords / Key Concept Matching (with basic stemming)
+    const rubricKeywords = (questionObj && Array.isArray(questionObj.rubricKeywords)) ? questionObj.rubricKeywords : [];
     const matchedKeywords = [];
     const missingKeywords = [];
 
     rubricKeywords.forEach(kw => {
-      const rx = new RegExp(`(^|[^a-zA-Z0-9])${kw}([^a-zA-Z0-9]|$)`, 'i');
+      // Build a flexible pattern: e.g. "clean" matches "cleaning", "cleaned", "cleans"
+      const baseStem = kw.toLowerCase().replace(/(ing|ed|s|es)$/, '');
+      const pattern = baseStem.length >= 3 ? baseStem : kw;
+      const rx = new RegExp(`(^|[^a-zA-Z0-9])${pattern}`, 'i');
       if (rx.test(lower)) {
         matchedKeywords.push(kw);
       } else {
@@ -218,58 +258,81 @@
       }
     });
 
-    // 4. STAR Methodology check (Situation, Task, Action, Result)
+    // 4. STAR Methodology Coverage (Situation, Task, Action, Result)
     const starMatches = {
-      situation: /(situation|context|project was|company was|background|when I was)/i.test(lower),
-      task: /(task|goal|objective|needed to|assigned to|responsible for|target was)/i.test(lower),
-      action: /(action|built|created|engineered|queried|analyzed|designed|developed|implemented|automated)/i.test(lower),
-      result: /(result|outcome|impact|achieved|reduced|increased|improved|saved|delivered|metric)/i.test(lower)
+      situation: /(situation|context|project was|company was|background|when I was|working on|scenario|analyzing|dataset)/i.test(lower),
+      task: /(task|goal|objective|needed to|assigned to|responsible for|target was|challenge|aim was)/i.test(lower),
+      action: /(action|built|created|engineered|queried|analyzed|designed|developed|implemented|automated|calculated|modeled|extracted|cleaned|tested)/i.test(lower),
+      result: /(result|outcome|impact|achieved|reduced|increased|improved|saved|delivered|metric|helped|concluded|identified|highlighted)/i.test(lower)
     };
     const starCount = Object.values(starMatches).filter(Boolean).length;
 
-    // 5. Numerical / Metric evidence check
-    const metricsFound = lower.match(/\b(\d+(\.\d+)?%|\$\d+|\₹\d+|\b\d+\+?\s*(rows|records|users|seconds|hours|queries|crore|lakh|percent))\b/gi) || [];
+    // 5. Quantifiable Metrics & Evidence (supports commas like 45,000 and % like 18%)
+    const metricsFound = lower.match(/(?:\b\d{1,3}(?:,\d{3})*|\b\d+)(?:\.\d+)?%|[$₹]\s*\d+|\b\d{1,3}(?:,\d{3})*\+?\s*(?:records|rows|users|customers|orders|transactions|seconds|hours|minutes|queries|crore|lakh|percent|tables?|kpis?|pages?|measures?)\b/gi) || [];
 
-    // 6. Score calculation (0 - 100)
-    let score = 50; // base score for a typed answer
+    // ---------------------------------------------------------
+    // 6. Calibrated Multi-Factor Scoring (0-100)
+    // ---------------------------------------------------------
+    // A. Substance & Length (up to 30 pts)
+    let substancePoints = 0;
+    if (wordCount < 10) substancePoints = 4;
+    else if (wordCount < 20) substancePoints = 8;
+    else if (wordCount < 35) substancePoints = 14;
+    else if (wordCount < 50) substancePoints = 20;
+    else if (wordCount <= 220) substancePoints = 30; // Ideal interview answer length
+    else substancePoints = 24; // Slightly verbose
 
-    // Length check
-    if (wordCount < 20) {
-      score = 30; // Very brief
-    } else if (wordCount >= 40 && wordCount <= 250) {
-      score += 15; // Healthy length
-    } else if (wordCount > 250) {
-      score += 10;
-    }
-
-    // Concept match
+    // B. Relevance & Key Concept Coverage (up to 35 pts)
+    let conceptPoints = 0;
     if (rubricKeywords.length > 0) {
-      const conceptFraction = matchedKeywords.length / rubricKeywords.length;
-      score += Math.round(conceptFraction * 25);
+      const fraction = matchedKeywords.length / rubricKeywords.length;
+      conceptPoints = Math.round(fraction * 35);
     } else {
-      score += 15;
+      // General question without rubric keywords: evaluate analytics terms
+      const generalKeywords = ['data', 'analysis', 'metric', 'insight', 'table', 'result', 'decision', 'user', 'team', 'process'];
+      const matchedGen = generalKeywords.filter(k => lower.includes(k));
+      conceptPoints = Math.min(30, Math.round((matchedGen.length / 5) * 30));
     }
 
-    // STAR bonus (for behavioral/scenario)
-    if (starCount >= 3) score += 10;
-    else if (starCount >= 2) score += 5;
+    // C. Structure & Problem Solving / STAR (up to 15 pts)
+    let structurePoints = 0;
+    if (starCount === 4) structurePoints = 15;
+    else if (starCount === 3) structurePoints = 12;
+    else if (starCount === 2) structurePoints = 8;
+    else if (starCount === 1) structurePoints = 4;
 
-    // Metrics bonus
-    if (metricsFound.length > 0) score += 5;
+    // D. Quantifiable Evidence & Concrete Metrics (up to 10 pts)
+    let metricsPoints = Math.min(10, metricsFound.length * 5);
 
-    // Filler penalty
-    if (totalFillers > 5) score -= Math.min(15, totalFillers);
+    // E. Deductions for heavy filler usage
+    let fillerDeduction = 0;
+    if (totalFillers > 2) {
+      fillerDeduction = Math.min(15, (totalFillers - 2) * 2);
+    }
 
-    score = Math.min(100, Math.max(10, Math.round(score)));
+    // Uncapped raw sum
+    let rawScore = substancePoints + conceptPoints + structurePoints + metricsPoints + pacingPoints - fillerDeduction;
 
-    // Qualitative assessment
-    let pacingAssessment = 'Normal speaking pace';
-    if (wpm < 90 && wordCount > 15) pacingAssessment = 'Deliberate / slightly slow (try 110-140 WPM)';
-    else if (wpm > 165) pacingAssessment = 'Fast-paced (pause after main points for clarity)';
-    else if (wpm >= 110 && wpm <= 150) pacingAssessment = 'Optimal natural interview pace';
+    // Hard boundary caps to strictly prevent short / incomplete answers from receiving high scores
+    if (wordCount < 10) {
+      rawScore = Math.min(15, rawScore);
+    } else if (wordCount < 20) {
+      rawScore = Math.min(30, rawScore);
+    } else if (wordCount < 35) {
+      rawScore = Math.min(50, rawScore);
+    } else if (wordCount < 50) {
+      rawScore = Math.min(70, rawScore);
+    }
+
+    // Irrelevant answer cap: if question had rubric keywords and candidate matched 0
+    if (rubricKeywords.length >= 3 && matchedKeywords.length === 0) {
+      rawScore = Math.min(38, rawScore);
+    }
+
+    const finalScore = Math.min(100, Math.max(0, Math.round(rawScore)));
 
     return {
-      score: score,
+      score: finalScore,
       wordCount: wordCount,
       durationSeconds: Math.round(durationSeconds || 0),
       wpm: wpm,
@@ -281,6 +344,14 @@
       starCoverage: starMatches,
       starCount: starCount,
       metricsFound: metricsFound,
+      breakdown: {
+        substance: substancePoints,
+        concepts: conceptPoints,
+        structure: structurePoints,
+        metrics: metricsPoints,
+        pacing: pacingPoints,
+        deductions: fillerDeduction
+      },
       disclaimer: 'Voice pace & metrics are approximate heuristics. No accent, gender, or demographic traits are evaluated.'
     };
   }
@@ -298,121 +369,84 @@
         const res = await fetch('./data/interview-questions.json');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        
-        const tracksObj = data.tracks || {};
-        const questionsList = Array.isArray(data.questions) ? data.questions : [];
-
-        const normalizedTracks = Object.keys(tracksObj).map(trackKey => {
-          const t = tracksObj[trackKey];
-          const trackQuestions = questionsList
-            .filter(q => q.track === trackKey || q.track === trackKey.replace(/-/g, '_'))
-            .map(q => ({
-              id: q.id,
-              trackId: trackKey,
-              difficulty: q.difficulty || 'junior',
-              question: q.question,
-              keyConcepts: q.key_concepts || [],
-              sampleAnswerPoints: q.sample_answer_points || [],
-              rubricKeywords: (q.rubric && q.rubric.keywords) ? q.rubric.keywords : []
-            }));
-
-          return {
-            id: trackKey,
-            title: t.title || trackKey,
-            description: t.description || '',
-            icon: t.icon || '💬',
-            questions: trackQuestions
-          };
-        });
-
-        return normalizedTracks;
-      } catch (e) {
-        console.warn('[Coach] Could not fetch interview questions file:', e);
+        if (data && data.tracks && data.questions) {
+          // Format into tracks array
+          const tracks = [];
+          Object.keys(data.tracks).forEach(trackKey => {
+            const meta = data.tracks[trackKey];
+            const qs = data.questions.filter(q => q.track === trackKey);
+            tracks.push({
+              id: trackKey,
+              title: meta.title,
+              icon: meta.icon,
+              description: meta.description,
+              questions: qs
+            });
+          });
+          return tracks;
+        }
         return [];
+      } catch (e) {
+        console.warn('[Coach] Could not load questions JSON, using fallback:', e.message);
+        return Coach.getFallbackTracks();
       }
     },
 
-    getQuestionsForTrack: function(tracks, trackId, count) {
-      count = count || 5;
-      if (!Array.isArray(tracks)) return [];
-      const normId = (trackId || '').replace(/_/g, '-');
-      const track = tracks.find(t => t.id.replace(/_/g, '-') === normId);
-      if (!track || !track.questions || track.questions.length === 0) {
-        return [];
-      }
-
-      // Deterministic daily rotation using day-of-year seed
-      const now = new Date();
-      const start = new Date(now.getFullYear(), 0, 0);
-      const diff = now - start;
+    getQuestionsForTrack: function(tracks, trackId, count = 5) {
+      const track = (tracks || []).find(t => t.id === trackId);
+      if (!track || !track.questions || !track.questions.length) return [];
+      
+      // Deterministic rotation based on local day of year to ensure daily variety
+      const d = new Date();
+      const startOfYear = new Date(d.getFullYear(), 0, 0);
+      const diff = d - startOfYear;
       const oneDay = 1000 * 60 * 60 * 24;
       const dayOfYear = Math.floor(diff / oneDay);
 
       const qs = [...track.questions];
-      const shuffled = qs.sort((a, b) => {
-        const hashA = (a.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + dayOfYear) % 17;
-        const hashB = (b.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + dayOfYear) % 17;
-        return hashA - hashB;
-      });
-
-      return shuffled.slice(0, count);
+      const offset = dayOfYear % qs.length;
+      const rotated = qs.slice(offset).concat(qs.slice(0, offset));
+      return rotated.slice(0, count);
     },
 
-    getDailyMixedSession: function(tracks, count) {
-      count = count || 5;
-      if (!Array.isArray(tracks)) return [];
-      const picked = [];
-      const trackKeywords = ['hr', 'fundamentals', 'sql', 'case', 'star'];
-
-      trackKeywords.forEach(kw => {
-        const t = tracks.find(tr => (tr.id || '').toLowerCase().includes(kw));
-        if (t && Array.isArray(t.questions) && t.questions.length > 0) {
-          const randomIndex = Math.floor(Math.random() * t.questions.length);
-          picked.push(Object.assign({}, t.questions[randomIndex], { trackId: t.id, trackName: t.title }));
+    getDailyMixedSession: function(tracks, count = 5) {
+      const targetTracks = ['hr-fresher', 'sql', 'power-bi', 'case-study', 'behavioral-star'];
+      const chosen = [];
+      targetTracks.forEach(tId => {
+        const t = (tracks || []).find(x => x.id === tId);
+        if (t && t.questions && t.questions.length) {
+          const qs = Coach.getQuestionsForTrack(tracks, tId, 1);
+          if (qs.length) chosen.push(qs[0]);
         }
       });
-
-      // If less than count, fill with random questions from any track
-      if (picked.length < count) {
-        tracks.forEach(tr => {
-          if (picked.length < count && tr.questions && tr.questions.length) {
-            picked.push(Object.assign({}, tr.questions[0], { trackId: tr.id, trackName: tr.title }));
-          }
-        });
-      }
-
-      return picked.slice(0, count);
+      return chosen.slice(0, count);
     },
 
-    getQuestionsForJob: function(tracks, job, count) {
-      count = count || 5;
-      if (!Array.isArray(tracks)) return [];
-      const title = (job.title || '').toLowerCase();
+    getQuestionsForJob: function(tracks, job, count = 5) {
+      if (!job || !tracks || !tracks.length) return Coach.getDailyMixedSession(tracks, count);
       const skills = (job.skills || []).map(s => s.toLowerCase());
-
       const chosenQuestions = [];
 
-      // 1. Tailored introduction
-      const hrTrack = tracks.find(t => t.id.includes('hr'));
-      if (hrTrack && hrTrack.questions.length > 0) {
-        chosenQuestions.push(Object.assign({}, hrTrack.questions[0], {
-          question: `Why are you interested in the ${job.title || 'Data Analyst'} role at ${job.company || 'our company'}?`,
-          sampleAnswerPoints: [
-            `Demonstrate research on ${job.company || 'the company'} and understanding of the role`,
-            'Connect your skills in ' + (skills.slice(0, 3).join(', ') || 'analytics') + ' directly to their business needs',
-            'Convey genuine enthusiasm for solving their data problems'
-          ],
-          rubricKeywords: ['company', 'role', 'skills', 'analytics', 'growth', 'data']
-        }));
-      }
+      // Company/Role opening question
+      chosenQuestions.push({
+        id: 'job_custom_intro',
+        track: 'hr-fresher',
+        difficulty: 'easy',
+        question: `Why are you interested in joining ${job.company || 'our company'} as a ${job.title || 'Data Analyst'}, and how does your project background fit this role?`,
+        sampleAnswerPoints: [
+          `Demonstrate research on ${job.company || 'the company'} and understanding of the role`,
+          'Connect your skills in ' + (skills.slice(0, 3).join(', ') || 'analytics') + ' directly to their business needs',
+          'Convey genuine enthusiasm for solving real-world data problems'
+        ],
+        rubricKeywords: ['company', 'role', 'skills', 'analytics', 'growth', 'data']
+      });
 
-      // 2. Select tech questions matching job requirements
       if (skills.some(s => s.includes('sql') || s.includes('query'))) {
         const sqlTrack = tracks.find(t => t.id.includes('sql'));
         if (sqlTrack && sqlTrack.questions.length) chosenQuestions.push(sqlTrack.questions[0]);
       }
       if (skills.some(s => s.includes('power bi') || s.includes('bi') || s.includes('tableau') || s.includes('excel'))) {
-        const biTrack = tracks.find(t => t.id.includes('powerbi') || t.id.includes('excel'));
+        const biTrack = tracks.find(t => t.id.includes('power-bi') || t.id.includes('excel'));
         if (biTrack && biTrack.questions.length) chosenQuestions.push(biTrack.questions[0]);
       }
       if (skills.some(s => s.includes('python') || s.includes('pandas'))) {
@@ -420,18 +454,16 @@
         if (pyTrack && pyTrack.questions.length) chosenQuestions.push(pyTrack.questions[0]);
       }
 
-      // 3. Case study & metrics
       const caseTrack = tracks.find(t => t.id.includes('case'));
       if (caseTrack && caseTrack.questions.length) chosenQuestions.push(caseTrack.questions[0]);
 
-      // 4. STAR behavioral
       const starTrack = tracks.find(t => t.id.includes('star') || t.id.includes('behavioral'));
       if (starTrack && starTrack.questions.length) chosenQuestions.push(starTrack.questions[0]);
 
       return chosenQuestions.slice(0, count);
     },
 
-    // AI Coaching with fallback
+    // Progressive AI Feedback with graceful offline fallback
     generateAIFeedback: async function(questionObj, transcript, metricAnalysis) {
       const ai = window.AJSAIClient;
       if (!ai || !ai.hasConsent()) {
@@ -442,30 +474,35 @@
       }
 
       const prompt = [
-        `You are a supportive, precise analytics interview coach for freshers and junior analysts.`,
+        `You are a supportive, precise analytics interview coach for junior and fresher candidates.`,
         `Question Asked: "${questionObj.question}"`,
         `Candidate Answer:`,
         ai.wrapUntrusted('TRANSCRIPT', transcript),
         '',
-        `Deterministic Heuristic Stats:`,
-        `- Score: ${metricAnalysis.score}/100`,
+        `Deterministic Rubric Statistics:`,
+        `- Calibrated Score: ${metricAnalysis.score}/100`,
         `- Word count: ${metricAnalysis.wordCount} words`,
         `- Pacing: ${metricAnalysis.wpm} WPM (${metricAnalysis.pacingAssessment})`,
         `- Filler words detected: ${metricAnalysis.totalFillers}`,
         `- Matched key concepts: ${metricAnalysis.matchedKeywords.join(', ') || 'None'}`,
         `- Missing expected concepts: ${metricAnalysis.missingKeywords.join(', ') || 'None'}`,
+        `- STAR structure count: ${metricAnalysis.starCount}/4`,
         '',
-        `Provide concise coaching:`,
+        `Provide concise, structured coaching:`,
         `1. What was done well.`,
         `2. Technical accuracy & concept gaps to fix.`,
         `3. Improved rewrite outline (or model answer).`,
         `4. One natural follow-up question.`,
-        `Keep response constructive, concise, and professional.`
+        `Keep response constructive, ATS/interview-focused, and strictly under 250 words.`
       ].join('\n');
 
-      const res = await ai.chat('You are an expert analytics technical interviewer.', prompt);
-      if (res.success && res.text) {
-        return { source: 'puter_ai', feedbackText: res.text };
+      try {
+        const res = await ai.chat('You are an expert analytics technical interviewer.', prompt);
+        if (res && res.success && res.text) {
+          return { source: 'puter_ai', feedbackText: res.text };
+        }
+      } catch (err) {
+        console.warn('[Coach] AI feedback call failed, using local rubric fallback:', err);
       }
 
       return {
@@ -476,7 +513,7 @@
 
     generateLocalFeedback: function(questionObj, transcript, metricAnalysis) {
       const lines = [
-        `### Interview Coach Analysis (Deterministic Rubric)`,
+        `### Interview Coach Analysis (Deterministic Local Rubric)`,
         `**Answer Score**: ${metricAnalysis.score}/100 | **Pacing**: ${metricAnalysis.wpm} WPM (${metricAnalysis.pacingAssessment})`,
         '',
         `#### Key Concept Check:`,
@@ -484,20 +521,53 @@
         `- **Concepts to Incorporate**: ${metricAnalysis.missingKeywords.join(', ') || 'Great coverage of expected concepts'}`,
         '',
         `#### Delivery & Style:`,
-        `- **Filler Words**: Detected ${metricAnalysis.totalFillers} fillers (${Object.keys(metricAnalysis.fillerCounts).map(k => `${k}: ${metricAnalysis.fillerCounts[k]}`).join(', ') || 'Zero fillers detected! Excellent poise.'})`,
+        `- **Filler Words**: Detected ${metricAnalysis.totalFillers} fillers (${Object.keys(metricAnalysis.fillerCounts).map(k => `${k}: ${metricAnalysis.fillerCounts[k]}`).join(', ') || 'Zero fillers detected! Poised delivery.'})`,
         `- **STAR Method Coverage**: Situation: ${metricAnalysis.starCoverage.situation ? '✓' : '✗'}, Task: ${metricAnalysis.starCoverage.task ? '✓' : '✗'}, Action: ${metricAnalysis.starCoverage.action ? '✓' : '✗'}, Result: ${metricAnalysis.starCoverage.result ? '✓' : '✗'}`,
-        `- **Quantifiable Proof**: ${metricAnalysis.metricsFound.length > 0 ? `Good use of numbers (${metricAnalysis.metricsFound.slice(0, 3).join(', ')})` : 'Include specific figures (e.g. rows processed, % saved, time taken) to validate your experience.'}`,
+        `- **Quantifiable Proof**: ${metricAnalysis.metricsFound.length > 0 ? `Good use of metrics (${metricAnalysis.metricsFound.slice(0, 3).join(', ')})` : 'Include specific figures (e.g. rows processed, % time saved) to validate your experience.'}`,
         '',
-        `#### Model Answer Key Points:`,
+        `#### Recommended Model Answer Points:`,
         ...(questionObj.sampleAnswerPoints || []).map(p => `- ${p}`),
         '',
         `#### Follow-up Question:`,
-        `*"Can you elaborate on how you handled edge cases or unexpected null values in this scenario?"*`
+        `*"Can you walk me through how you would validate data quality or handle unexpected null values in this scenario?"*`
       ];
 
       return lines.join('\n');
+    },
+
+    getFallbackTracks: function() {
+      return [
+        {
+          id: 'hr-fresher',
+          title: 'HR & Fresher Introduction',
+          description: 'Foundational motivation and background questions.',
+          questions: [
+            {
+              id: 'fb_hr_1',
+              track: 'hr-fresher',
+              question: 'Tell me about yourself and why you want to build a career in data analytics.',
+              sampleAnswerPoints: ['Highlight analytics tools (SQL, Excel, BI)', 'Mention 1 project with business outcome', 'Convey enthusiasm for problem-solving'],
+              rubricKeywords: ['analytics', 'sql', 'excel', 'power bi', 'project', 'insight']
+            }
+          ]
+        },
+        {
+          id: 'sql',
+          title: 'SQL & Relational Databases',
+          description: 'Core SQL queries, joins, and aggregations.',
+          questions: [
+            {
+              id: 'fb_sql_1',
+              track: 'sql',
+              question: 'What is the difference between WHERE and HAVING in SQL, and when would you use each?',
+              sampleAnswerPoints: ['WHERE filters rows before aggregation', 'HAVING filters aggregated groups', 'HAVING requires GROUP BY and aggregate functions'],
+              rubricKeywords: ['where', 'having', 'aggregate', 'group by', 'filter', 'rows']
+            }
+          ]
+        }
+      ];
     }
   };
 
   window.AJSInterviewCoach = Coach;
-})(window);
+})(typeof window !== 'undefined' ? window : globalThis);

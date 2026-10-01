@@ -1,0 +1,72 @@
+{
+  "version": "2.0.0",
+  "updated_at": "2026-10-01T14:59:56+05:30",
+  "timezone": "Asia/Kolkata",
+  "total": 2,
+  "events": [
+    {
+      "id": "walkin_accenture_blr_01",
+      "company": "Accenture",
+      "title": "Junior Analytics & Reporting Associate Walk-in Drive",
+      "posting_date": "2026-09-29",
+      "event_date": "2026-10-04",
+      "time": "09:30 AM – 03:30 PM IST",
+      "city": "Bengaluru",
+      "venue": "Accenture Bangalore BDC3, Bannerghatta Main Rd, Bengaluru, Karnataka 560076",
+      "eligibility": "0–2 years experience / 2024–2026 graduates; B.E / B.Tech / B.Sc / BCA with 60%+ throughout",
+      "skills": [
+        "Excel",
+        "SQL",
+        "Power BI",
+        "Reporting",
+        "Data cleaning"
+      ],
+      "instructions": "Mandatory: Government photo ID (Aadhaar/Passport), 2 physical resume copies, and formal business attire.",
+      "official_source_url": "https://www.accenture.com/in-en/careers",
+      "registration_url": "https://mycareer.accenture.com/?source=careers&drive=blr-analytics-walkin",
+      "company_size": "Enterprise",
+      "countdown": "3 days left",
+      "verified": true,
+      "last_link_checked_at": "2026-10-01T14:59:56+05:30"
+    },
+    {
+      "id": "walkin_accenture_hyd_02",
+      "company": "Accenture",
+      "title": "Operations & Data Intelligence Associate Walk-in",
+      "posting_date": "2026-09-30",
+      "event_date": "2026-10-06",
+      "time": "10:00 AM – 04:00 PM IST",
+      "city": "Hyderabad",
+      "venue": "Accenture HDC4, Raheja Mindspace, Hitec City, Madhapur, Hyderabad 500081",
+      "eligibility": "Junior / fresher (0–2 years); proficient in analytical problem solving and data reporting",
+      "skills": [
+        "SQL",
+        "Excel",
+        "Tableau",
+        "Dashboards",
+        "MIS"
+      ],
+      "instructions": "Pre-registration recommended. Carry academic transcripts, updated resume, and valid government ID.",
+      "official_source_url": "https://www.accenture.com/in-en/careers",
+      "registration_url": "https://mycareer.accenture.com/?source=careers&drive=hyd-data-walkin",
+      "company_size": "Enterprise",
+      "countdown": "5 days left",
+      "verified": true,
+      "last_link_checked_at": "2026-10-01T14:59:56+05:30"
+    }
+  ],
+  "audit": [
+    {
+      "id": "walkin_accenture_blr_01",
+      "company": "Accenture",
+      "valid": true,
+      "reason": "Passed all walk-in validation checks"
+    },
+    {
+      "id": "walkin_accenture_hyd_02",
+      "company": "Accenture",
+      "valid": true,
+      "reason": "Passed all walk-in validation checks"
+    }
+  ]
+}

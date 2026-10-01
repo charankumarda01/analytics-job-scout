@@ -491,10 +491,9 @@ def scan_only(output: str):
         "locations": ["Hyderabad", "Bengaluru", "Chennai", "Remote India"],
         "types": ["jobs", "internships"],
     }
-    data = scan(preferences)
     path = Path(output).resolve()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    from scanner.engine import run_full_scan
+    data = run_full_scan(preferences=preferences, output_path=path, check_live_http=True)
     print(f"Daily scan written to {path}")
     print(json.dumps(data["summary"], indent=2))
 

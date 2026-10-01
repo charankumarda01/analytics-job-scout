@@ -33,11 +33,39 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install scanner dependency
-        run: pip install -r requirements.txt
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Validate Python syntax
+        run: |
+          python -m compileall scanner tests server.py
+
+      - name: Validate JavaScript syntax
+        run: |
+          node -c docs/js/storage.js docs/js/ai-client.js docs/js/resume-agent.js docs/js/interview-coach.js docs/js/walkin-alerts.js docs/js/app.js
+
+      - name: Run Python unit & schema tests
+        run: |
+          python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Run Node unit tests
+        run: |
+          node tests/test_storage.test.js
+          node tests/test_interview_scoring.test.js
+          node tests/test_resume_ats.test.js
 
       - name: Run strict official-source scan
         run: python server.py --scan-only --output docs/data/latest.json
+
+      - name: Verify payload safety & schema
+        run: |
+          python -m unittest tests/test_payload_schema.py
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

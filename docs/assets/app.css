@@ -621,3 +621,127 @@ a { color: inherit; }
   .resume-sidebar-col { position: static !important; }
   .resume-preview-sheet { border: none !important; box-shadow: none !important; padding: 0 !important; }
 }
+
+/* -------------------------------------------------------------
+   Walk-in Alerts & Event Badges
+------------------------------------------------------------- */
+.walkin-card {
+  border-left: 4px solid var(--accent);
+}
+.countdown-badge {
+  background: #eef7f5;
+  color: var(--accent-dark);
+  font-weight: 700;
+  border: 1px solid #cce8df;
+}
+.countdown-badge.urgent {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffeeba;
+  animation: pulse-badge 2s infinite ease-in-out;
+}
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.walkin-new-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e8f7f0;
+  border: 1px solid #b7e4ce;
+  color: #106c59;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+.walkin-feed-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.btn.active-green {
+  background: #118c73;
+  color: #fff;
+  border-color: #118c73;
+}
+
+/* -------------------------------------------------------------
+   Company Research Drawer & Modals
+------------------------------------------------------------- */
+.research-drawer {
+  max-width: 600px;
+  width: 95%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.research-link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.research-link-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f8faf9;
+  border: 1px solid #e2eae6;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.research-link-card:hover {
+  background: #f0f7f4;
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+.research-disclaimer {
+  background: #fff9e6;
+  border: 1px solid #fae69e;
+  color: #875c00;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  margin-top: 16px;
+}
+.research-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.research-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Stale Data / Unavailable Banner */
+.stale-scan-banner {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+

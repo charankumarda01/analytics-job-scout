@@ -198,8 +198,8 @@
     }
 
     // 4. Measurable Impact & Quantifiable Evidence (Max 15 pts)
-    // Look for numbers, percentages, currency, time savings, data volume
-    const metricMatches = cleanText.match(/\b(\d+(\.\d+)?%|\$\d+|\₹\d+|\b\d+\+?\s*(rows|records|users|clients|queries|seconds|minutes|hours|days|weeks|months|percent|lakh|crore|million|k\b))\b/gi) || [];
+    // Look for numbers, percentages, currency, time savings, data volume (supports commas like 120,000 and ₹4,50,000)
+    const metricMatches = cleanText.match(/(?:\b\d{1,3}(?:,\d{2,3})*|\b\d+)(?:\.\d+)?%|[$₹]\s*(?:\d{1,3}(?:,\d{2,3})*|\d+)|\b(?:\d{1,3}(?:,\d{2,3})*|\d+)\+?\s*(?:rows|records|users|customers|orders|transactions|clients|queries|seconds|minutes|hours|days|weeks|months|percent|lakh|crore|million|k\b)/gi) || [];
     let impactPts = 0;
     if (metricMatches.length >= 6) impactPts = 15;
     else if (metricMatches.length >= 4) impactPts = 12;
@@ -590,7 +590,9 @@
     STRONG_ACTION_VERBS: STRONG_ACTION_VERBS,
     parseFile: parseFile,
     analyzeResumeATS: analyzeResumeATS,
+    analyzeATS: analyzeResumeATS,
     matchJobWithResume: matchJobWithResume,
+    matchJob: matchJobWithResume,
     OfflineGenerators: OfflineGenerators,
 
     // AI-Enhanced actions with graceful fallback
@@ -687,4 +689,4 @@
   };
 
   window.AJSResumeAgent = ResumeAgent;
-})(window);
+})(typeof window !== 'undefined' ? window : globalThis);

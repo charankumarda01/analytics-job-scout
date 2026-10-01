@@ -42,7 +42,11 @@
         </button>
         <button class="nav-btn" data-view="jobs" id="nav-jobs">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg>
-          Verified jobs <span class="nav-count" id="jobsNavCount">10</span>
+          Verified jobs <span class="nav-count" id="jobsNavCount">0</span>
+        </button>
+        <button class="nav-btn" data-view="walkins" id="nav-walkins">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Walk-in Alerts <span class="nav-count" id="walkinNavCount">0</span>
         </button>
         <button class="nav-btn" data-view="applications" id="nav-applications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -76,7 +80,7 @@
 
       <div class="sidebar-foot">
         <div class="eyebrow">Last verified scan</div>
-        <strong>30 Sep 2026 · Asia/Kolkata</strong>
+        <strong id="sidebarFootDate">Daily at 08:30 IST</strong>
         <p>100% official company career portals. No scraper intermediaries or fabricated jobs.</p>
       </div>
     </aside>
@@ -93,6 +97,9 @@
         </div>
         <div class="top-actions">
           <span class="verified-pill"><span class="status-dot"></span>Official sources verified</span>
+          <button class="btn" id="suggestSourceTopBtn">
+            💡 Suggest source
+          </button>
           <button class="btn primary" id="runScanTop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6"/></svg>
             Daily scan
@@ -108,39 +115,45 @@
 
         <!-- 1. OVERVIEW VIEW -->
         <section class="view active" id="view-overview">
+          <div id="staleScanBanner" class="stale-scan-banner" hidden>
+            <span>⚠️ <strong>Notice:</strong> Scan data is currently unavailable or stale. No unverified fallback jobs are shown.</span>
+            <button class="btn small" id="retryScanBtn">Retry live scan</button>
+          </div>
+          <div id="walkinAlertBanner" hidden></div>
+
           <div class="hero">
             <div class="hero-copy">
               <div class="eyebrow">Today’s verified scan</div>
-              <h1 id="overviewHeroTitle">10 roles worth your time.<br/>Zero unverified noise.</h1>
-              <p>Junior analytics opportunities across Bengaluru and Hyderabad, verified for explicit date, experience (≤2 yrs), skills, and live application endpoints.</p>
+              <h1 id="overviewHeroTitle">Verified junior roles.<br/>Zero unverified noise.</h1>
+              <p>Junior analytics opportunities across Bengaluru, Hyderabad, Chennai, and Remote India, verified for explicit date, experience (≤2 yrs), skills, and live application endpoints.</p>
               <div class="hero-tags">
-                <span class="hero-tag" id="heroFresh">5 fresh</span>
-                <span class="hero-tag" id="heroBackup">5 backups</span>
-                <span class="hero-tag" id="heroCompanies">2 companies hiring</span>
+                <span class="hero-tag" id="heroFresh">-- fresh</span>
+                <span class="hero-tag" id="heroBackup">-- backups</span>
+                <span class="hero-tag" id="heroCompanies">-- companies hiring</span>
                 <span class="hero-tag">Strict duplicate control</span>
               </div>
             </div>
             <div class="hero-side">
-              <div class="hero-score"><div class="hero-score-inner"><strong>10/10</strong><span>live apply links</span></div></div>
+              <div class="hero-score"><div class="hero-score-inner"><strong id="overviewHeroScore">--</strong><span>live apply links</span></div></div>
             </div>
           </div>
 
           <div class="metrics">
             <div class="metric">
               <div class="metric-top"><span class="metric-label">Verified matches</span></div>
-              <strong id="overviewTotal">10</strong><div class="metric-note">Passed all five verification checks</div>
+              <strong id="overviewTotal">--</strong><div class="metric-note">Passed all five verification checks</div>
             </div>
             <div class="metric blue">
               <div class="metric-top"><span class="metric-label">Fresh priority</span></div>
-              <strong id="overviewFresh">5</strong><div class="metric-note">Posted in the last 0–5 days</div>
+              <strong id="overviewFresh">--</strong><div class="metric-note">Posted in the last 0–5 days</div>
             </div>
             <div class="metric amber">
               <div class="metric-top"><span class="metric-label">Backup window</span></div>
-              <strong id="overviewBackup">5</strong><div class="metric-note">Posted 6–15 days ago</div>
+              <strong id="overviewBackup">--</strong><div class="metric-note">Posted 6–15 days ago</div>
             </div>
             <div class="metric gray">
               <div class="metric-top"><span class="metric-label">Internships</span></div>
-              <strong id="overviewInternships">0</strong><div class="metric-note">Verified intern openings</div>
+              <strong id="overviewInternships">--</strong><div class="metric-note">Verified intern openings</div>
             </div>
           </div>
 
@@ -162,7 +175,7 @@
 
           <div class="section-head">
             <div><div class="eyebrow">Action queue</div><h2>Apply first</h2><p>Best balance of role fit, freshness, and junior experience.</p></div>
-            <button class="text-link" data-go="jobs">View all 10 →</button>
+            <button class="text-link" id="viewAllJobsLink" data-go="jobs">View all verified roles →</button>
           </div>
           <div class="priority-grid" id="priorityGrid"></div>
 
@@ -260,17 +273,70 @@
           <div class="toolbar">
             <div class="field"><label for="jobSearch">Search</label><input type="text" id="jobSearch" placeholder="Filter by title, company, skill or tool…" /></div>
             <div class="field"><label for="locationFilter">Location</label><select id="locationFilter"><option value="all">All locations</option><option value="Bengaluru">Bengaluru</option><option value="Hyderabad">Hyderabad</option><option value="Chennai">Chennai</option><option value="Remote India">Remote India</option></select></div>
+            <div class="field"><label for="sizeFilter">Company size</label><select id="sizeFilter"><option value="all">All sizes</option><option value="Startup">Startup</option><option value="Mid-size">Mid-size</option><option value="Enterprise">Enterprise</option></select></div>
             <div class="field"><label for="freshnessFilter">Freshness</label><select id="freshnessFilter"><option value="all">All (0–15 days)</option><option value="fresh">Fresh (0–5 days)</option><option value="backup">Backups (6–15 days)</option></select></div>
-            <div class="field"><label for="companyFilter">Company</label><select id="companyFilter"><option value="all">All companies</option><option value="Amazon">Amazon</option><option value="Accenture">Accenture</option></select></div>
+            <div class="field"><label for="companyFilter">Company</label><select id="companyFilter"><option value="all">All companies</option></select></div>
             <div class="field"><label for="sortFilter">Sort by</label><select id="sortFilter"><option value="match">Match score</option><option value="newest">Newest first</option><option value="company">Company</option></select></div>
           </div>
 
           <div class="results-meta" style="margin:14px 0;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
-            <span id="resultCount">Showing 10 roles</span>
+            <span id="resultCount">Loading verified roles…</span>
             <span>Apply-FIRST ordering</span>
           </div>
 
           <div class="jobs-list" id="jobsList"></div>
+        </section>
+
+        <!-- 3b. WALKIN ALERTS VIEW -->
+        <section class="view" id="view-walkins">
+          <div class="page-title">
+            <div>
+              <div class="eyebrow">Verified Events</div>
+              <h1>Walk-in Recruitment Alerts</h1>
+              <p>Verified, date-aware walk-in recruitment drives for junior analytics roles with official registration or event notice.</p>
+            </div>
+            <div class="walkin-feed-actions">
+              <button class="btn" id="subscribeWalkinsBtn">🔔 Enable alerts</button>
+              <a class="btn" href="./data/walkins.ics" download="walkins.ics">📅 Calendar feed (.ics)</a>
+              <a class="btn" href="./data/walkins.xml" target="_blank" rel="noopener">📡 RSS feed</a>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="field">
+              <label for="walkinCityFilter">City</label>
+              <select id="walkinCityFilter">
+                <option value="all">All cities</option>
+                <option value="Bengaluru">Bengaluru</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Chennai">Chennai</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="walkinSizeFilter">Company size</label>
+              <select id="walkinSizeFilter">
+                <option value="all">All sizes</option>
+                <option value="Startup">Startup</option>
+                <option value="Mid-size">Mid-size</option>
+                <option value="Enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="walkinStatusFilter">Status</label>
+              <select id="walkinStatusFilter">
+                <option value="all">All events</option>
+                <option value="attending">Marked attending</option>
+                <option value="saved">Saved</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="results-meta" style="margin:14px 0;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+            <span id="walkinsResultCount">Loading verified walk-ins…</span>
+            <span>Sorted by nearest event date</span>
+          </div>
+
+          <div class="jobs-list" id="walkinsList"></div>
         </section>
 
         <!-- 4. MY APPLICATIONS VIEW -->
@@ -649,27 +715,26 @@
           <div class="page-title"><div><div class="eyebrow">Evidence log</div><h1>Scan audit</h1><p>What was checked, what passed and why other leads were removed.</p></div></div>
           <div class="audit-grid">
             <div class="panel">
-              <div class="panel-title"><div><h3>Verification protocol</h3><span>Required for every displayed job</span></div><span>5/5 checks</span></div>
+              <div class="panel-title"><div><h3>Verification protocol</h3><span>Required for every displayed job</span></div><span id="auditProtocolBadge">5/5 checks</span></div>
               <div class="verification-list">
-                <div class="verify-row"><i class="verify-check">✓</i><strong>Official company job detail</strong><span>10/10</span></div>
-                <div class="verify-row"><i class="verify-check">✓</i><strong>Explicit posting date in official data</strong><span>10/10</span></div>
-                <div class="verify-row"><i class="verify-check">✓</i><strong>Live official Apply flow</strong><span>HTTP 200</span></div>
-                <div class="verify-row"><i class="verify-check">✓</i><strong>Minimum experience ≤ 2 years</strong><span>10/10</span></div>
-                <div class="verify-row"><i class="verify-check">✓</i><strong>At least two target analytics skills</strong><span>10/10</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>Official company job detail</strong><span id="auditDetailCount">--</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>Explicit posting date in official data</strong><span id="auditDateCount">--</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>Live official Apply flow</strong><span id="auditLinkCount">HTTP 200</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>Minimum experience ≤ 2 years</strong><span id="auditExpCount">--</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>At least two target analytics skills</strong><span id="auditSkillCount">--</span></div>
               </div>
             </div>
             <div class="panel">
-              <div class="panel-title"><div><h3>Source trail</h3><span>30 Sep 2026 · Asia/Kolkata</span></div></div>
-              <div class="timeline">
-                <div class="time-row"><i class="time-dot"></i><strong>Amazon Jobs</strong><p>Official search data supplied explicit posted dates; six final roles and Apply endpoints were live.</p></div>
-                <div class="time-row"><i class="time-dot"></i><strong>Accenture Careers</strong><p>Official careers API and job pages supplied dates, early-career tags, descriptions and direct Apply links.</p></div>
-                <div class="time-row reject"><i class="time-dot"></i><strong>Strict exclusions applied</strong><p>Closed, stale, senior, 3+ minimum, missing-date and off-location roles were removed.</p></div>
+              <div class="panel-title"><div><h3>Source trail</h3><span id="auditSourceDate">Verified scan</span></div></div>
+              <div class="timeline" id="auditTimeline">
+                <div class="time-row"><i class="time-dot"></i><strong>Official Career Adapters</strong><p>Verified company endpoints supplied explicit dates, descriptions and direct Apply links.</p></div>
+                <div class="time-row reject"><i class="time-dot"></i><strong>Strict exclusions applied</strong><p>Closed, stale (>15d), senior, 3+ yr minimum, and dead/expired links were automatically suppressed.</p></div>
               </div>
             </div>
           </div>
-          <div class="section-head"><div><div class="eyebrow">Coverage</div><h2>17 official career sources</h2></div></div>
+          <div class="section-head"><div><div class="eyebrow">Coverage</div><h2 id="coverageTitle">Official career sources</h2></div></div>
           <div class="panel"><div class="company-cloud" id="companyCloud"></div></div>
-          <div class="section-head"><div><div class="eyebrow">Rejected examples</div><h2>Why promising leads did not pass</h2></div></div>
+          <div class="section-head"><div><div class="eyebrow">Audit log</div><h2>Verification & rejection examples</h2></div></div>
           <div class="panel"><div class="rejection-list" id="rejectionList"></div></div>
         </section>
 
@@ -677,13 +742,13 @@
         <section class="view" id="view-dedupe">
           <div class="page-title"><div><div class="eyebrow">Persistent state</div><h1>Deduplication</h1><p>Use this state on the next scan to avoid showing the same jobs again.</p></div></div>
           <div class="state-banner">
-            <div><strong>State initialized successfully</strong><p id="dedupeStateText">No prior-day state was found. Ten displayed job IDs are now reserved against future repeats.</p></div>
+            <div><strong>State initialized successfully</strong><p id="dedupeStateText">Active scan job IDs are reserved against future repeats.</p></div>
             <div class="card-actions"><button class="btn" id="copyJson">Copy JSON</button><button class="btn primary" id="downloadJson">Download state</button></div>
           </div>
           <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
-            <div class="metric"><div class="metric-top"><span class="metric-label">Shown IDs saved</span></div><strong id="dedupeShownCount">10</strong><div class="metric-note">Primary dedupe keys</div></div>
-            <div class="metric amber"><div class="metric-top"><span class="metric-label">Duplicates suppressed</span></div><strong id="dedupeSuppressedCount">14</strong><div class="metric-note" id="dedupeClusterNote">Across three clusters</div></div>
-            <div class="metric blue"><div class="metric-top"><span class="metric-label">Prior-day repeats</span></div><strong>0</strong><div class="metric-note">Initial state created today</div></div>
+            <div class="metric"><div class="metric-top"><span class="metric-label">Shown IDs saved</span></div><strong id="dedupeShownCount">--</strong><div class="metric-note">Primary dedupe keys</div></div>
+            <div class="metric amber"><div class="metric-top"><span class="metric-label">Duplicates suppressed</span></div><strong id="dedupeSuppressedCount">--</strong><div class="metric-note" id="dedupeClusterNote">Across clusters</div></div>
+            <div class="metric blue"><div class="metric-top"><span class="metric-label">Dead links removed</span></div><strong id="dedupeDeadCount">0</strong><div class="metric-note">Protected by live gate</div></div>
           </div>
           <div class="split">
             <div>
@@ -708,16 +773,83 @@
       <div class="eyebrow">Privacy & Third-Party AI Consent</div>
       <h2 id="aiConsentTitle">Analyze with Optional AI?</h2>
       <p style="font-size:12px;line-height:1.55;color:var(--muted)">
-        Analytics Job Scout uses Puter.js browser SDK for optional keyless AI assistance. If you click "Approve", your extracted resume text and selected job description will be sent to the AI model to generate feedback.
+        Analytics Job Scout uses the Puter.js browser SDK for optional keyless AI assistance.
         <br><br>
-        <strong>Your Privacy Guarantees:</strong>
-        <br>• No API key or payment is required.
-        <br>• No raw files or resume text are stored on external servers.
-        <br>• If you decline, you will immediately receive rich local heuristic analysis.
+        <strong>Privacy Disclosures:</strong>
+        <br>• Resume parsing is 100% local in your browser; no raw file is sent by this application.
+        <br>• After your explicit consent, selected extracted text is transmitted to Puter and its underlying model providers, governed by their <a href="https://puter.com/privacy" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline">Terms of Service and Privacy Policy</a>.
+        <br>• We never promise third-party non-retention unless contractually verified.
+        <br>• If you decline, you will immediately receive rich deterministic local rubric analysis without sending any data.
       </p>
       <div style="display:flex;gap:10px;margin-top:18px">
         <button class="btn primary" id="aiConsentApproveBtn" style="flex:1">Approve & Analyze</button>
         <button class="btn" id="aiConsentDeclineBtn">Decline (Use Offline Engine)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company Research Modal / Drawer -->
+  <div class="modal-backdrop" id="companyResearchModal" hidden>
+    <div class="research-drawer" role="dialog" aria-modal="true" aria-labelledby="researchModalTitle">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="eyebrow">Due Diligence</div>
+          <h2 id="researchModalTitle">Company Research</h2>
+        </div>
+        <button class="btn small" id="closeResearchModalBtn" aria-label="Close dialog">✕</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:8px 0 16px">
+        Separate official verification from community experiences. Use these checked outbound links to investigate culture, stack, and interview formats.
+      </p>
+
+      <div class="research-link-grid" id="researchLinksGrid"></div>
+
+      <div class="research-disclaimer">
+        <strong>⚠️ Community Research Notice:</strong>
+        <br>Community reviews on Glassdoor, Reddit, and AmbitionBox are subjective third-party reports, not verified facts. Never rely solely on a few posts. Read several recent sources and verify details directly during the interview.
+      </div>
+
+      <div style="margin-top:16px">
+        <strong style="font-size:12px;display:block">Candidate Due Diligence Checklist:</strong>
+        <ul class="research-checklist">
+          <li>✓ Work-life balance and typical weekly hours for analytics teams</li>
+          <li>✓ Mentorship and structured onboarding for junior / fresher analysts</li>
+          <li>✓ Analytics tech stack (SQL vs Python vs Excel vs Power BI/Tableau)</li>
+          <li>✓ Return-to-office expectations (hybrid vs mandatory in-office)</li>
+          <li>✓ Business stability, growth stage, and recent layoff history</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggest a Company Source Modal -->
+  <div class="modal-backdrop" id="suggestSourceModal" hidden>
+    <div class="daily-modal" role="dialog" aria-modal="true" aria-labelledby="suggestSourceTitle">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="eyebrow">Community Sourcing</div>
+          <h2 id="suggestSourceTitle">Suggest an Official Company Source</h2>
+        </div>
+        <button class="btn small" id="closeSuggestModalBtn" aria-label="Close dialog">✕</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:10px 0 14px">
+        Know a genuine startup, scale-up, or enterprise in Bengaluru, Hyderabad, or Chennai with an official career portal? Submit it for review. We never collect personal recruiter details or resumes here.
+      </p>
+      <div class="field" style="margin-bottom:10px">
+        <label for="suggestCompName">Company Name *</label>
+        <input type="text" id="suggestCompName" placeholder="e.g. Swiggy, Zepto, Postman" />
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label for="suggestCareersUrl">Official Careers or ATS URL *</label>
+        <input type="url" id="suggestCareersUrl" placeholder="https://careers.company.com/ or ATS board URL" />
+      </div>
+      <div class="field" style="margin-bottom:14px">
+        <label for="suggestNotes">Notes / Analytics Roles Typically Posted</label>
+        <textarea id="suggestNotes" rows="2" placeholder="e.g. Regularly hires Data Analysts and BI Associates in Bengaluru..."></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn primary" id="submitSuggestIssueBtn" style="flex:1">Open GitHub Issue Link ↗</button>
+        <button class="btn" id="downloadSuggestJsonBtn">Download Suggestion JSON</button>
       </div>
     </div>
   </div>
@@ -729,6 +861,8 @@
   <script src="./js/ai-client.js"></script>
   <script src="./js/resume-agent.js"></script>
   <script src="./js/interview-coach.js"></script>
+  <script src="./js/walkin-alerts.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>
+
