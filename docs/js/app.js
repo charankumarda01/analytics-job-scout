@@ -1495,9 +1495,13 @@
       const staleBanner = document.getElementById('staleScanBanner');
       if (staleBanner) {
         staleBanner.hidden = false;
+        let hint = '';
+        if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
+          hint = `<br/><span style="display:inline-block;margin-top:6px;font-size:11px;color:#854d0e">💡 <strong>Why you see this:</strong> You opened <code>docs/index.html</code> directly from your disk (<code>file://</code>). Web browsers block local file <code>fetch()</code> requests by default. To view with verified data, open the live site at <a href="https://charankumarda01.github.io/analytics-job-scout/" target="_blank" style="text-decoration:underline;font-weight:700">charankumarda01.github.io/analytics-job-scout/</a> or run <code>python server.py</code> and navigate to <a href="http://localhost:8000/analytics-job-scout/" target="_blank" style="text-decoration:underline;font-weight:700">http://localhost:8000/analytics-job-scout/</a>.</span>`;
+        }
         staleBanner.innerHTML = `
-          <span>⚠️ <strong>Scan data unavailable:</strong> Could not load verified scan payload (${escapeHTML(err.message)}). Fail-closed mode active. No unverified records are displayed.</span>
-          <button class="btn small" id="retryScanBtn">Retry live scan</button>
+          <span>⚠️ <strong>Scan data unavailable:</strong> Could not load verified scan payload (${escapeHTML(err.message)}). Fail-closed mode active. No unverified records are displayed.${hint}</span>
+          <button class="btn small" id="retryScanBtn" style="margin-top:6px">Retry live scan</button>
         `;
         document.getElementById('retryScanBtn')?.addEventListener('click', loadPublishedScan);
       }
