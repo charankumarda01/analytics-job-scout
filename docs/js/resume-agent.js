@@ -426,7 +426,7 @@
     }
 
     // 2. DOCX (Mammoth.js)
-    if (extension === 'docx') {
+    if (extension === 'docx' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       return new Promise((resolve, reject) => {
         if (!window.mammoth) {
           reject(new Error('Mammoth.js parser not loaded. Please use the Paste Text option or refresh with internet connection.'));

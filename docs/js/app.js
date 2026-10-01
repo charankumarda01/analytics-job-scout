@@ -1677,39 +1677,112 @@
       renderJobs();
     });
 
-    // 9. Resume actions
-    document.getElementById('resumeFileUpload')?.addEventListener('change', async e => {
-      const file = e.target.files?.[0];
+    // 9. Resume actions (Upload, Dropzone, Paste Textarea, and Storage)
+    const fileInput = document.getElementById('resumeFileInput') || document.getElementById('resumeFileUpload');
+    const dropzone = document.getElementById('resumeDropzone');
+    const rawTextArea = document.getElementById('resumeRawText') || document.getElementById('resumeTextEditArea');
+    const rememberCheckbox = document.getElementById('resumeRememberDeviceCheckbox') || document.getElementById('rememberResumeToggle');
+
+    async function handleResumeFile(file) {
       if (!file) return;
 
-      toast('Parsing resume file locally…');
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert(`File size ${(file.size / (1024 * 1024)).toFixed(1)}MB exceeds maximum allowed 5MB.`);
+        return;
+      }
+
+      toast(`Parsing ${file.name} locally…`);
       try {
+        if (!window.AJSResumeAgent) {
+          throw new Error('Resume agent is not ready. Please refresh the page.');
+        }
         const text = await window.AJSResumeAgent.parseFile(file);
         currentResumeData.fileName = file.name;
         currentResumeData.rawText = text;
 
-        const editArea = document.getElementById('resumeTextEditArea');
-        if (editArea) editArea.value = text;
+        if (rawTextArea) {
+          rawTextArea.value = text;
+        }
 
-        saveResume();
+        saveResume(currentResumeData.remembered);
         toast(`Parsed ${file.name} successfully!`);
       } catch (err) {
-        alert('Resume upload notice: ' + err.message);
+        console.error('[Resume Upload Error]', err);
+        toast('Upload note: ' + err.message);
+        alert('Resume upload notice: ' + err.message + '\n\nTip: You can also copy and paste your resume text directly into the box below.');
+      }
+    }
+
+    // File input change
+    fileInput?.addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (file) {
+        await handleResumeFile(file);
+        fileInput.value = ''; // Reset so uploading the same file again works
       }
     });
 
-    document.getElementById('saveResumeEditBtn')?.addEventListener('click', () => {
-      const editArea = document.getElementById('resumeTextEditArea');
-      if (editArea) {
-        currentResumeData.rawText = editArea.value;
-        saveResume();
+    // Dropzone click & drag-and-drop
+    if (dropzone) {
+      dropzone.addEventListener('click', e => {
+        if (e.target !== fileInput) {
+          fileInput?.click();
+        }
+      });
+
+      ['dragenter', 'dragover'].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'dragend'].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', async e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+        const file = e.dataTransfer?.files?.[0];
+        if (file) {
+          await handleResumeFile(file);
+        }
+      });
+    }
+
+    // Editable preview / paste textarea
+    if (rawTextArea) {
+      if (currentResumeData && currentResumeData.rawText) {
+        rawTextArea.value = currentResumeData.rawText;
       }
-    });
+      let debounceTimer = null;
+      rawTextArea.addEventListener('input', () => {
+        currentResumeData.rawText = rawTextArea.value;
+        if (!currentResumeData.fileName) currentResumeData.fileName = 'Pasted Resume';
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          saveResume(currentResumeData.remembered);
+        }, 300);
+      });
+    }
 
-    document.getElementById('rememberResumeToggle')?.addEventListener('change', e => {
-      saveResume(e.target.checked);
-    });
+    // Remember on device toggle
+    if (rememberCheckbox) {
+      rememberCheckbox.checked = !!currentResumeData.remembered;
+      rememberCheckbox.addEventListener('change', e => {
+        saveResume(e.target.checked);
+      });
+    }
 
+    // Forget resume button
     document.getElementById('forgetResumeBtn')?.addEventListener('click', () => {
       if (confirm('Forget resume content from this browser?')) {
         currentResumeData = {
@@ -1722,8 +1795,7 @@
           projects: []
         };
         if (Storage) Storage.forgetResume();
-        const editArea = document.getElementById('resumeTextEditArea');
-        if (editArea) editArea.value = '';
+        if (rawTextArea) rawTextArea.value = '';
         renderResumeATSAnalysis();
         renderCompareJob();
         renderJobs();
@@ -1731,10 +1803,13 @@
       }
     });
 
-    document.getElementById('deleteAllDataBtn')?.addEventListener('click', () => {
+    // Delete all data button
+    const deleteBtn = document.getElementById('deleteAllCareerDataBtn') || document.getElementById('deleteAllDataBtn');
+    deleteBtn?.addEventListener('click', () => {
       if (confirm('Delete all career data (resume, mock interviews, tracked applications, preferences)?')) {
         if (Storage) Storage.deleteAllCareerData();
         currentResumeData = { rawText: '', skills: [] };
+        if (rawTextArea) rawTextArea.value = '';
         renderResumeATSAnalysis();
         renderApplications();
         CoachUI.renderStreakAndStats();
@@ -1828,8 +1903,8 @@
 
     // Populate resume text editor if resume exists
     if (currentResumeData && currentResumeData.rawText) {
-      const editArea = document.getElementById('resumeTextEditArea');
-      if (editArea) editArea.value = currentResumeData.rawText;
+      const rawTextArea = document.getElementById('resumeRawText') || document.getElementById('resumeTextEditArea');
+      if (rawTextArea) rawTextArea.value = currentResumeData.rawText;
     }
 
     // Load data from single source of truth
