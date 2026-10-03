@@ -87,4 +87,15 @@ assert(advancedMatch.missingSkills.includes('snowflake'), 'Should detect missing
 assert(advancedMatch.missingSkills.includes('dbt'), 'Should detect missing dbt');
 console.log(`✓ Missing skills cleanly identified: ${advancedMatch.missingSkills.join(', ')}`);
 
+// 6. Plain-language formula explanation & evidence snippets
+assert(matchResult.formulaExplanation.includes('Formula:'), 'Should provide transparent formula explanation');
+assert(matchResult.evidence.length > 0, 'Should provide snippet evidence for claims');
+assert(matchResult.evidenceBySkill['sql'], 'Evidence quote snippet for SQL must exist');
+console.log('✓ Plain-language formula explanation and quote snippets verified');
+
+// 7. Prioritized checklist levels & non-fabrication guidance
+assert(matchResult.prioritizedChecklist.critical.length > 0, 'Critical checklist items must exist');
+assert(advancedMatch.prioritizedChecklist.critical.some(c => c.guidance && c.guidance.includes('ONLY if you have true')), 'Checklist must warn against fabrication');
+console.log('✓ Prioritized checklist with non-fabrication guidance verified');
+
 console.log('All Resume ATS & Matching tests passed successfully!');

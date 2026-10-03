@@ -27,7 +27,7 @@
     "fresh": 3,
     "backup": 2,
     "internships": 0,
-    "duplicates_suppressed": 9,
+    "duplicates_suppressed": 4,
     "suppressed_dead_links": 0,
     "suppressed_scam_leads": 0
   },
@@ -201,11 +201,6 @@
       "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
       "location": "Bengaluru",
       "suppressed_job_ids": [
-        "10554404",
-        "10554405",
-        "10554406",
-        "10554407",
-        "10554403",
         "10554404",
         "10554405",
         "10554406",

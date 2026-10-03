@@ -6,6 +6,7 @@
 (function(window) {
   'use strict';
 
+  const PREFIX = 'ajs.v2.';
   const FILLER_WORDS = ['um', 'uh', 'like', 'basically', 'actually', 'you know', 'kind of', 'sort of', 'i mean', 'so yeah', 'right?'];
 
   const COMMUNICATION_DRILLS = [
@@ -566,8 +567,368 @@
           ]
         }
       ];
+    },
+
+    // -------------------------------------------------------------
+    // Personalized Adaptive End-to-End Interview Coach
+    // -------------------------------------------------------------
+    buildPersonalizedSession: function(job, resumeData, options) {
+      const opts = options || {};
+      const sessionType = opts.sessionType || 'standard'; // 'quick' (3-4 Qs), 'standard' (5-6 Qs), 'full_mock' (8-10 Qs)
+      const targetStage = opts.targetStage || 'full_loop'; // 'screening', 'technical', 'hiring_manager', 'behavioral', 'case_study', 'full_loop'
+
+      const jobTitle = job ? (job.title || 'Data Analyst') : 'Junior Data Analyst';
+      const company = job ? (job.company || 'Company') : 'Analytics Team';
+      const skills = (job && Array.isArray(job.skills)) ? job.skills : ['SQL', 'Excel', 'Power BI'];
+
+      // Extract user's truthful resume projects if present
+      let userProjectTitle = '';
+      if (resumeData) {
+        if (Array.isArray(resumeData.projects) && resumeData.projects.length > 0 && resumeData.projects[0].title) {
+          userProjectTitle = resumeData.projects[0].title;
+        } else if (resumeData.rawText) {
+          const match = resumeData.rawText.match(/(?:project|platform|dashboard|analysis)[:\s]+([^\n\r,]{4,40})/i);
+          if (match) userProjectTitle = match[1].trim();
+        }
+      }
+
+      const questions = [];
+
+      // 1. Role-Focused Introduction
+      if (['screening', 'hiring_manager', 'full_loop'].includes(targetStage)) {
+        questions.push({
+          id: 'q_intro',
+          stage: 'intro',
+          stageLabel: 'Role-Focused Introduction',
+          question: `Welcome! To start our interview for the ${jobTitle} opening at ${company}: please give a concise 60–90 second overview of your analytical background, the core tools you work with, and why you are excited about this specific opportunity.`,
+          rubricKeywords: ['analytics', 'sql', 'tools', 'experience', 'projects', company.toLowerCase()],
+          sampleAnswerPoints: [
+            'State current education or focus area clearly',
+            'Mention top analytics tools (SQL, Excel, Power BI or Python)',
+            'Highlight 1 real project or hands-on experience',
+            `Connect your interest directly to ${company} and the ${jobTitle} role`
+          ],
+          truthfulOutlineTemplate: 'Present education/focus -> Highlight SQL/BI tools -> Cite 1 real project -> State enthusiasm for ' + company,
+          isHypothetical: false
+        });
+      }
+
+      // 2. Resume & Project Deep-Dive
+      if (['screening', 'technical', 'hiring_manager', 'full_loop'].includes(targetStage)) {
+        const projectPrompt = userProjectTitle
+          ? `In your resume, you highlighted your project "${userProjectTitle}". Walk me through the end-to-end data pipeline: what was the business question, how did you source and clean the data, and what measurable outcome did you deliver?`
+          : `Walk me through the most significant analytics project on your resume: what business problem were you solving, how did you extract and validate the data using SQL/Excel, and what actionable insight did you produce?`;
+
+        questions.push({
+          id: 'q_project_deepdive',
+          stage: 'resume_project',
+          stageLabel: 'Project Deep-Dive (Resume Grounded)',
+          question: projectPrompt,
+          rubricKeywords: ['data', 'sql', 'pipeline', 'cleaning', 'dashboard', 'metric', 'result', 'insights'],
+          sampleAnswerPoints: [
+            'Context: State the business question or problem clearly',
+            'Action: Detail the technical tools used (e.g. SQL joins/CTEs, Power Query)',
+            'Data Hygiene: Mention data cleaning or null-handling checks',
+            'Impact: Provide at least one quantified outcome or time saved'
+          ],
+          truthfulOutlineTemplate: 'Business Context -> Data extraction (SQL) -> Cleaning & Validation -> Visualisation -> Quantified Business Result',
+          isHypothetical: false
+        });
+      }
+
+      // 3. Technical Analytics: SQL & Databases
+      if (['technical', 'screening', 'full_loop'].includes(targetStage)) {
+        questions.push({
+          id: 'q_tech_sql',
+          stage: 'technical',
+          stageLabel: 'Technical Analytics: SQL & Data Foundations',
+          question: `For our analytics team at ${company}, SQL query accuracy and performance are critical. How would you approach identifying and removing duplicate transaction records in a large table, and when would you use a window function like ROW_NUMBER() over GROUP BY?`,
+          rubricKeywords: ['sql', 'duplicate', 'row_number', 'partition by', 'group by', 'cte', 'distinct'],
+          sampleAnswerPoints: [
+            'Explain identifying duplicates by key columns using GROUP BY and HAVING count(*) > 1',
+            'Explain ROW_NUMBER() OVER (PARTITION BY key ORDER BY date DESC) inside a CTE',
+            'Delete or filter where rn > 1 to retain only the latest verified record',
+            'Explain distinction: GROUP BY collapses rows; ROW_NUMBER preserves individual records'
+          ],
+          truthfulOutlineTemplate: 'GROUP BY vs Window Function -> CTE structure -> PARTITION BY key column -> Filtering duplicate rank',
+          isHypothetical: false
+        });
+      }
+
+      // 4. Technical Analytics: BI, Modeling & Reporting
+      const hasBI = skills.some(s => /power\s*bi|tableau|dashboard|reporting/i.test(s));
+      if (hasBI && ['technical', 'full_loop'].includes(targetStage)) {
+        questions.push({
+          id: 'q_tech_bi',
+          stage: 'technical',
+          stageLabel: 'Technical Analytics: BI & Data Modeling',
+          question: `When designing a business intelligence dashboard for stakeholders at ${company}: how do you structure your data model (e.g., star schema with fact and dimension tables) versus working with a single flat table, and how does this affect report refresh and calculation speed?`,
+          rubricKeywords: ['star schema', 'fact', 'dimension', 'relationships', 'dax', 'performance', 'model'],
+          sampleAnswerPoints: [
+            'Differentiate Fact table (transactions/metrics) from Dimension tables (dates, customers, products)',
+            'Star schema reduces redundancy, enables 1-to-many relationships, and optimizes DAX engine memory',
+            'Flat tables cause massive row width and slower filter propagation',
+            'Ensure clean surrogate keys and avoid bi-directional cross-filtering unless strictly necessary'
+          ],
+          truthfulOutlineTemplate: 'Fact vs Dimension definition -> Star schema advantages -> Memory and DAX efficiency -> Real dashboard best practices',
+          isHypothetical: false
+        });
+      }
+
+      // 5. Diagnostic Case Study (Hypothetical, clearly labeled)
+      if (['case_study', 'technical', 'hiring_manager', 'full_loop'].includes(targetStage)) {
+        questions.push({
+          id: 'q_case_diagnostic',
+          stage: 'case_study',
+          stageLabel: 'Practical Case Study: Root-Cause Diagnostics',
+          question: `[Hypothetical Scenario]: At ${company}, suppose our weekly order conversion rate suddenly drops by 14% across our primary mobile flow. As our analyst, walk me step-by-step through how you would investigate this anomaly to pinpoint the root cause before reporting to leadership.`,
+          rubricKeywords: ['conversion', 'funnel', 'segment', 'hypothesis', 'drop', 'anomaly', 'device', 'version', 'root cause'],
+          sampleAnswerPoints: [
+            'Verify instrumentation first: check if logging or analytics tracking failed versus actual order drops',
+            'Segment the funnel: identify exact drop-off step (cart -> checkout -> payment)',
+            'Cross-tabulate dimensions: slice by device OS, app version, geography, and payment method',
+            'Formulate hypothesis, check deployment timeline with engineers, and summarize findings with next steps'
+          ],
+          truthfulOutlineTemplate: 'Verify tracking sanity -> Funnel step segmentation -> Dimension slicing (OS/version/region) -> Engineer check -> Executive summary',
+          isHypothetical: true
+        });
+      }
+
+      // 6. Behavioral Question using STAR Method
+      if (['behavioral', 'hiring_manager', 'full_loop'].includes(targetStage)) {
+        questions.push({
+          id: 'q_behavioral_star',
+          stage: 'behavioral',
+          stageLabel: 'Behavioral: Ambiguity & Stakeholder Communication',
+          question: `Tell me about a time when you received messy, contradictory, or incomplete data with an urgent deadline. How did you handle stakeholder expectations, validate accuracy, and deliver actionable insights?`,
+          rubricKeywords: ['situation', 'task', 'action', 'result', 'stakeholder', 'deadline', 'validation', 'accuracy'],
+          sampleAnswerPoints: [
+            'Situation: Concrete context (academic project, internship, or course assignment)',
+            'Task: What report or delivery was required under what timeline',
+            'Action: Documented discrepancies, ran sanity checks, and proactively aligned with stakeholders',
+            'Result: Accurate delivery on time and established repeatable validation rules'
+          ],
+          truthfulOutlineTemplate: 'STAR format: Concrete Situation -> Assigned Task -> Proactive Action & Sanity Checks -> Quantified Result',
+          isHypothetical: false
+        });
+      }
+
+      // 7. Candidate Questions for the Interviewer
+      if (['hiring_manager', 'screening', 'full_loop'].includes(targetStage)) {
+        questions.push({
+          id: 'q_candidate_questions',
+          stage: 'closing',
+          stageLabel: 'Candidate Questions for the Interviewer',
+          question: `We have 5 minutes left. What two questions would you like to ask me about our analytics team culture, our data infrastructure, or our expectations for a junior analyst joining ${company}?`,
+          rubricKeywords: ['questions', 'team', 'stack', 'culture', 'onboarding', '90 days', company.toLowerCase()],
+          sampleAnswerPoints: [
+            'Question 1: Focus on team analytics stack, data maturity, or day-to-day collaboration',
+            'Question 2: Focus on success criteria for this role in the first 90 days',
+            'Polite closing appreciation for the interviewer\'s time'
+          ],
+          truthfulOutlineTemplate: 'Data stack & collaboration question -> 90-day success criteria question -> Gracious closing',
+          isHypothetical: false
+        });
+      }
+
+      // Adjust question count based on session type
+      let maxCount = 5;
+      if (sessionType === 'quick') maxCount = 3;
+      else if (sessionType === 'full_mock') maxCount = 8;
+
+      const finalQuestions = questions.slice(0, maxCount);
+
+      return {
+        id: 'sess_' + Date.now(),
+        jobId: job ? (job.id || job.requisition_id) : null,
+        company: company,
+        jobTitle: jobTitle,
+        sessionType: sessionType,
+        targetStage: targetStage,
+        createdAt: new Date().toISOString(),
+        currentIndex: 0,
+        questions: finalQuestions,
+        responses: [],
+        completed: false
+      };
+    },
+
+    evaluateAnswer: function(questionObj, transcript, durationSeconds) {
+      const metricAnalysis = analyzeTranscript(transcript, questionObj, durationSeconds);
+      const text = (transcript || '').trim();
+
+      // What was strong
+      const strongPoints = [];
+      if (metricAnalysis.matchedKeywords.length >= 3) {
+        strongPoints.push(`Strong conceptual grasp: covered key terms like ${metricAnalysis.matchedKeywords.slice(0, 3).join(', ')}.`);
+      }
+      if (metricAnalysis.starCount >= 3) {
+        strongPoints.push('Effective structural discipline: followed the STAR storytelling framework.');
+      }
+      if (metricAnalysis.metricsFound.length >= 1) {
+        strongPoints.push(`Concrete evidence: backed up claims with quantified numbers (${metricAnalysis.metricsFound[0]}).`);
+      }
+      if (strongPoints.length === 0) {
+        strongPoints.push('Direct response addressed the core topic of the question.');
+      }
+
+      // What was unclear or missing
+      const missingPoints = [];
+      if (metricAnalysis.missingKeywords.length > 0) {
+        missingPoints.push(`Did not explicitly cover expected concepts: ${metricAnalysis.missingKeywords.slice(0, 3).join(', ')}.`);
+      }
+      if (metricAnalysis.wordCount < 40) {
+        missingPoints.push('Answer was too brief. Expand with concrete step-by-step reasoning or a specific example.');
+      }
+      if (metricAnalysis.metricsFound.length === 0 && questionObj.stage !== 'closing') {
+        missingPoints.push('Lacked measurable proof. Add specific volumes (e.g. rows processed, % time saved).');
+      }
+
+      // Immediate improvement
+      let immediateImprovement = 'Include a specific project example to substantiate your claims.';
+      if (metricAnalysis.missingKeywords.length > 0) {
+        immediateImprovement = `Explicitly explain how you would apply ${metricAnalysis.missingKeywords[0]} in this scenario.`;
+      } else if (metricAnalysis.metricsFound.length === 0) {
+        immediateImprovement = 'Quantify your impact: state approximately how much data you handled or time you saved.';
+      }
+
+      // Contextual follow-up question
+      let followUpQuestion = null;
+      if (metricAnalysis.score < 70) {
+        if (questionObj.stage === 'technical') {
+          followUpQuestion = `Follow-up: Could you clarify how you would handle null values or edge cases in that query?`;
+        } else if (questionObj.stage === 'case_study') {
+          followUpQuestion = `Follow-up: What if the drop was only on Android devices—what team would you consult first?`;
+        } else {
+          followUpQuestion = `Follow-up: Can you give me one concrete metric that proved your approach was successful?`;
+        }
+      }
+
+      return {
+        metricAnalysis: metricAnalysis,
+        score: metricAnalysis.score,
+        whatWasStrong: strongPoints,
+        whatWasUnclearOrMissing: missingPoints,
+        immediateImprovement: immediateImprovement,
+        strongerAnswerOutline: questionObj.sampleAnswerPoints || [],
+        canRetry: true,
+        followUpQuestion: followUpQuestion
+      };
+    },
+
+    generateFinalReport: function(session) {
+      if (!session || !Array.isArray(session.responses) || session.responses.length === 0) {
+        return {
+          overallScore: 0,
+          stageScores: {},
+          strongestAnswers: [],
+          needsPractice: [],
+          technicalGaps: [],
+          communicationSummary: 'No answers recorded.',
+          improvements: ['Complete an interview session to generate personalized feedback.'],
+          threeDayPlan: ['Review basic SQL syntax', 'Prepare 1 STAR project story', 'Practice 60-second introduction'],
+          sevenDayPlan: ['Day 1-2: Core SQL & Joins', 'Day 3-4: Dashboard modeling', 'Day 5-6: Case diagnostics', 'Day 7: Full mock'],
+          recommendedNextSession: 'quick'
+        };
+      }
+
+      const responses = session.responses;
+      const totalScore = Math.round(responses.reduce((sum, r) => sum + (r.score || 0), 0) / responses.length);
+
+      const stageScores = {};
+      responses.forEach(r => {
+        const stage = r.stage || 'general';
+        if (!stageScores[stage]) stageScores[stage] = { sum: 0, count: 0 };
+        stageScores[stage].sum += (r.score || 0);
+        stageScores[stage].count += 1;
+      });
+
+      const stageAverages = {};
+      Object.keys(stageScores).forEach(st => {
+        stageAverages[st] = Math.round(stageScores[st].sum / stageScores[st].count);
+      });
+
+      const strongestAnswers = responses.filter(r => r.score >= 75).map(r => ({
+        question: r.question,
+        score: r.score,
+        strongPoints: r.whatWasStrong
+      }));
+
+      const needsPractice = responses.filter(r => r.score < 75).map(r => ({
+        question: r.question,
+        score: r.score,
+        missingPoints: r.whatWasUnclearOrMissing,
+        improvement: r.immediateImprovement
+      }));
+
+      const technicalGaps = [];
+      responses.forEach(r => {
+        if (r.metricAnalysis && r.metricAnalysis.missingKeywords) {
+          r.metricAnalysis.missingKeywords.forEach(k => {
+            if (!technicalGaps.includes(k)) technicalGaps.push(k);
+          });
+        }
+      });
+
+      const totalFillers = responses.reduce((sum, r) => sum + (r.metricAnalysis?.totalFillers || 0), 0);
+      const avgWpm = Math.round(responses.reduce((sum, r) => sum + (r.metricAnalysis?.wpm || 0), 0) / responses.length);
+
+      const improvements = [
+        technicalGaps.length > 0 ? `Deepen revision on technical concepts: ${technicalGaps.slice(0, 3).join(', ')}.` : 'Continue practicing crisp technical explanations.',
+        totalFillers > 5 ? `Reduce filler words (detected ${totalFillers} total). Pause silently between sentences.` : 'Great delivery composure with minimal fillers.',
+        'Always quantify results with concrete metrics (rows, percentages, hours saved).',
+        'Structure all behavioral and case answers using the STAR format (Situation, Task, Action, Result).',
+        `Re-read the job description for ${session.company || 'the role'} to align terminology.`
+      ];
+
+      return {
+        overallScore: totalScore,
+        stageScores: stageAverages,
+        strongestAnswers: strongestAnswers,
+        needsPractice: needsPractice,
+        technicalGaps: technicalGaps.slice(0, 5),
+        communicationSummary: `Average pace: ${avgWpm} WPM · Total filler words: ${totalFillers}`,
+        improvements: improvements.slice(0, 5),
+        threeDayPlan: [
+          `Day 1: Revise technical gaps (${technicalGaps.slice(0, 2).join(', ') || 'SQL syntax'})`,
+          `Day 2: Rewrite your 2 weakest answers using STAR framework`,
+          `Day 3: Re-take a quick mock session for ${session.company || 'your target role'}`
+        ],
+        sevenDayPlan: [
+          'Day 1-2: Core SQL window functions & aggregations',
+          'Day 3: BI dashboard modeling & metrics definitions',
+          'Day 4: Diagnostic root-cause case study practice',
+          'Day 5: Behavioral STAR storytelling practice',
+          'Day 6: Mock interview with speech recognition',
+          'Day 7: Final full mock review and confidence building'
+        ],
+        recommendedNextSession: totalScore < 70 ? 'standard' : 'quick'
+      };
+    },
+
+    saveActiveSession: function(session) {
+      if (!session) return;
+      try {
+        localStorage.setItem(PREFIX + 'active_interview_session', JSON.stringify(session));
+      } catch (e) {}
+    },
+
+    loadActiveSession: function() {
+      try {
+        const str = localStorage.getItem(PREFIX + 'active_interview_session');
+        return str ? JSON.parse(str) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+
+    clearActiveSession: function() {
+      try {
+        localStorage.removeItem(PREFIX + 'active_interview_session');
+      } catch (e) {}
     }
   };
 
   window.AJSInterviewCoach = Coach;
 })(typeof window !== 'undefined' ? window : globalThis);
+

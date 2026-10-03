@@ -315,86 +315,230 @@
   // Job Matcher
   // -------------------------------------------------------------
   function matchJobWithResume(job, resumeText) {
-    if (!job || !resumeText) {
+    if (!job || !resumeText || !resumeText.trim()) {
       return {
         matchScore: 0,
+        formulaExplanation: 'Score (0%) = Match score is 0 because no resume content was provided.',
         matchedSkills: [],
-        missingSkills: [],
+        missingSkills: Array.isArray(job?.skills) ? job.skills.map(s => s.toLowerCase()) : [],
         evidence: [],
-        checklist: []
+        evidenceBySkill: {},
+        requiredSkills: {
+          present: [],
+          missing: Array.isArray(job?.skills) ? job.skills.map(s => ({ skill: s, tip: 'Add only if true and verifiable.' })) : []
+        },
+        preferredSkills: { present: [], missing: [] },
+        toolTerms: { present: [], missing: [] },
+        domainTerms: { present: [], missing: [] },
+        experiencePhrases: { present: [], missing: [] },
+        responsibilitiesAndImpact: { metricsCount: 0, actionVerbsCount: 0 },
+        warnings: ['Upload or paste a resume to generate job-specific ATS keyword analysis.'],
+        prioritizedChecklist: {
+          critical: [{ id: 'upload_resume', text: 'Provide a resume to match with this job opening', done: false, level: 'critical' }],
+          useful: [],
+          optional: []
+        },
+        checklist: [],
+        jobTitle: job?.title || '',
+        company: job?.company || ''
       };
     }
 
-    const resumeLower = resumeText.toLowerCase();
+    const cleanResume = resumeText.trim();
+    const resumeLower = cleanResume.toLowerCase();
     const jobSkills = Array.isArray(job.skills) ? job.skills : [];
-    const jobText = `${job.title || ''} ${job.company || ''} ${jobSkills.join(' ')} ${job.description || ''}`.toLowerCase();
+    const jobText = `${job.title || ''} ${job.company || ''} ${jobSkills.join(' ')} ${job.fit || ''} ${job.exp || ''}`.toLowerCase();
 
-    // Collect skills expected by this job
-    const expectedKeywords = [];
-    jobSkills.forEach(s => {
-      if (!expectedKeywords.includes(s.toLowerCase())) {
-        expectedKeywords.push(s.toLowerCase());
-      }
-    });
+    // 1. Identify primary required skills (explicitly declared in verified job skills)
+    const requiredSkillsSet = new Set(jobSkills.map(s => s.trim().toLowerCase()));
 
-    // Also look for keywords from taxonomy in the job posting
+    // 2. Identify preferred/secondary tools from taxonomy found in job text
+    const preferredSkillsSet = new Set();
     Object.keys(SKILL_TAXONOMY).forEach(k => {
       SKILL_TAXONOMY[k].keywords.forEach(kw => {
-        const rx = new RegExp(`(^|[^a-zA-Z0-9])${kw}([^a-zA-Z0-9]|$)`, 'i');
-        if (rx.test(jobText) && !expectedKeywords.includes(kw)) {
-          expectedKeywords.push(kw);
+        const rx = new RegExp(`(^|[^a-zA-Z0-9])${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-zA-Z0-9]|$)`, 'i');
+        if (rx.test(jobText) && !requiredSkillsSet.has(kw)) {
+          preferredSkillsSet.add(kw);
         }
       });
     });
 
+    const allExpectedKeywords = Array.from(new Set([...requiredSkillsSet, ...preferredSkillsSet]));
+
     const matched = [];
     const missing = [];
     const evidence = [];
+    const evidenceBySkill = {};
 
-    expectedKeywords.forEach(kw => {
-      const rx = new RegExp(`(^|[^a-zA-Z0-9])${kw}([^a-zA-Z0-9]|$)`, 'i');
-      if (rx.test(resumeLower)) {
+    const reqPresent = [];
+    const reqMissing = [];
+    const prefPresent = [];
+    const prefMissing = [];
+
+    allExpectedKeywords.forEach(kw => {
+      const rxExact = new RegExp(`(^|[^a-zA-Z0-9])${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-zA-Z0-9]|$)`, 'i');
+      const isMatch = rxExact.test(resumeLower);
+      const isRequired = requiredSkillsSet.has(kw);
+
+      if (isMatch) {
         matched.push(kw);
-        // Extract snippet
+        // Find evidence snippet
         const idx = resumeLower.indexOf(kw);
-        if (idx !== -1 && evidence.length < 5) {
+        let snippet = '';
+        if (idx !== -1) {
           const start = Math.max(0, idx - 30);
-          const end = Math.min(resumeText.length, idx + kw.length + 35);
-          evidence.push('...' + resumeText.substring(start, end).replace(/\s+/g, ' ') + '...');
+          const end = Math.min(cleanResume.length, idx + kw.length + 40);
+          snippet = '…' + cleanResume.substring(start, end).replace(/\s+/g, ' ').trim() + '…';
+          if (evidence.length < 8) evidence.push(snippet);
+          evidenceBySkill[kw] = snippet;
         }
+
+        const matchObj = { skill: kw, matchType: 'exact', evidenceQuote: snippet };
+        if (isRequired) reqPresent.push(matchObj);
+        else prefPresent.push(matchObj);
       } else {
         missing.push(kw);
+        const missObj = { skill: kw, tip: `Add "${kw}" only if you have genuine project or work experience.` };
+        if (isRequired) reqMissing.push(missObj);
+        else prefMissing.push(missObj);
       }
     });
 
-    const total = expectedKeywords.length || 1;
-    const matchScore = Math.min(100, Math.round((matched.length / total) * 100));
+    // 3. Impact & Section Analysis
+    const metricMatches = cleanResume.match(/(\d+[\d,.]*\s*(?:%|percent|k|m|cr|lakh|crore|x|hrs|hours|days|seconds|minutes|\+))/gi) || [];
+    const verbsFound = STRONG_ACTION_VERBS.filter(v => new RegExp(`\\b${v}\\b`, 'i').test(resumeLower));
+    const titleMatch = new RegExp((job.title || 'Data Analyst').replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i').test(resumeLower);
 
-    const checklist = [
-      {
-        item: `Include matched keywords naturally: ${matched.slice(0, 4).join(', ') || 'Key terms'}`,
-        done: matched.length > 0
-      },
-      {
-        item: `Address top missing skills if you have practical experience: ${missing.slice(0, 3).join(', ') || 'All major skills covered'}`,
-        done: missing.length === 0
-      },
-      {
-        item: `Mirror role title "${job.title || 'Data Analyst'}" in your resume profile summary`,
-        done: new RegExp((job.title || 'Data Analyst').replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i').test(resumeLower)
-      },
-      {
-        item: 'Highlight a relevant analytics project demonstrating tools required by ' + (job.company || 'this company'),
-        done: true
-      }
+    // Plain-language formula scoring:
+    // 50% Required Core Skills + 20% Preferred Tools + 15% Measurable Impact + 15% Active Verbs/Format
+    const reqTotal = requiredSkillsSet.size || 1;
+    const reqScore = (reqPresent.length / reqTotal) * 50;
+
+    const prefTotal = preferredSkillsSet.size || 1;
+    const prefScore = preferredSkillsSet.size > 0 ? (prefPresent.length / prefTotal) * 20 : 20;
+
+    const impactScore = Math.min(15, metricMatches.length * 3);
+    const verbScore = Math.min(15, verbsFound.length * 2);
+
+    const calculatedScore = Math.min(100, Math.round(reqScore + prefScore + impactScore + verbScore));
+    const formulaExplanation = `Formula: ${Math.round(reqScore)}/50 Required Core Skills + ${Math.round(prefScore)}/20 Preferred Tools + ${Math.round(impactScore)}/15 Quantified Impact + ${Math.round(verbScore)}/15 Action Verbs = ${calculatedScore}%`;
+
+    // 4. Prioritized Checklist (Critical, Useful, Optional)
+    const criticalChecklist = [];
+    const usefulChecklist = [];
+    const optionalChecklist = [];
+
+    // Critical: Required missing skills
+    reqMissing.forEach(m => {
+      criticalChecklist.push({
+        id: `crit_miss_${m.skill}`,
+        text: `Required skill missing: "${m.skill}"`,
+        guidance: 'Add to Skills or Project bullets ONLY if you have true hands-on experience. Never fabricate skills.',
+        done: false,
+        level: 'critical'
+      });
+    });
+
+    if (reqPresent.length > 0) {
+      criticalChecklist.push({
+        id: 'crit_req_present',
+        text: `Core requirements verified: ${reqPresent.map(p => p.skill).slice(0, 4).join(', ')}`,
+        guidance: 'Preserve these exact keywords in your summary and project descriptions.',
+        done: true,
+        level: 'critical'
+      });
+    }
+
+    // Useful: Title alignment & preferred tools
+    if (!titleMatch) {
+      usefulChecklist.push({
+        id: 'use_title_align',
+        text: `Align target title with opening: "${job.title || 'Data Analyst'}"`,
+        guidance: 'Ensure your professional summary references this target role title directly.',
+        done: false,
+        level: 'useful'
+      });
+    } else {
+      usefulChecklist.push({
+        id: 'use_title_align',
+        text: `Target title aligned: "${job.title}" is referenced in your resume`,
+        guidance: 'Strong role focus verified.',
+        done: true,
+        level: 'useful'
+      });
+    }
+
+    if (metricMatches.length < 2) {
+      usefulChecklist.push({
+        id: 'use_metrics',
+        text: 'Add at least 2 quantified metrics to your project achievements',
+        guidance: 'e.g. "Processed 50,000+ transaction rows", "Reduced reporting cycle by 25%". Add only true metrics.',
+        done: false,
+        level: 'useful'
+      });
+    } else {
+      usefulChecklist.push({
+        id: 'use_metrics',
+        text: `Quantified impact verified: ${metricMatches.length} metrics found in resume`,
+        guidance: 'Demonstrates measurable business value.',
+        done: true,
+        level: 'useful'
+      });
+    }
+
+    prefMissing.forEach(pm => {
+      usefulChecklist.push({
+        id: `use_pref_${pm.skill}`,
+        text: `Preferred tool not found: "${pm.skill}"`,
+        guidance: 'If you have worked with this tool or equivalent, mention it in your technical stack.',
+        done: false,
+        level: 'useful'
+      });
+    });
+
+    // Optional: Certifications / portfolio links
+    optionalChecklist.push({
+      id: 'opt_portfolio',
+      text: `Link an analytics portfolio project specifically tailored to ${job.company || 'this team'}`,
+      guidance: 'Demonstrates proactive initiative and gives interviewers concrete work to discuss.',
+      done: /github\.com|portfolio|project/i.test(resumeLower),
+      level: 'optional'
+    });
+
+    // Flat checklist array for backward compatibility
+    const flatChecklist = [
+      ...criticalChecklist.map(c => ({ item: c.text, done: c.done })),
+      ...usefulChecklist.map(u => ({ item: u.text, done: u.done })),
+      ...optionalChecklist.map(o => ({ item: o.text, done: o.done }))
     ];
 
+    const warnings = [];
+    if (missing.length > 5) {
+      warnings.push(`Notice: ${missing.length} keywords from this posting are missing in your resume. Tailor truthful experience before submitting.`);
+    }
+
     return {
-      matchScore: matchScore,
+      matchScore: calculatedScore,
+      formulaExplanation: formulaExplanation,
       matchedSkills: matched,
       missingSkills: missing,
       evidence: evidence,
-      checklist: checklist,
+      evidenceBySkill: evidenceBySkill,
+      requiredSkills: { present: reqPresent, missing: reqMissing },
+      preferredSkills: { present: prefPresent, missing: prefMissing },
+      responsibilitiesAndImpact: {
+        metricsCount: metricMatches.length,
+        metrics: metricMatches.slice(0, 6),
+        actionVerbsCount: verbsFound.length,
+        actionVerbs: verbsFound.slice(0, 8)
+      },
+      prioritizedChecklist: {
+        critical: criticalChecklist,
+        useful: usefulChecklist,
+        optional: optionalChecklist
+      },
+      checklist: flatChecklist,
+      warnings: warnings,
       jobTitle: job.title,
       company: job.company
     };

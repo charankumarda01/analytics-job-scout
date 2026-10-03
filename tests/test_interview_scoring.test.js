@@ -5,6 +5,13 @@
 const assert = require('assert');
 
 // Mock browser environment for node
+const storageMap = new Map();
+global.localStorage = {
+  getItem: (k) => storageMap.has(k) ? storageMap.get(k) : null,
+  setItem: (k, v) => storageMap.set(k, String(v)),
+  removeItem: (k) => storageMap.delete(k),
+  clear: () => storageMap.clear()
+};
 global.window = global;
 require('../docs/js/interview-coach.js');
 const Coach = global.AJSInterviewCoach;
@@ -67,5 +74,59 @@ assert(strongRes.score >= 80, `Strong complete answer should score >= 80, got ${
 assert(strongRes.starCount >= 3, `Should identify STAR structure, found ${strongRes.starCount}`);
 assert(strongRes.metricsFound.length >= 2, `Should identify quantifiable metrics, found ${strongRes.metricsFound.length}`);
 console.log(`✓ Strong complete answer scored ${strongRes.score}/100 with STAR=${strongRes.starCount} and metrics=${strongRes.metricsFound.length}`);
+
+// 8. Personalized adaptive session generation
+const sampleJob = {
+  id: 'JOB_AMZ_BA',
+  company: 'Amazon',
+  title: 'Business Analyst, Logistics Analytics',
+  skills: ['SQL', 'Power BI', 'Excel', 'Data Cleaning']
+};
+const sampleResume = {
+  name: 'Candidate',
+  projects: [{ title: 'Supply Chain Shipment Tracker', tools: 'SQL, Power BI' }]
+};
+
+const session = Coach.buildPersonalizedSession(sampleJob, sampleResume, { sessionType: 'standard', targetStage: 'full_loop' });
+assert(session.questions.length >= 4, `Personalized session should generate questions, got ${session.questions.length}`);
+assert(session.questions.some(q => q.question.includes('Amazon')), 'Questions must reference the selected company');
+assert(session.questions.some(q => q.question.includes('Supply Chain Shipment Tracker')), 'Project deep dive must reference user resume project');
+assert(session.questions.some(q => q.stage === 'case_study' && q.isHypothetical), 'Diagnostic case questions must be clearly labeled hypothetical');
+console.log(`✓ Personalized adaptive session generated ${session.questions.length} role/resume-grounded questions`);
+
+// 9. Answer evaluation with constructive feedback & truthful outline
+const firstQ = session.questions[0];
+const evaluation = Coach.evaluateAnswer(firstQ, strongAnswer, 60);
+assert(evaluation.score >= 70, `Evaluation score should be >= 70, got ${evaluation.score}`);
+assert(evaluation.whatWasStrong.length > 0, 'Must provide what was strong');
+assert(evaluation.immediateImprovement !== null, 'Must provide an immediate improvement');
+assert(Array.isArray(evaluation.strongerAnswerOutline), 'Must provide model outline points');
+console.log('✓ Answer evaluation provided structured constructive coaching');
+
+// 10. Final report generation with transparent rubrics & action plan
+session.responses.push({
+  question: firstQ.question,
+  stage: firstQ.stage,
+  score: evaluation.score,
+  metricAnalysis: evaluation.metricAnalysis,
+  whatWasStrong: evaluation.whatWasStrong,
+  whatWasUnclearOrMissing: evaluation.whatWasUnclearOrMissing,
+  immediateImprovement: evaluation.immediateImprovement
+});
+
+const report = Coach.generateFinalReport(session);
+assert(report.overallScore > 0, 'Final report must compute overall score');
+assert(Array.isArray(report.threeDayPlan) && report.threeDayPlan.length > 0, 'Report must contain 3-day plan');
+assert(Array.isArray(report.sevenDayPlan) && report.sevenDayPlan.length > 0, 'Report must contain 7-day plan');
+assert(Array.isArray(report.improvements) && report.improvements.length > 0, 'Report must contain top improvements');
+console.log('✓ Final personalized interview report generated successfully');
+
+// 11. Session pause / resume via localStorage
+Coach.saveActiveSession(session);
+const loadedSession = Coach.loadActiveSession();
+assert.strictEqual(loadedSession.id, session.id, 'Active session must be saved and loaded from storage');
+Coach.clearActiveSession();
+assert.strictEqual(Coach.loadActiveSession(), null, 'Active session must be cleared');
+console.log('✓ Session pause and resume persistence verified');
 
 console.log('All Interview Scoring Calibration tests passed successfully!');

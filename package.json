@@ -1,0 +1,16 @@
+{
+  "name": "analytics-job-scout",
+  "version": "2.0.0",
+  "description": "Verified junior analytics jobs, Applications Workspace, ATS Checklist, Audit and Personalized Interview Coach",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:node && npm run test:python",
+    "test:node": "node tests/test_storage.test.js && node tests/test_resume_ats.test.js && node tests/test_interview_scoring.test.js",
+    "test:python": "pytest",
+    "test:e2e": "playwright test",
+    "lint:js": "node scripts/check_syntax.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

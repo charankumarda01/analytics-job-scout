@@ -36,10 +36,24 @@ def clean_str(val: str | None) -> str:
     return re.sub(r"\s+", " ", html.unescape(val)).strip()
 
 
+# Disallowed removed event IDs and regression blacklist
+REMOVED_WALKIN_IDS = {"walkin_accenture_blr_01", "walkin_accenture_hyd_02"}
+
+# Generic career portal paths or login pages that must never verify an event
+GENERIC_CAREER_URL_PATTERNS = [
+    re.compile(r"^https?://(?:www\.)?accenture\.com/[^/]+/careers/?$", re.I),
+    re.compile(r"^https?://mycareer\.accenture\.com/?(?:\?.*)?$", re.I),
+    re.compile(r"^https?://[^/]+/(?:careers|jobs|in-en/careers)/?$", re.I),
+    re.compile(r"(?i)[?&]drive="),
+    re.compile(r"(?i)\b(?:login|signin|auth)\b")
+]
+
+
 def validate_walkin_event(event: dict[str, Any], today: date) -> tuple[bool, str]:
     """
     Strict validation gate for walk-in recruitment events.
     Must have official company source, future date, 0-15 day posting age, junior fit, and verified link.
+    Generic careers pages or generic/login MyCareer pages must never verify an event.
     """
     required_fields = [
         "id", "company", "title", "posting_date", "event_date",
@@ -48,6 +62,10 @@ def validate_walkin_event(event: dict[str, Any], today: date) -> tuple[bool, str
     for field in required_fields:
         if not event.get(field):
             return False, f"Missing required field: {field}"
+
+    event_id = str(event.get("id", "")).strip()
+    if event_id in REMOVED_WALKIN_IDS:
+        return False, f"Event ID {event_id} is permanently removed and blacklisted from production"
 
     # 1. Posting date freshness (0–15 days old)
     try:
@@ -68,7 +86,7 @@ def validate_walkin_event(event: dict[str, Any], today: date) -> tuple[bool, str
     if e_date < today:
         return False, f"Event date {event['event_date']} is in the past; auto-suppressed"
 
-    # 3. URL safety checks
+    # 3. URL safety & anti-generic checks
     reg_url = event["registration_url"].strip()
     source_url = event["official_source_url"].strip()
     for u in (reg_url, source_url):
@@ -76,6 +94,9 @@ def validate_walkin_event(event: dict[str, Any], today: date) -> tuple[bool, str
             return False, "URL must be secure HTTPS"
         if SUSPICIOUS_TERMS.search(u):
             return False, "URL contains disallowed aggregator/shortener or suspicious endpoint"
+        for pattern in GENERIC_CAREER_URL_PATTERNS:
+            if pattern.search(u):
+                return False, f"URL {u} is a generic careers/login page or unverified drive= URL; cannot verify event"
 
     # 4. Content anti-scam scan
     full_content = " ".join([

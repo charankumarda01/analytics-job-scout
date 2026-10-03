@@ -145,6 +145,10 @@
       if (countEl) countEl.textContent = `Showing ${filtered.length} verified walk-in event${filtered.length === 1 ? '' : 's'}`;
 
       if (!filtered.length) {
+        if (!walkinsData.events || !walkinsData.events.length) {
+          listEl.innerHTML = '<div class="empty-state"><strong>Zero Unverified Walk-ins Active</strong>All walk-ins require official recruitment verification. No unverified or generic links are displayed.</div>';
+          return;
+        }
         listEl.innerHTML = '<div class="empty-state"><strong>No verified walk-ins match your active filters</strong>Try clearing location or company size filters.</div>';
         return;
       }

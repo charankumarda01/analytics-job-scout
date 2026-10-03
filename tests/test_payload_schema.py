@@ -63,27 +63,44 @@ class TestPayloadSchema(unittest.TestCase):
                 has_allowed_domain = any(d in j["apply"] for d in allowed)
                 self.assertTrue(has_allowed_domain, f"Job {j['id']} apply URL {j['apply']} not in allowed domains for {j['company']}")
 
+        # Deduplication integrity checks
+        dup_groups = data.get("duplicate_groups", [])
+        total_unique_suppressed = 0
+        all_suppressed_ids = set()
+        for g in dup_groups:
+            kept_id = g.get("kept_job_id")
+            suppressed = g.get("suppressed_job_ids", [])
+            # 1. Kept ID must never appear in suppressed_job_ids
+            self.assertNotIn(kept_id, suppressed, f"Kept ID {kept_id} must not appear in its suppressed_job_ids")
+            # 2. Suppressed IDs must be unique within group
+            self.assertEqual(len(suppressed), len(set(suppressed)), f"Duplicate suppressed IDs in group for kept {kept_id}")
+            total_unique_suppressed += len(suppressed)
+            all_suppressed_ids.update(suppressed)
+
+        self.assertEqual(
+            summary["duplicates_suppressed"],
+            total_unique_suppressed,
+            f"duplicates_suppressed {summary['duplicates_suppressed']} must equal documented unique removed count {total_unique_suppressed}"
+        )
+
     def test_walkins_json_schema(self):
         self.assertTrue(WALKINS_JSON.exists(), f"Walkins file {WALKINS_JSON} does not exist.")
-        data = json.loads(WALKINS_JSON.read_text(encoding="utf-8"))
+        raw_text = WALKINS_JSON.read_text(encoding="utf-8")
+        data = json.loads(raw_text)
 
         self.assertIn("events", data)
         self.assertIn("total", data)
         events = data["events"]
         self.assertEqual(len(events), data["total"])
 
-        today = datetime.now(TZ).date()
+        # Phase 0 Safety Gate: zero verified walk-in events until event-specific official evidence exists
+        self.assertEqual(data["total"], 0, "Phase 0 safety gate: total walk-in events must be 0")
+        self.assertEqual(len(events), 0, "Phase 0 safety gate: events array must be empty")
 
-        for ev in events:
-            for key in ["id", "company", "title", "event_date", "posting_date", "city", "registration_url", "verified"]:
-                self.assertIn(key, ev, f"Walkin event {ev.get('id')} missing key: {key}")
-
-            self.assertTrue(ev["verified"], f"Event {ev['id']} must have verified: true")
-            self.assertTrue(ev["registration_url"].startswith("https://"), f"Event {ev['id']} registration URL must be HTTPS")
-
-            # Event date must be today or future
-            ev_date = date.fromisoformat(ev["event_date"])
-            self.assertGreaterEqual(ev_date, today, f"Event {ev['id']} date {ev['event_date']} is in the past")
+        # Regression: verify neither removed event ID or drive= URL exists in walkins.json
+        self.assertNotIn("walkin_accenture_blr_01", raw_text, "walkin_accenture_blr_01 must not exist in walkins.json")
+        self.assertNotIn("walkin_accenture_hyd_02", raw_text, "walkin_accenture_hyd_02 must not exist in walkins.json")
+        self.assertNotIn("drive=", raw_text, "drive= URL must not exist in walkins.json")
 
 
 if __name__ == "__main__":

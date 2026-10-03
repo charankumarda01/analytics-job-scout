@@ -1,7 +1,10 @@
 /**
  * Analytics Job Scout v2 - Master Application Controller
- * Coordinates Views, Verified Jobs, Walk-in Alerts, Resume AI, and Daily Interview Coach.
- * Strict fail-closed payload loading, single source of truth, and privacy-conscious career workspace.
+ * Coordinates Views, Verified Jobs, Applications Workspace, ATS Checklist,
+ * Scan Audit, and Personalized Interview Coach.
+ *
+ * Strict fail-closed payload loading, single source of truth, privacy-first storage,
+ * and adaptive interview coaching grounded in verified jobs and truthful resume evidence.
  */
 (function(window) {
   'use strict';
@@ -23,83 +26,16 @@
     remembered: false,
     name: '',
     headline: '',
-    email: '',
-    phone: '',
-    location: '',
-    linkedin: '',
-    github: '',
-    summary: '',
     skills: [],
     projects: [],
     education: { degree: '', university: '', year: '' }
   };
 
-  const rolePacks = {
-    'Amazon · Business Analyst Support': ['SQL', 'data extraction', 'ETL / data pipelines', 'Advanced Excel', 'Tableau / QuickSight', 'statistical analysis', 'root-cause analysis', 'performance dashboards', 'capacity planning'],
-    'Amazon · Business Analyst I, CMT': ['SQL', 'ETL', 'Excel VBA', 'PivotTables', 'Power Pivot', 'Tableau / Power BI', 'BI metrics', 'requirements gathering', 'data modelling', 'reporting'],
-    'Accenture · Analytics and Modeling': ['Power BI dashboards', 'data modelling', 'dataset structuring', 'data cleansing', 'KPI reporting', 'report automation', 'sales analytics', 'CRM data quality', 'de-duplication']
-  };
-
-  const checklistGroups = [
-    { title: 'Target title & summary', icon: 'doc', items: [
-      ['Use one exact target title', 'Data Analyst, Business Analyst, BI Analyst, Reporting Analyst, MIS Analyst or Operations Analyst.'],
-      ['Write a focused 2–3 line summary', 'State your level, strongest tools and the business outcomes you support.'],
-      ['Add target location and availability', 'Include “available immediately” only when true.']
-    ]},
-    { title: 'SQL & data foundations', icon: 'database', items: [
-      ['SQL', 'Show it in Skills and in at least one evidence bullet.'],
-      ['Joins, CTEs and subqueries', 'Name only techniques you can explain in an interview.'],
-      ['Window functions and aggregations', 'Useful for analytics and BI roles.'],
-      ['Data validation and data quality', 'Connect the keyword to a concrete check or result.'],
-      ['Query optimization', 'Include only with real hands-on evidence.']
-    ]},
-    { title: 'Excel', icon: 'grid', items: [
-      ['Advanced Excel', 'Use the exact phrase where supported.'],
-      ['PivotTables and Pivot Charts', 'High-frequency requirement across the shortlist.'],
-      ['XLOOKUP or INDEX-MATCH', 'List the function you have actually used.'],
-      ['Power Query', 'Useful for repeatable cleaning and transformation.'],
-      ['VBA or macros', 'Useful for legacy MIS workflows; claim only if demonstrated.']
-    ]},
-    { title: 'Power BI & visualization', icon: 'chart', items: [
-      ['Power BI', 'Place in Skills and a project bullet.'],
-      ['DAX and Power Query', 'Core dashboard-building terms.'],
-      ['Data modelling', 'Mention relationships, star schema or dataset structure if true.'],
-      ['KPI dashboards', 'Name the KPIs and intended user.'],
-      ['Tableau or QuickSight', 'Use only the tools you have actually used.'],
-      ['Data visualization', 'Explain how the visual supported a business decision.']
-    ]},
-    { title: 'Python & analytics', icon: 'code', items: [
-      ['Python and pandas', 'Show cleaning, transformation or analysis evidence.'],
-      ['Exploratory data analysis (EDA)', 'Name the dataset and business question.'],
-      ['Matplotlib or Seaborn', 'Pair the tool with a specific visualization.'],
-      ['Descriptive statistics', 'Use accurate statistical language.'],
-      ['Hypothesis testing, correlation or regression', 'Include only if you can defend the method.']
-    ]},
-    { title: 'Data workflow', icon: 'flow', items: [
-      ['ETL / ELT', 'Spell out Extract, Transform, Load once.'],
-      ['Data pipelines', 'Describe source, transformation and destination.'],
-      ['Data warehouse concepts', 'Relevant to relational and dimensional modeling.'],
-      ['Report automation', 'Quantify time saved or faster turnaround.'],
-      ['CRM data hygiene and de-duplication', 'Relevant to data operations and accuracy.']
-    ]},
-    { title: 'Business analysis', icon: 'briefcase', items: [
-      ['Requirements gathering', 'Show how requirements became a report or dashboard.'],
-      ['KPI definition and performance tracking', 'Name the measure, cadence and audience.'],
-      ['Root-cause analysis', 'State the issue, evidence and recommendation.'],
-      ['Trend analysis and forecasting', 'Use where supported by a project.'],
-      ['Stakeholder management', 'Name the stakeholder group without confidential data.'],
-      ['Process improvement and actionable insights', 'Connect analysis to a measurable outcome.']
-    ]},
-    { title: 'ATS formatting', icon: 'check', items: [
-      ['Use a single-column layout', 'Use standard headings: Summary, Skills, Experience, Projects, Education.'],
-      ['Avoid text boxes, icons and skill bars', 'Keep the document machine-readable.'],
-      ['Put contact details in the body', 'Do not rely only on headers or footers.'],
-      ['Add 2–4 relevant projects', 'Especially important when professional experience is limited.'],
-      ['Use at least three quantified bullets', 'Data volume, time saved, accuracy, adoption or performance.'],
-      ['Save as searchable PDF', 'Use DOCX only when the portal requests it.'],
-      ['Proofread claims against application answers', 'Dates, experience and skills must agree.']
-    ]}
-  ];
+  // Application workspace state
+  let currentViewMode = 'list'; // 'list' or 'board'
+  let activeDetailAppId = null;
+  let activeFollowupJobId = null;
+  let pendingImportData = null;
 
   // -------------------------------------------------------------
   // General UI Helpers
@@ -107,7 +43,7 @@
   function fmtDate(d) {
     if (!d) return '';
     try {
-      const parts = d.split('-');
+      const parts = String(d).split('-');
       if (parts.length === 3) {
         const dt = new Date(parts[0], parts[1] - 1, parts[2]);
         return dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -153,37 +89,56 @@
   }
 
   // -------------------------------------------------------------
-  // View Router
+  // View Router (7 Canonical Information Architecture Destinations)
   // -------------------------------------------------------------
   function switchView(name) {
-    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    const viewMap = {
+      overview: 'overview',
+      dashboard: 'overview',
+      jobs: 'jobs',
+      applications: 'applications',
+      resume: 'resume',
+      coach: 'coach',
+      walkins: 'walkins',
+      audit: 'audit'
+    };
+    const target = viewMap[name] || 'overview';
+
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === `view-${target}`));
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      const bView = b.dataset.view;
+      b.classList.toggle('active', bView === target || (target === 'overview' && bView === 'dashboard'));
+    });
 
     const titles = {
-      overview: 'Overview',
-      daily: 'Daily live scan',
-      jobs: 'Verified jobs',
-      walkins: 'Walk-in Alerts',
-      applications: 'My applications',
-      resume: 'Resume AI',
-      ats: 'ATS checklist',
+      overview: 'Dashboard',
+      jobs: 'Find Jobs',
+      applications: 'My Applications',
+      resume: 'ATS & Resume',
       coach: 'Interview Coach',
-      audit: 'Scan audit',
-      dedupe: 'Dedupe state'
+      walkins: 'Walk-in Alerts',
+      audit: 'Scan Audit'
     };
     const crumb = document.getElementById('crumbName');
-    if (crumb) crumb.textContent = titles[name] || 'Workspace';
+    if (crumb) crumb.textContent = titles[target] || 'Workspace';
 
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.classList.remove('open');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    if (name === 'resume') {
-      renderResumeATSAnalysis();
-      renderCompareJob();
-    } else if (name === 'coach') {
+    if (target === 'overview') {
+      renderDashboard();
+    } else if (target === 'jobs') {
+      renderJobs();
+    } else if (target === 'applications') {
+      renderApplicationsWorkspace();
+    } else if (target === 'resume') {
+      renderResumeATSWorkspace();
+    } else if (target === 'coach') {
       CoachUI.init();
-    } else if (name === 'walkins') {
+    } else if (target === 'audit') {
+      renderAudit(publishedScanMeta);
+    } else if (target === 'walkins') {
       if (window.AJSWalkinAlerts) window.AJSWalkinAlerts.markEventsSeen();
     }
   }
@@ -191,7 +146,7 @@
   window.switchView = switchView;
 
   // -------------------------------------------------------------
-  // Jobs & Priorities Rendering (Single Source of Truth)
+  // Resume & ATS Helpers
   // -------------------------------------------------------------
   function hasUserResume() {
     if (!currentResumeData) return false;
@@ -210,11 +165,129 @@
       currentResumeData.headline,
       currentResumeData.summary,
       (currentResumeData.skills || []).join(', '),
-      ...(currentResumeData.projects || []).map(x => `${x.title} ${x.tools} ${x.bullet}`),
+      ...(currentResumeData.projects || []).map(x => `${x.title || ''} ${x.tools || ''} ${x.bullet || ''}`),
       currentResumeData.education?.degree,
       currentResumeData.education?.university
     ];
     return parts.filter(Boolean).join('\n');
+  }
+
+  // -------------------------------------------------------------
+  // 1. Dashboard Controller
+  // -------------------------------------------------------------
+  function renderDashboard() {
+    if (!jobs.length) {
+      const titleEl = document.getElementById('overviewHeroTitle');
+      if (titleEl) titleEl.innerHTML = '0 verified roles.<br/>Scan loading or unavailable.';
+    }
+
+    const apps = Storage ? Storage.getApplications() : [];
+    const queue = Storage ? Storage.getActionQueue(jobs) : [];
+    const hasResume = hasUserResume();
+
+    // Compute Next Best Action
+    const nextActionCard = document.getElementById('dashboardNextActionCard');
+    const titleEl = document.getElementById('nextActionTitle');
+    const subEl = document.getElementById('nextActionSubtitle');
+    const primaryBtn = document.getElementById('nextActionPrimaryBtn');
+
+    if (nextActionCard && titleEl && subEl && primaryBtn) {
+      if (!hasResume) {
+        titleEl.textContent = 'Upload or paste your resume for personalized match scores';
+        subEl.textContent = 'Unlock job-specific ATS checklists, evidence quotes, and targeted interview mock practice.';
+        primaryBtn.textContent = 'Set up ATS Resume →';
+        primaryBtn.onclick = () => switchView('resume');
+      } else if (queue.length > 0) {
+        const topTask = queue[0];
+        titleEl.textContent = `${topTask.actionTitle}: ${topTask.company} · ${topTask.title}`;
+        subEl.textContent = topTask.reason;
+        primaryBtn.textContent = 'Take Action →';
+        primaryBtn.onclick = () => {
+          switchView('applications');
+          if (topTask.appId) openApplicationDetail(topTask.appId);
+        };
+      } else if (jobs.length > 0) {
+        const topJob = jobs.find(j => j.priority) || jobs[0];
+        titleEl.textContent = `Apply to ${topJob.company} · ${topJob.title}`;
+        subEl.textContent = `Verified junior fit posted ${topJob.days}d ago in ${topJob.location}. Live Apply endpoint verified.`;
+        primaryBtn.textContent = 'View Job Details →';
+        primaryBtn.onclick = () => switchView('jobs');
+      } else {
+        titleEl.textContent = 'Explore verified career tools';
+        subEl.textContent = 'Check verified postings, customize your ATS checklist, and practice mock questions.';
+        primaryBtn.textContent = 'Find Jobs →';
+        primaryBtn.onclick = () => switchView('jobs');
+      }
+    }
+
+    // Update Dashboard Metrics - Strictly Separated!
+    // Scan numbers
+    const total = jobs.length;
+    const fresh = jobs.filter(j => j.window === 'fresh').length;
+    const backup = total - fresh;
+
+    const ovTotal = document.getElementById('overviewTotal');
+    if (ovTotal) ovTotal.textContent = total;
+    const ovFresh = document.getElementById('overviewFresh');
+    if (ovFresh) ovFresh.textContent = fresh;
+    const ovBackup = document.getElementById('overviewBackup');
+    if (ovBackup) ovBackup.textContent = backup;
+    const ovWalkins = document.getElementById('overviewWalkinsCount');
+    if (ovWalkins) ovWalkins.textContent = '0';
+
+    // Application Pipeline numbers
+    const appMetrics = Storage ? Storage.getApplicationMetrics(jobs) : {};
+    const readyEl = document.getElementById('dashReadyCount');
+    if (readyEl) readyEl.textContent = appMetrics.ready_to_apply || (total - apps.length);
+    const savedEl = document.getElementById('dashSavedCount');
+    if (savedEl) savedEl.textContent = appMetrics.saved || 0;
+    const applyingEl = document.getElementById('dashApplyingCount');
+    if (applyingEl) applyingEl.textContent = appMetrics.applying || 0;
+    const appliedEl = document.getElementById('dashAppliedCount');
+    if (appliedEl) appliedEl.textContent = appMetrics.applied || 0;
+    const interviewEl = document.getElementById('dashInterviewCount');
+    if (interviewEl) interviewEl.textContent = (appMetrics.assessment || 0) + (appMetrics.interviews || 0);
+
+    // Follow-ups card
+    const followupsCard = document.getElementById('dashboardFollowupsCard');
+    const followupsList = document.getElementById('dashboardFollowupsList');
+    const urgentItems = queue.filter(q => q.actionType === 'followup_due' || q.actionType === 'interview_prep');
+
+    if (followupsCard && followupsList) {
+      if (urgentItems.length > 0) {
+        followupsCard.hidden = false;
+        followupsList.innerHTML = urgentItems.map(item => `
+          <div style="padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:12px">
+            <div>
+              <strong>${escapeHTML(item.company)} — ${escapeHTML(item.title)}</strong>
+              <div style="color:var(--muted)">${escapeHTML(item.reason)}</div>
+            </div>
+            <button class="btn small" onclick="window.AJSApp.openApp('${escapeHTML(item.appId)}')">Review</button>
+          </div>
+        `).join('');
+      } else {
+        followupsCard.hidden = true;
+      }
+    }
+
+    // Work in progress panel
+    const resumeNameEl = document.getElementById('dashResumeName');
+    if (resumeNameEl) {
+      resumeNameEl.textContent = currentResumeData?.fileName || (hasResume ? 'Pasted Profile' : 'No resume loaded');
+    }
+    const atsCovEl = document.getElementById('dashAtsCoverage');
+    if (atsCovEl && window.AJSResumeAgent && hasResume) {
+      const ats = window.AJSResumeAgent.analyzeResumeATS(getResumeFullText());
+      atsCovEl.textContent = `${ats.totalScore}% ATS Score`;
+    }
+    const streakEl = document.getElementById('dashCoachStreak');
+    if (streakEl && Storage) {
+      const coachProgress = Storage.getInterviewProgress();
+      streakEl.textContent = `${coachProgress.streakDays || 0} days`;
+    }
+
+    // Priority grid
+    renderPriorities();
   }
 
   function renderPriorities() {
@@ -222,7 +295,7 @@
     if (!grid) return;
 
     if (!jobs.length) {
-      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><strong>No verified jobs loaded</strong>Please refresh or check connection.</div>';
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><strong>No verified jobs loaded</strong>Please reload scan or check connection.</div>';
       return;
     }
 
@@ -231,6 +304,7 @@
 
     const userReady = hasUserResume();
     const resumeText = getResumeFullText();
+    const apps = Storage ? Storage.getApplications() : [];
 
     grid.innerHTML = p.map((j, i) => {
       let fitBadge = '';
@@ -240,6 +314,9 @@
           fitBadge = `<span style="color:#106c59;font-weight:700"> · 🎯 Fit: ${matchRes.matchScore}%</span>`;
         }
       }
+
+      const existingApp = apps.find(a => a.id === j.id || a.canonical_key === j.canonical_key);
+      const isApplied = existingApp && ['applied', 'assessment', 'recruiter_screen', 'interview', 'final_round', 'offer'].includes(existingApp.status);
 
       return `
         <article class="priority-card" data-rank="0${i+1}">
@@ -257,10 +334,12 @@
           </div>
           <p>${escapeHTML(j.fit || '')}</p>
           <div class="card-actions">
-            <a class="btn primary" data-apply-open="${escapeHTML(j.id)}" href="${escapeHTML(j.apply)}" target="_blank" rel="noopener noreferrer">Apply now ↗</a>
-            <button class="btn" data-match-job="${escapeHTML(j.id)}">🎯 Match resume</button>
+            ${isApplied
+              ? `<button class="btn primary" data-open-detail="${escapeHTML(existingApp.id)}">Update application</button>`
+              : `<button class="btn primary" data-apply-click="${escapeHTML(j.id)}">Apply on official site ↗</button>`
+            }
+            <button class="btn" data-match-job="${escapeHTML(j.id)}">🎯 ATS checklist</button>
             <button class="btn" data-practice-job="${escapeHTML(j.id)}">🎤 Practice</button>
-            <button class="btn" data-research-company="${escapeHTML(j.company)}">🏢 Research</button>
           </div>
         </article>`;
     }).join('');
@@ -268,6 +347,9 @@
     bindJobButtons();
   }
 
+  // -------------------------------------------------------------
+  // 2. Find Jobs Controller (Button Hierarchy & Official Apply Flow)
+  // -------------------------------------------------------------
   function renderJobs() {
     const el = document.getElementById('jobsList');
     if (!el) return;
@@ -286,8 +368,17 @@
     const company = document.getElementById('companyFilter')?.value || 'all';
     const sort = document.getElementById('sortFilter')?.value || 'match';
 
-    const savedJobsList = Storage ? Storage.getSavedJobs() : [];
-    const savedIds = new Set(savedJobsList.map(j => j.id));
+    const apps = Storage ? Storage.getApplications() : [];
+    const appMap = new Map();
+    const savedIds = new Set();
+    apps.forEach(a => {
+      if (a.id) appMap.set(String(a.id), a);
+      if (a.requisition_id) appMap.set(String(a.requisition_id), a);
+      if (a.status === 'saved') {
+        if (a.id) savedIds.add(String(a.id));
+        if (a.requisition_id) savedIds.add(String(a.requisition_id));
+      }
+    });
 
     let list = jobs.filter(j => {
       const hay = [j.title, j.company, j.location, j.exp, j.fit, ...(j.skills || [])].join(' ').toLowerCase();
@@ -296,7 +387,7 @@
              (size === 'all' || (j.company_size || 'Unknown') === size) &&
              (fresh === 'all' || j.window === fresh) &&
              (company === 'all' || j.company === company) &&
-             (!savedOnly || savedIds.has(j.id));
+             (!savedOnly || savedIds.has(String(j.id)));
     });
 
     if (sort === 'match') list.sort((a,b) => b.score - a.score || a.days - b.days);
@@ -319,12 +410,19 @@
       if (userReady && window.AJSResumeAgent) {
         const matchRes = window.AJSResumeAgent.matchJobWithResume(j, resumeText);
         if (matchRes.matchScore > 0) {
-          scoreBadge = `<span class="badge" style="background:#eaf4fd;color:#185a9d;border:1px solid #c7e0f8">🎯 Your Fit: ${matchRes.matchScore}%</span>`;
+          scoreBadge = `<span class="badge" style="background:#eaf4fd;color:#185a9d;border:1px solid #c7e0f8">🎯 Match: ${matchRes.matchScore}%</span>`;
         }
       }
 
-      const isSaved = savedIds.has(j.id);
-      const sizeTag = j.company_size ? `<span class="badge" style="background:#f4f4f4;color:#495057">${escapeHTML(j.company_size)}</span>` : '';
+      const existingApp = appMap.get(String(j.id)) || apps.find(a => a.canonical_key === j.canonical_key);
+      const isSaved = existingApp && existingApp.status === 'saved';
+      const isApplied = existingApp && ['applied', 'assessment', 'recruiter_screen', 'interview', 'final_round', 'offer'].includes(existingApp.status);
+      const isApplying = existingApp && existingApp.status === 'applying';
+
+      let statusBadge = '';
+      if (isApplied) statusBadge = `<span class="status-pill ${existingApp.status}">✓ ${Storage.STATUS_LABELS[existingApp.status]}</span>`;
+      else if (isApplying) statusBadge = `<span class="status-pill applying">Portal Opened</span>`;
+      else if (isSaved) statusBadge = `<span class="status-pill saved">Saved</span>`;
 
       return `
         <article class="job-card" id="job-card-${escapeHTML(j.id)}">
@@ -332,9 +430,8 @@
           <div class="job-main">
             <div class="job-topline">
               <span class="badge ${j.window}">${j.window === 'fresh' ? 'Fresh' : 'Backup'} · ${j.days}d</span>
-              <span class="badge verified">✓ Verified Official</span>
-              ${sizeTag}
-              ${isSaved ? '<span class="badge saved">♥ Saved</span>' : ''}
+              <span class="badge verified">✓ Official Posting</span>
+              ${statusBadge}
               ${scoreBadge}
             </div>
             <h3><a href="${escapeHTML(j.detail || j.apply)}" target="_blank" rel="noopener noreferrer">${escapeHTML(j.title)}</a></h3>
@@ -354,12 +451,27 @@
             <small>role fit</small>
           </div>
           <div class="job-actions">
-            <a class="btn primary" data-apply-open="${escapeHTML(j.id)}" href="${escapeHTML(j.apply)}" target="_blank" rel="noopener noreferrer">Apply on official site ↗</a>
-            <button class="btn" data-match-job="${escapeHTML(j.id)}">🎯 Match my resume</button>
-            <button class="btn" data-practice-job="${escapeHTML(j.id)}">🎤 Practice for this job</button>
-            <button class="btn" data-research-company="${escapeHTML(j.company)}">🏢 Research company</button>
-            <button class="btn save-btn ${isSaved ? 'saved' : ''}" data-save="${escapeHTML(j.id)}">${isSaved ? '♥ Saved' : '♡ Save'}</button>
-            <button class="btn small" data-report-job="${escapeHTML(j.id)}" title="Report a broken or expired link on this device">🚩 Report link</button>
+            <!-- Button Hierarchy: Primary Action -->
+            ${isApplied
+              ? `<button class="btn primary" data-open-detail="${escapeHTML(existingApp.id)}">Update application</button>`
+              : `<button class="btn primary" data-apply-click="${escapeHTML(j.id)}">Apply on official site ↗</button>`
+            }
+
+            <!-- Secondary Actions -->
+            ${!isApplied ? `
+              <button class="btn ${isSaved ? 'saved' : ''}" data-save-job="${escapeHTML(j.id)}">${isSaved ? '♥ Saved' : '♡ Save'}</button>
+              <button class="btn" data-quick-mark-applied="${escapeHTML(j.id)}">Mark applied</button>
+            ` : `
+              <a class="btn" href="${escapeHTML(j.apply)}" target="_blank" rel="noopener noreferrer">View official posting ↗</a>
+            `}
+
+            <!-- Contextual Actions -->
+            <button class="btn" data-match-job="${escapeHTML(j.id)}">🎯 ATS checklist</button>
+            <button class="btn" data-practice-job="${escapeHTML(j.id)}">🎤 Prepare interview</button>
+
+            <!-- Overflow / Research -->
+            <button class="btn small" data-research-company="${escapeHTML(j.company)}">🏢 Research</button>
+            <button class="btn small" data-report-job="${escapeHTML(j.id)}" title="Report broken link">🚩 Report</button>
           </div>
         </article>`;
     }).join('');
@@ -368,312 +480,1136 @@
   }
 
   function bindJobButtons() {
-    // Save toggle
-    document.querySelectorAll('[data-save]').forEach(btn => {
-      btn.addEventListener('click', () => toggleSave(btn.dataset.save));
+    // 1. Primary Apply Click (Opens in new tab, records opened_at, NEVER auto-marks applied!)
+    document.querySelectorAll('[data-apply-click]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const jobId = String(btn.dataset.applyClick);
+        const job = jobs.find(j => String(j.id) === jobId);
+        if (!job) return;
+
+        // Open official destination in new tab
+        window.open(job.apply, '_blank', 'noopener,noreferrer');
+
+        // Record apply click strictly as opened_at / applying
+        if (Storage) {
+          Storage.recordApplyClick(job);
+        }
+
+        // Show non-blocking follow-up prompt
+        showApplyFollowupToast(job.id);
+        renderJobs();
+        renderApplicationsWorkspace();
+      });
     });
 
-    // Match resume
+    // 2. Open detail drawer
+    document.querySelectorAll('[data-open-detail]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openApplicationDetail(btn.dataset.openDetail);
+      });
+    });
+
+    // 3. Save toggle
+    document.querySelectorAll('[data-save-job]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const jobId = String(btn.dataset.saveJob);
+        const job = jobs.find(j => String(j.id) === jobId);
+        if (!job || !Storage) return;
+
+        const apps = Storage.getApplications();
+        const existing = apps.find(a => String(a.id) === jobId || String(a.requisition_id) === jobId);
+        if (existing && existing.status === 'saved') {
+          Storage.deleteApplication(existing.id);
+          toast('Removed from saved roles');
+        } else {
+          Storage.saveApplication({
+            id: String(job.id),
+            requisition_id: String(job.id),
+            company: job.company,
+            title: job.title,
+            location: job.location,
+            type: job.type,
+            detail_url: job.detail,
+            apply_url: job.apply,
+            status: 'saved',
+            skills: job.skills,
+            notes: 'Saved from job search'
+          });
+          toast('Role saved for later');
+        }
+        renderJobs();
+        renderApplicationsWorkspace();
+      });
+    });
+
+    // 4. Mark applied directly
+    document.querySelectorAll('[data-quick-mark-applied]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const jobId = String(btn.dataset.quickMarkApplied);
+        openMarkAppliedModal(jobId);
+      });
+    });
+
+    // 5. Match resume
     document.querySelectorAll('[data-match-job]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const jobId = btn.dataset.matchJob;
+        const jobId = String(btn.dataset.matchJob);
         switchView('resume');
         const compSelect = document.getElementById('compareJobSelect');
         if (compSelect) {
           compSelect.value = jobId;
-          renderCompareJob();
+          renderJobAtsMatch(jobId);
         }
       });
     });
 
-    // Practice for job
+    // 6. Practice for job
     document.querySelectorAll('[data-practice-job]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const jobId = btn.dataset.practiceJob;
-        const targetJob = jobs.find(j => j.id === jobId);
+        const jobId = String(btn.dataset.practiceJob);
+        const targetJob = jobs.find(j => String(j.id) === jobId);
         switchView('coach');
-        CoachUI.startJobPractice(targetJob);
+        if (targetJob) CoachUI.startJobPractice(targetJob);
       });
     });
 
-    // Research company
+    // 7. Research company
     document.querySelectorAll('[data-research-company]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const compName = btn.dataset.researchCompany;
-        openCompanyResearch(compName);
+        openCompanyResearch(btn.dataset.researchCompany);
       });
     });
 
-    // Report broken link
+    // 8. Report link
     document.querySelectorAll('[data-report-job]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const jobId = btn.dataset.reportJob;
-        const card = document.getElementById(`job-card-${jobId}`);
-        if (card) card.style.display = 'none';
-        toast('Link problem reported on this device. Card hidden.');
-      });
-    });
-
-    bindApplyTracking();
-  }
-
-  function toggleSave(id) {
-    if (!Storage) return;
-    const saved = Storage.getSavedJobs();
-    const exists = saved.some(j => j.id === id);
-    if (exists) {
-      Storage.removeSavedJob(id);
-      toast('Removed from saved roles');
-    } else {
-      const job = jobs.find(j => j.id === id);
-      if (job) {
-        Storage.saveJob(job);
-        toast('Role saved');
-      }
-    }
-    updateSaved();
-    renderJobs();
-  }
-
-  function updateSaved() {
-    const saved = Storage ? Storage.getSavedJobs() : [];
-    const cnt = document.getElementById('savedCount');
-    if (cnt) cnt.textContent = saved.length;
-    const btn = document.getElementById('savedToggle');
-    if (btn) btn.innerHTML = `${savedOnly ? '♥' : '♡'} Saved only <span>${saved.length}</span>`;
-  }
-
-  function bindApplyTracking() {
-    document.querySelectorAll('[data-apply-open]').forEach(a => {
-      if (a.dataset.bound) return;
-      a.dataset.bound = '1';
-      a.addEventListener('click', () => {
-        const jobId = a.dataset.applyOpen;
-        const job = jobs.find(j => j.id === jobId);
-        if (Storage && job) {
-          // Explicit requirement: Opening an Apply link tracks as "Opened" / "To apply", NOT automatically "Applied"!
-          Storage.recordApplication(job, 'Opened');
-          renderApplications();
-        }
+        const card = document.getElementById(`job-card-${btn.dataset.reportJob}`);
+        if (card) card.style.opacity = '0.5';
+        toast('Link problem flagged on this device');
       });
     });
   }
 
   // -------------------------------------------------------------
-  // Application Tracking (Preserves Semantics)
+  // Non-blocking Apply Follow-up Toast & Mark Applied Dialog
   // -------------------------------------------------------------
-  function renderApplications() {
+  function showApplyFollowupToast(jobId) {
+    activeFollowupJobId = jobId;
+    const toastEl = document.getElementById('applyFollowupToast');
+    if (!toastEl) return;
+    toastEl.hidden = false;
+  }
+
+  function hideApplyFollowupToast() {
+    activeFollowupJobId = null;
+    const toastEl = document.getElementById('applyFollowupToast');
+    if (toastEl) toastEl.hidden = true;
+  }
+
+  function openMarkAppliedModal(jobId) {
+    const modal = document.getElementById('markAppliedModal');
+    const dateInput = document.getElementById('markAppliedDateInput');
+    const noteInput = document.getElementById('markAppliedNoteInput');
+    if (!modal || !dateInput) return;
+
+    // Default to current local date/time in ISO format for datetime-local
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    dateInput.value = now.toISOString().slice(0, 16);
+    if (noteInput) noteInput.value = '';
+
+    modal.dataset.targetJobId = jobId;
+    modal.hidden = false;
+  }
+
+  // -------------------------------------------------------------
+  // 3. My Applications Workspace Controller
+  // -------------------------------------------------------------
+  function renderApplicationsWorkspace() {
     const apps = Storage ? Storage.getApplications() : [];
     const navCount = document.getElementById('applicationNavCount');
     if (navCount) navCount.textContent = apps.length;
 
-    const metricsEl = document.getElementById('applicationMetrics');
-    if (metricsEl) {
-      metricsEl.innerHTML = `
-        <div class="metric blue"><div class="metric-top"><span class="metric-label">Tracked</span></div><strong>${apps.length}</strong><div class="metric-note">Total openings logged</div></div>
-        <div class="metric"><div class="metric-top"><span class="metric-label">Submitted</span></div><strong>${apps.filter(a => a.status === 'Applied').length}</strong><div class="metric-note">Submitted by you</div></div>
-        <div class="metric amber"><div class="metric-top"><span class="metric-label">Interviewing</span></div><strong>${apps.filter(a => a.status === 'Interview').length}</strong><div class="metric-note">Process active</div></div>
-        <div class="metric gray"><div class="metric-top"><span class="metric-label">Opened / Pending</span></div><strong>${apps.filter(a => a.status === 'Opened' || a.status === 'To apply').length}</strong><div class="metric-note">In consideration</div></div>`;
+    // Render Metrics
+    renderWorkspaceMetrics(apps);
+
+    // Render Action Queue
+    renderWorkspaceActionQueue();
+
+    // Populate Company Filter
+    const compFilter = document.getElementById('appCompanyFilter');
+    if (compFilter) {
+      const companies = Array.from(new Set(apps.map(a => a.company).filter(Boolean))).sort();
+      const currentVal = compFilter.value;
+      compFilter.innerHTML = '<option value="all">All companies</option>' +
+        companies.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+      if (currentVal) compFilter.value = currentVal;
     }
 
-    const listEl = document.getElementById('applicationList');
-    if (!listEl) return;
-    if (!apps.length) {
-      listEl.innerHTML = '<div class="empty-apps"><strong>No tracked applications yet</strong>Click "Apply on official site" on any job to log an application.</div>';
+    // Filter and Sort Applications
+    const filteredApps = filterAndSortApplications(apps);
+
+    const countText = document.getElementById('pipelineCountText');
+    if (countText) countText.textContent = `${filteredApps.length} of ${apps.length} applications shown`;
+
+    // Render List or Board
+    if (currentViewMode === 'board') {
+      document.getElementById('applicationListViewContainer').hidden = true;
+      document.getElementById('applicationBoardViewContainer').hidden = false;
+      renderKanbanBoard(filteredApps);
+    } else {
+      document.getElementById('applicationListViewContainer').hidden = false;
+      document.getElementById('applicationBoardViewContainer').hidden = true;
+      renderApplicationListTable(filteredApps);
+    }
+  }
+
+  function renderWorkspaceMetrics(apps) {
+    const metricsEl = document.getElementById('applicationMetrics');
+    if (!metricsEl) return;
+
+    const metrics = Storage ? Storage.getApplicationMetrics(jobs) : {};
+
+    metricsEl.innerHTML = `
+      <div class="metric"><div class="metric-top"><span class="metric-label">Ready to apply</span></div><strong>${metrics.ready_to_apply || 0}</strong><div class="metric-note">Unapplied from scan</div></div>
+      <div class="metric blue"><div class="metric-top"><span class="metric-label">Saved</span></div><strong>${metrics.saved || 0}</strong><div class="metric-note">Saved for review</div></div>
+      <div class="metric amber"><div class="metric-top"><span class="metric-label">Applying</span></div><strong>${metrics.applying || 0}</strong><div class="metric-note">Portal opened</div></div>
+      <div class="metric" style="background:#eaf8f4;border-color:#b5e2d6"><div class="metric-top"><span class="metric-label">Applied</span></div><strong style="color:#0e6c59">${metrics.applied || 0}</strong><div class="metric-note">Submitted</div></div>
+      <div class="metric" style="background:#f6f0fd;border-color:#ded0fa"><div class="metric-top"><span class="metric-label">Assessments</span></div><strong style="color:#5f2ca0">${metrics.assessment || 0}</strong><div class="metric-note">Tests pending</div></div>
+      <div class="metric" style="background:#f4ecfd;border-color:#ded0fa"><div class="metric-top"><span class="metric-label">Interviews</span></div><strong style="color:#5f2ca0">${metrics.interviews || 0}</strong><div class="metric-note">Active rounds</div></div>
+      <div class="metric" style="background:#d4edda;border-color:#c3e6cb"><div class="metric-top"><span class="metric-label">Offers</span></div><strong style="color:#155724">${metrics.offer || 0}</strong><div class="metric-note">Received</div></div>
+      <div class="metric gray"><div class="metric-top"><span class="metric-label">Closed/Rejected</span></div><strong>${metrics.closed || 0}</strong><div class="metric-note">Concluded</div></div>
+      <div class="metric" style="background:#fff3dd;border-color:#ffe2a8"><div class="metric-top"><span class="metric-label">Follow-ups Due</span></div><strong style="color:#b56b0b">${metrics.followups_due || 0}</strong><div class="metric-note">Time-sensitive</div></div>
+    `;
+  }
+
+  function renderWorkspaceActionQueue() {
+    const queueList = document.getElementById('actionQueueList');
+    if (!queueList) return;
+
+    const queue = Storage ? Storage.getActionQueue(jobs) : [];
+    if (!queue.length) {
+      queueList.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;padding:24px">
+          <strong>No pending actions in your queue</strong>
+          <p style="margin:4px 0 0;color:var(--muted)">You're all caught up! Explore new verified roles or practice mock interviews.</p>
+        </div>`;
       return;
     }
 
-    const statuses = ['Opened', 'To apply', 'Applied', 'Interview', 'Offer', 'Rejected'];
-
-    listEl.innerHTML = apps.map(a => `
-      <div class="application-row">
-        <div class="application-role">
-          <strong>${escapeHTML(a.title)}</strong>
-          <span>${escapeHTML(a.company)}</span>
+    queueList.innerHTML = queue.map(item => `
+      <div class="action-card ${item.urgency === 'high' ? 'urgent' : ''}">
+        <div class="action-card-header">
+          <strong>${escapeHTML(item.company)}</strong>
+          <span class="action-badge">${escapeHTML(item.actionTitle)}</span>
         </div>
-        <select class="status-select" data-app-id="${escapeHTML(a.id)}">
-          ${statuses.map(s => `<option value="${s}" ${(a.status || 'Opened') === s ? 'selected' : ''}>${s}</option>`).join('')}
-        </select>
-        <span class="application-date">Logged ${new Date(a.appliedAt || Date.now()).toLocaleDateString('en-IN')}</span>
-        <div class="card-actions">
-          <a class="btn small primary" href="${escapeHTML(a.apply_url)}" target="_blank" rel="noopener noreferrer">Open portal ↗</a>
-          <button class="btn small" data-remove-app="${escapeHTML(a.id)}">Remove</button>
+        <h4>${escapeHTML(item.title)}</h4>
+        <div class="action-card-reason">
+          💡 <strong>Why this is listed:</strong> ${escapeHTML(item.reason)}
         </div>
-      </div>`).join('');
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:var(--muted)">${item.deadline ? 'Due: ' + fmtDate(item.deadline) : ''}</span>
+          <button class="btn small primary" onclick="window.AJSApp.openApp('${escapeHTML(item.appId)}')">Take action →</button>
+        </div>
+      </div>
+    `).join('');
+  }
 
-    listEl.querySelectorAll('[data-app-id]').forEach(sel => {
-      sel.addEventListener('change', () => {
-        const id = sel.dataset.appId;
-        if (Storage) {
-          Storage.updateApplicationStatus(id, sel.value);
-          renderApplications();
-        }
-      });
-    });
+  function filterAndSortApplications(apps) {
+    const q = (document.getElementById('appSearchInput')?.value || '').trim().toLowerCase();
+    const status = document.getElementById('appStatusFilter')?.value || 'all';
+    const company = document.getElementById('appCompanyFilter')?.value || 'all';
+    const scanFilter = document.getElementById('appScanHealthFilter')?.value || 'all';
+    const sort = document.getElementById('appSortFilter')?.value || 'updated';
 
-    listEl.querySelectorAll('[data-remove-app]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.removeApp;
-        if (Storage) {
-          Storage.removeApplication(id);
-          renderApplications();
-        }
-      });
+    return apps.filter(a => {
+      const matchQ = !q || [a.title, a.company, a.notes, a.recruiter_name].join(' ').toLowerCase().includes(q);
+      const matchStatus = status === 'all' || a.status === status;
+      const matchCompany = company === 'all' || a.company === company;
+      const matchScan = scanFilter === 'all' ||
+        (scanFilter === 'in_scan' && a.in_latest_scan) ||
+        (scanFilter === 'not_in_scan' && !a.in_latest_scan);
+      return matchQ && matchStatus && matchCompany && matchScan;
+    }).sort((a, b) => {
+      if (sort === 'updated') return new Date(b.last_updated_at || 0) - new Date(a.last_updated_at || 0);
+      if (sort === 'applied') return new Date(b.applied_date || 0) - new Date(a.applied_date || 0);
+      if (sort === 'nextAction') return new Date(a.reminder_date || '9999') - new Date(b.reminder_date || '9999');
+      if (sort === 'company') return a.company.localeCompare(b.company);
+      return 0;
     });
   }
 
-  // -------------------------------------------------------------
-  // Resume Feature Module (ATS, Matching, and Fallbacks)
-  // -------------------------------------------------------------
-  function renderResumeATSAnalysis() {
-    const hasResume = hasUserResume();
-    const text = getResumeFullText();
+  function renderApplicationListTable(filteredApps) {
+    const tbody = document.getElementById('applicationTableBody');
+    if (!tbody) return;
 
-    const result = (hasResume && window.AJSResumeAgent)
-      ? window.AJSResumeAgent.analyzeResumeATS(text)
-      : { totalScore: 0, grade: 'No Resume Loaded', breakdown: [], recommendations: [], skillsFound: [] };
+    if (!filteredApps.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">No applications match your search and filter criteria.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filteredApps.map(a => {
+      const inScanBadge = a.in_latest_scan
+        ? `<span class="badge verified">✓ In today's scan</span>`
+        : `<span class="badge backup" title="Job left the 15-day scan window or closed officially. Retained safely in your history.">⚠️ Not in today's scan</span>`;
+
+      const statusPill = `<span class="status-pill ${a.status}">${Storage.STATUS_LABELS[a.status] || a.status}</span>`;
+
+      const nextActionText = a.next_action
+        ? `<strong>${escapeHTML(a.next_action)}</strong>${a.reminder_date ? `<div style="font-size:11px;color:var(--muted)">Due: ${fmtDate(a.reminder_date)}</div>` : ''}`
+        : `<span style="color:var(--muted);font-size:11px">None set</span>`;
+
+      const timelineSnippet = (a.timeline && a.timeline.length)
+        ? `<span style="font-size:11px;color:var(--muted)">${escapeHTML(a.timeline[a.timeline.length - 1].note || a.timeline[a.timeline.length - 1].action)}</span>`
+        : '<span style="font-size:11px;color:var(--muted)">Logged</span>';
+
+      return `
+        <tr>
+          <td>
+            <strong>${escapeHTML(a.title)}</strong>
+            <div style="font-size:11.5px;color:var(--muted)">${escapeHTML(a.company)} · ${escapeHTML(a.location || 'Remote')}</div>
+          </td>
+          <td>${statusPill}</td>
+          <td>${inScanBadge}</td>
+          <td>${nextActionText}</td>
+          <td>${timelineSnippet}</td>
+          <td style="text-align:right;white-space:nowrap">
+            <button class="btn small" onclick="window.AJSApp.openApp('${escapeHTML(a.id)}')">View Details</button>
+            <a class="btn small" href="${escapeHTML(a.apply_url || a.detail_url)}" target="_blank" rel="noopener noreferrer">Open Portal ↗</a>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  function renderKanbanBoard(filteredApps) {
+    const board = document.getElementById('applicationBoardViewContainer');
+    if (!board) return;
+
+    const columns = [
+      { id: 'saved', label: 'Saved', statuses: ['saved'] },
+      { id: 'applying', label: 'In Progress', statuses: ['applying'] },
+      { id: 'applied', label: 'Applied', statuses: ['applied'] },
+      { id: 'assessment', label: 'Assessments', statuses: ['assessment', 'recruiter_screen'] },
+      { id: 'interview', label: 'Interviews', statuses: ['interview', 'final_round'] },
+      { id: 'offer', label: 'Offers', statuses: ['offer'] },
+      { id: 'closed', label: 'Closed / Rejected', statuses: ['rejected', 'withdrawn', 'closed'] }
+    ];
+
+    board.innerHTML = columns.map(col => {
+      const colApps = filteredApps.filter(a => col.statuses.includes(a.status));
+      return `
+        <div class="kanban-col">
+          <div class="kanban-col-head">
+            <strong>${escapeHTML(col.label)}</strong>
+            <span class="kanban-count">${colApps.length}</span>
+          </div>
+          <div class="kanban-items">
+            ${colApps.map(a => `
+              <div class="kanban-card" onclick="window.AJSApp.openApp('${escapeHTML(a.id)}')">
+                <strong>${escapeHTML(a.title)}</strong>
+                <span>${escapeHTML(a.company)}</span>
+                <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center">
+                  <span class="status-pill ${a.status}" style="font-size:9.5px">${Storage.STATUS_LABELS[a.status]}</span>
+                  ${!a.in_latest_scan ? '<span style="font-size:9.5px;color:#a35200">⚠️ Stale</span>' : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // -------------------------------------------------------------
+  // Application Detail Drawer
+  // -------------------------------------------------------------
+  function openApplicationDetail(appId) {
+    const app = Storage ? Storage.getApplication(appId) : null;
+    if (!app) {
+      toast('Application record not found');
+      return;
+    }
+
+    activeDetailAppId = appId;
+    const backdrop = document.getElementById('appDetailDrawerBackdrop');
+    if (!backdrop) return;
+
+    // Header info
+    document.getElementById('drawerTitle').textContent = app.title;
+    document.getElementById('drawerCompanySub').textContent = `${app.company} · ${app.location || 'India'} (${app.type || 'Full-time'})`;
+    document.getElementById('drawerApplyLink').href = app.apply_url || app.detail_url;
+
+    // Scan health notice
+    const noticeEl = document.getElementById('drawerScanStatusNotice');
+    if (noticeEl) {
+      if (app.in_latest_scan) {
+        noticeEl.style.background = '#e6f5f1';
+        noticeEl.style.color = '#0e6c59';
+        noticeEl.innerHTML = '✓ <strong>Active in today’s verified scan.</strong> Requisition is live and verified on official company career portal.';
+      } else {
+        noticeEl.style.background = '#fff3dd';
+        noticeEl.style.color = '#925909';
+        noticeEl.innerHTML = '⚠️ <strong>Not in today’s verified scan.</strong> The official posting was closed, filled, or moved beyond the 15-day window. All your notes, timeline, and interview prep remain preserved.';
+      }
+    }
+
+    // Timeline Track
+    const track = document.getElementById('drawerTimelineTrack');
+    if (track) {
+      const events = app.timeline || [];
+      track.innerHTML = events.slice().reverse().map(ev => `
+        <div class="timeline-node">
+          <div class="timeline-node-dot"></div>
+          <div class="timeline-node-date">${new Date(ev.date || ev.changed_at || Date.now()).toLocaleString('en-IN')}</div>
+          <div class="timeline-node-title">${escapeHTML(ev.action || (ev.status ? Storage.STATUS_LABELS[ev.status] || ev.status : 'Status Updated'))}</div>
+          ${ev.note ? `<p class="timeline-node-note">${escapeHTML(ev.note)}</p>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Inputs
+    const nextActionInput = document.getElementById('drawerNextActionInput');
+    if (nextActionInput) nextActionInput.value = app.next_action || '';
+    const reminderInput = document.getElementById('drawerReminderDateInput');
+    if (reminderInput) reminderInput.value = app.reminder_date || '';
+
+    const recName = document.getElementById('drawerRecruiterName');
+    if (recName) recName.value = app.recruiter_name || '';
+    const recChan = document.getElementById('drawerContactChannel');
+    if (recChan) recChan.value = app.contact_channel || '';
+
+    const notesText = document.getElementById('drawerNotesText');
+    if (notesText) notesText.value = app.notes || '';
+
+    // Archive toggle text
+    const archiveBtn = document.getElementById('drawerArchiveBtn');
+    if (archiveBtn) archiveBtn.textContent = app.archived ? 'Unarchive' : 'Archive';
+
+    backdrop.hidden = false;
+  }
+
+  function closeApplicationDetail() {
+    activeDetailAppId = null;
+    const backdrop = document.getElementById('appDetailDrawerBackdrop');
+    if (backdrop) backdrop.hidden = true;
+  }
+
+  // -------------------------------------------------------------
+  // 4. ATS & Resume Workspace Controller
+  // -------------------------------------------------------------
+  function renderResumeATSWorkspace() {
+    populateResumeProfiles();
+
+    // Populate Job Selector
+    const compareSelect = document.getElementById('compareJobSelect');
+    if (compareSelect) {
+      const allSelectable = [
+        ...jobs,
+        ...(Storage ? Storage.getApplications().filter(a => !jobs.some(j => j.id === a.id)) : [])
+      ];
+
+      const currentVal = compareSelect.value;
+      compareSelect.innerHTML = allSelectable.map(j => `
+        <option value="${escapeHTML(j.id)}">${escapeHTML(j.company)} · ${escapeHTML(j.title)}</option>
+      `).join('');
+
+      if (currentVal && allSelectable.some(j => j.id === currentVal)) {
+        compareSelect.value = currentVal;
+      }
+      renderJobAtsMatch(compareSelect.value);
+    }
+  }
+
+  function populateResumeProfiles() {
+    const profSelect = document.getElementById('resumeProfileSelect');
+    if (!profSelect || !Storage) return;
+
+    const profiles = Storage.getResumeProfiles();
+    profSelect.innerHTML = '<option value="">(Current Session Resume)</option>' +
+      profiles.map(p => `<option value="${escapeHTML(p.name)}">${escapeHTML(p.name)} (${p.wordCount || 0} words)</option>`).join('');
+  }
+
+  function renderJobAtsMatch(jobId) {
+    const allJobs = [
+      ...jobs,
+      ...(Storage ? Storage.getApplications() : [])
+    ];
+    const job = allJobs.find(j => j.id === jobId) || jobs[0];
+    if (!job) return;
+
+    const resumeText = getResumeFullText();
+    const hasResume = hasUserResume();
+
+    const matchRes = (hasResume && window.AJSResumeAgent)
+      ? window.AJSResumeAgent.matchJobWithResume(job, resumeText)
+      : {
+          matchScore: 0,
+          matchedSkills: [],
+          missingSkills: job.skills || [],
+          requiredMatched: [],
+          requiredMissing: (job.skills || []).slice(0, 3),
+          preferredMatched: [],
+          preferredMissing: (job.skills || []).slice(3),
+          evidenceSnippets: {},
+          checklist: []
+        };
 
     // Update gauge
     const circle = document.getElementById('atsScoreGaugeCircle');
-    if (circle) circle.style.setProperty('--gauge-pct', result.totalScore);
+    if (circle) circle.style.setProperty('--gauge-pct', matchRes.matchScore);
     const scoreVal = document.getElementById('atsScoreValue');
-    if (scoreVal) scoreVal.textContent = result.totalScore;
-    const scoreGrade = document.getElementById('atsScoreGrade');
-    if (scoreGrade) scoreGrade.textContent = result.grade;
-
-    // Breakdown list
-    const bdEl = document.getElementById('atsBreakdownList');
-    if (bdEl) {
-      if (hasResume && result.breakdown.length) {
-        bdEl.innerHTML = result.breakdown.map(b => `
-          <div class="ats-breakdown-row">
-            <div class="ats-breakdown-info">
-              <strong>${escapeHTML(b.category)}</strong>
-              <span>${escapeHTML(b.detail)}</span>
-            </div>
-            <span class="ats-breakdown-pts ${b.earned > 0 ? 'good' : ''}">${b.earned > 0 ? '+' : ''}${b.earned} / ${b.max} pts</span>
-          </div>`).join('');
-      } else {
-        bdEl.innerHTML = `
-          <div style="padding:16px;text-align:center;color:var(--muted);font-size:12px">
-            Upload a .pdf / .docx or paste resume text to calculate your 0–100 ATS benchmark score.
-          </div>`;
-      }
+    if (scoreVal) scoreVal.textContent = matchRes.matchScore;
+    const targetTitle = document.getElementById('atsTargetJobTitle');
+    if (targetTitle) targetTitle.textContent = `${job.company} · ${job.title}`;
+    const grade = document.getElementById('atsScoreGrade');
+    if (grade) {
+      grade.textContent = matchRes.matchScore >= 75 ? 'Strong Match' : (matchRes.matchScore >= 50 ? 'Moderate Match' : 'Gaps Detected');
     }
 
-    // Recommendations list
-    const recEl = document.getElementById('atsRecommendationsList');
-    if (recEl) {
-      if (hasResume && result.recommendations.length) {
-        recEl.innerHTML = result.recommendations.map(r => `<li>${escapeHTML(r)}</li>`).join('');
-      } else if (hasResume) {
-        recEl.innerHTML = '<li style="color:#118c73">✓ Your resume meets core ATS benchmarks for junior analytics roles!</li>';
-      } else {
-        recEl.innerHTML = '<li>Upload your resume above to view personalized ATS improvement points.</li>';
-      }
+    // Real-time right sidebar gauge
+    const inspectCircle = document.getElementById('inspectScoreCircle');
+    if (inspectCircle) inspectCircle.style.setProperty('--gauge-pct', matchRes.matchScore);
+    const inspectText = document.getElementById('inspectScoreText');
+    if (inspectText) inspectText.textContent = `${matchRes.matchScore}%`;
+    const inspectTitle = document.getElementById('inspectScoreTitle');
+    if (inspectTitle) inspectTitle.textContent = `${job.company} · ${job.title}`;
+    const inspectSub = document.getElementById('inspectScoreSub');
+    if (inspectSub) {
+      inspectSub.textContent = hasResume
+        ? `${matchRes.matchedSkills.length} of ${(job.skills || []).length} keywords verified in resume`
+        : 'Upload resume to calculate match';
     }
 
-    // Extracted Skills chips
-    const skillsWrap = document.getElementById('atsSkillsFoundWrap');
-    if (skillsWrap) {
-      if (hasResume && result.skillsFound && result.skillsFound.length) {
-        skillsWrap.innerHTML = result.skillsFound.map(s => `<span class="skill-pill active">${escapeHTML(s)}</span>`).join('');
-      } else {
-        skillsWrap.innerHTML = '<span style="color:#718f87;font-size:11px">Upload or paste resume text to extract analytics skills.</span>';
-      }
-    }
-
-    // Memory vs Device indicator
-    const devIndicator = document.getElementById('resumeStorageBadge');
-    if (devIndicator) {
-      if (currentResumeData && currentResumeData.remembered) {
-        devIndicator.textContent = 'Saved to this device';
-        devIndicator.style.background = '#e6f5f1';
-        devIndicator.style.color = '#106c59';
-      } else {
-        devIndicator.textContent = 'In page memory only (private)';
-        devIndicator.style.background = '#fff3dd';
-        devIndicator.style.color = '#b56b0b';
-      }
-    }
-
-    const wcEl = document.getElementById('resumeWordCount');
-    if (wcEl) wcEl.textContent = `${result.wordCount || 0} words`;
-  }
-
-  function renderCompareJob() {
-    const select = document.getElementById('compareJobSelect');
-    if (!select) return;
-
-    if (!select.options.length && jobs.length > 0) {
-      select.innerHTML = jobs.map(j => `<option value="${escapeHTML(j.id)}">${escapeHTML(j.company)} · ${escapeHTML(j.title)} (${escapeHTML(j.location)})</option>`).join('');
-    }
-
-    const jobId = select.value || (jobs[0] && jobs[0].id);
-    const job = jobs.find(j => j.id === jobId);
-    if (!job) return;
-
-    const hasResume = hasUserResume();
-    const resumeText = getResumeFullText();
-
-    const match = (hasResume && window.AJSResumeAgent)
-      ? window.AJSResumeAgent.matchJobWithResume(job, resumeText)
-      : { matchScore: 0, matchedSkills: [], missingSkills: (job.skills || []) };
-
-    const circle = document.getElementById('inspectScoreCircle');
-    if (circle) circle.style.setProperty('--gauge-pct', match.matchScore);
-    const textEl = document.getElementById('inspectScoreText');
-    if (textEl) textEl.textContent = `${match.matchScore}%`;
-    const titleEl = document.getElementById('inspectScoreTitle');
-    if (titleEl) titleEl.textContent = `${job.company} · ${job.title}`;
-    const subEl = document.getElementById('inspectScoreSub');
-    if (subEl) subEl.textContent = hasResume
-      ? `${match.matchedSkills.length} of ${(job.skills || []).length} keywords matched`
-      : 'No resume loaded. Upload resume to calculate match.';
-
+    // Right sidebar matched & missing chips
     const matchedEl = document.getElementById('inspectMatchedSkills');
     if (matchedEl) {
-      matchedEl.innerHTML = (match.matchedSkills && match.matchedSkills.length)
-        ? match.matchedSkills.map(s => `<span class="match-chip-hit">✓ ${escapeHTML(s)}</span>`).join('')
-        : '<span style="color:#a2c4bc;font-size:10px">No keyword overlap detected yet.</span>';
+      matchedEl.innerHTML = (matchRes.matchedSkills && matchRes.matchedSkills.length)
+        ? matchRes.matchedSkills.map(s => `<span class="match-chip-hit">✓ ${escapeHTML(s)}</span>`).join('')
+        : '<span style="color:#a2c4bc;font-size:10px">No matching keywords detected yet.</span>';
     }
-
     const missingEl = document.getElementById('inspectMissingSkills');
     if (missingEl) {
-      missingEl.innerHTML = (match.missingSkills && match.missingSkills.length)
-        ? match.missingSkills.map(s => `
-          <span class="match-chip-miss">
-            ${escapeHTML(s)}
-            <button type="button" data-add-missing-study="${escapeHTML(s)}" title="Add to learning / edit checklist">+ Add to study list</button>
-          </span>`).join('')
+      missingEl.innerHTML = (matchRes.missingSkills && matchRes.missingSkills.length)
+        ? matchRes.missingSkills.map(s => `<span class="match-chip-miss">${escapeHTML(s)}</span>`).join('')
         : '<span style="color:#7de8cc;font-size:10px">✓ 100% keyword coverage!</span>';
+    }
 
-      // Fixed: Replace silent skill mutation with study checklist item!
-      missingEl.querySelectorAll('[data-add-missing-study]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const s = btn.dataset.addMissingStudy;
-          if (Storage) {
-            const list = Storage.getChecklist();
-            if (!list.includes(s)) {
-              list.push(s);
-              Storage.saveChecklist(list);
-            }
-          }
-          toast(`Added "${s}" to study checklist. To include in ATS score, add truthful project evidence.`);
-        });
-      });
+    // Required Skills Evidence
+    const reqList = document.getElementById('requiredSkillsEvidenceList');
+    if (reqList) {
+      const items = [
+        ...(matchRes.requiredMatched || []).map(s => ({ skill: s, matched: true, quote: matchRes.evidenceSnippets[s] })),
+        ...(matchRes.requiredMissing || []).map(s => ({ skill: s, matched: false }))
+      ];
+      reqList.innerHTML = items.map(it => `
+        <div style="padding:8px 12px;background:#f9fbf9;border-left:3px solid ${it.matched ? '#168c73' : '#d9534f'};border-radius:4px;margin-bottom:6px;font-size:12px">
+          <strong>${it.matched ? '✓' : '✗'} ${escapeHTML(it.skill)}</strong>
+          ${it.quote ? `<div style="color:var(--muted);font-style:italic;margin-top:2px">“${escapeHTML(it.quote)}”</div>` : '<div style="color:#a35200;font-size:11px">Missing from resume text. Add only if you have genuine experience.</div>'}
+        </div>
+      `).join('');
+    }
+
+    // Preferred Skills Evidence
+    const prefList = document.getElementById('preferredSkillsEvidenceList');
+    if (prefList) {
+      const items = [
+        ...(matchRes.preferredMatched || []).map(s => ({ skill: s, matched: true, quote: matchRes.evidenceSnippets[s] })),
+        ...(matchRes.preferredMissing || []).map(s => ({ skill: s, matched: false }))
+      ];
+      prefList.innerHTML = items.map(it => `
+        <div style="padding:8px 12px;background:#f9fbf9;border-left:3px solid ${it.matched ? '#168c73' : '#f0ad4e'};border-radius:4px;margin-bottom:6px;font-size:12px">
+          <strong>${it.matched ? '✓' : '✗'} ${escapeHTML(it.skill)}</strong>
+          ${it.quote ? `<div style="color:var(--muted);font-style:italic;margin-top:2px">“${escapeHTML(it.quote)}”</div>` : '<div style="color:var(--muted);font-size:11px">Optional / Preferred skill.</div>'}
+        </div>
+      `).join('');
+    }
+
+    // Actionable Tailoring Checklist (Critical, Useful, Optional)
+    const chkContainer = document.getElementById('jobAtsChecklistContainer');
+    if (chkContainer) {
+      const checklist = matchRes.checklist || [];
+      if (!checklist.length) {
+        chkContainer.innerHTML = '<div style="font-size:12px;color:#168c73;padding:10px">✓ No major skill gaps detected for this role!</div>';
+        return;
+      }
+
+      chkContainer.innerHTML = checklist.map((item, idx) => `
+        <div style="padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong style="font-size:12.5px;color:var(--ink)">${escapeHTML(item.item)}</strong>
+            <span class="badge ${item.priority === 'critical' ? 'danger' : (item.priority === 'useful' ? 'backup' : 'verified')}">${escapeHTML(item.priority.toUpperCase())}</span>
+          </div>
+          <p style="margin:4px 0 0;font-size:11.5px;color:var(--muted)">${escapeHTML(item.guidance)}</p>
+        </div>
+      `).join('');
     }
   }
 
-  function saveResume(remember) {
-    if (remember !== undefined) currentResumeData.remembered = remember;
-    if (Storage) {
-      Storage.saveResume(currentResumeData, currentResumeData.remembered);
+  // -------------------------------------------------------------
+  // 5. Personalized Interview Coach Controller
+  // -------------------------------------------------------------
+  const CoachUI = {
+    currentSession: null,
+    currentQuestionIndex: 0,
+    activeQuestion: null,
+    sessionAnswers: [],
+    timerInterval: null,
+    secondsElapsed: 0,
+    recognizer: null,
+    isListening: false,
+
+    init: function() {
+      CoachUI.populateTargetJobSelector();
+      CoachUI.renderStreakAndStats();
+      CoachUI.checkForPausedSession();
+    },
+
+    populateTargetJobSelector: function() {
+      const select = document.getElementById('coachTargetJobSelect');
+      if (!select) return;
+
+      const allJobs = [
+        ...jobs,
+        ...(Storage ? Storage.getApplications() : [])
+      ];
+
+      select.innerHTML = allJobs.map(j => `
+        <option value="${escapeHTML(j.id)}">${escapeHTML(j.company)} · ${escapeHTML(j.title)}</option>
+      `).join('');
+    },
+
+    checkForPausedSession: function() {
+      const paused = Storage ? Storage.getPausedInterviewSession() : null;
+      const banner = document.getElementById('coachResumeSessionBanner');
+      const text = document.getElementById('coachResumeSessionText');
+      if (!banner || !text) return;
+
+      if (paused && paused.activeQuestionIndex !== undefined) {
+        banner.hidden = false;
+        text.textContent = `Paused on Question ${paused.activeQuestionIndex + 1} of ${paused.questions.length} for ${paused.targetJob?.company || 'Target Job'}.`;
+      } else {
+        banner.hidden = true;
+      }
+    },
+
+    renderStreakAndStats: function() {
+      const prog = Storage ? Storage.getInterviewProgress() : { streakDays: 0, sessionsCompleted: 0, questionsAnswered: 0, averageScore: 0 };
+
+      const streakEl = document.getElementById('coachStreakCount');
+      if (streakEl) streakEl.textContent = prog.streakDays || 0;
+      const sessEl = document.getElementById('coachSessionsCount');
+      if (sessEl) sessEl.textContent = prog.sessionsCompleted || 0;
+      const qEl = document.getElementById('coachQuestionsCount');
+      if (qEl) qEl.textContent = prog.questionsAnswered || 0;
+      const avgEl = document.getElementById('coachAvgScore');
+      if (avgEl) avgEl.textContent = prog.averageScore ? `${prog.averageScore}%` : '--';
+    },
+
+    startJobPractice: function(targetJob) {
+      const select = document.getElementById('coachTargetJobSelect');
+      if (select && targetJob) select.value = targetJob.id;
+      CoachUI.startSession();
+    },
+
+    startSession: function() {
+      const select = document.getElementById('coachTargetJobSelect');
+      const stageSelect = document.getElementById('coachTargetStageSelect');
+      const minutesSelect = document.getElementById('coachSessionMinutesSelect');
+
+      const allJobs = [...jobs, ...(Storage ? Storage.getApplications() : [])];
+      const selectedJob = allJobs.find(j => j.id === (select?.value)) || jobs[0];
+
+      if (!selectedJob) {
+        toast('Please select a target job opening first');
+        return;
+      }
+
+      const stage = stageSelect?.value || 'full_loop';
+      const duration = parseInt(minutesSelect?.value || '30', 10);
+      const resumeText = getResumeFullText();
+
+      if (!window.AJSInterviewCoach) {
+        toast('Interview Coach module loading...');
+        return;
+      }
+
+      // Build personalized question set
+      const session = window.AJSInterviewCoach.buildPersonalizedSession(selectedJob, resumeText, stage, duration);
+      CoachUI.currentSession = session;
+      CoachUI.currentQuestionIndex = 0;
+      CoachUI.sessionAnswers = [];
+
+      document.getElementById('coachSetupPanel').hidden = true;
+      document.getElementById('coachCompletePanel').hidden = true;
+      document.getElementById('coachArenaPanel').hidden = false;
+
+      CoachUI.startTimer();
+      CoachUI.loadQuestion(0);
+    },
+
+    resumePausedSession: function() {
+      const paused = Storage ? Storage.getPausedInterviewSession() : null;
+      if (!paused) return;
+
+      CoachUI.currentSession = paused;
+      CoachUI.currentQuestionIndex = paused.activeQuestionIndex || 0;
+      CoachUI.sessionAnswers = paused.answers || [];
+
+      document.getElementById('coachSetupPanel').hidden = true;
+      document.getElementById('coachCompletePanel').hidden = true;
+      document.getElementById('coachArenaPanel').hidden = false;
+
+      CoachUI.startTimer();
+      CoachUI.loadQuestion(CoachUI.currentQuestionIndex);
+    },
+
+    startTimer: function() {
+      clearInterval(CoachUI.timerInterval);
+      CoachUI.secondsElapsed = 0;
+      const display = document.getElementById('arenaTimerDisplay');
+      CoachUI.timerInterval = setInterval(() => {
+        CoachUI.secondsElapsed++;
+        const mins = String(Math.floor(CoachUI.secondsElapsed / 60)).padStart(2, '0');
+        const secs = String(CoachUI.secondsElapsed % 60).padStart(2, '0');
+        if (display) display.textContent = `${mins}:${secs}`;
+      }, 1000);
+    },
+
+    loadQuestion: function(index) {
+      if (!CoachUI.currentSession || !CoachUI.currentSession.questions[index]) return;
+
+      CoachUI.currentQuestionIndex = index;
+      CoachUI.activeQuestion = CoachUI.currentSession.questions[index];
+
+      // Reset UI elements
+      const qCounter = document.getElementById('arenaQuestionCounter');
+      if (qCounter) qCounter.textContent = `Question ${index + 1} of ${CoachUI.currentSession.questions.length}`;
+
+      const stageTag = document.getElementById('arenaStageTag');
+      if (stageTag) stageTag.textContent = CoachUI.activeQuestion.stage || 'Interview Round';
+
+      const qText = document.getElementById('arenaQuestionText');
+      if (qText) qText.textContent = CoachUI.activeQuestion.question;
+
+      const textarea = document.getElementById('arenaAnswerText');
+      if (textarea) textarea.value = '';
+
+      const feedbackWrap = document.getElementById('arenaFeedbackWrap');
+      if (feedbackWrap) feedbackWrap.hidden = true;
+
+      // Optional text-to-speech read aloud
+      const readAloudToggle = document.getElementById('coachVoiceReadAloudToggle');
+      if (readAloudToggle && readAloudToggle.checked && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(CoachUI.activeQuestion.question);
+        window.speechSynthesis.speak(utterance);
+      }
+    },
+
+    toggleVoiceRecognition: function() {
+      const micStatus = document.getElementById('arenaMicStatus');
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert('Browser speech recognition is not supported in this browser. Please type your response directly into the box.');
+        return;
+      }
+
+      if (CoachUI.isListening) {
+        CoachUI.recognizer?.stop();
+        CoachUI.isListening = false;
+        if (micStatus) micStatus.textContent = 'Click to speak';
+        return;
+      }
+
+      try {
+        CoachUI.recognizer = new SpeechRecognition();
+        CoachUI.recognizer.continuous = true;
+        CoachUI.recognizer.interimResults = true;
+        CoachUI.recognizer.lang = 'en-IN';
+
+        CoachUI.recognizer.onstart = () => {
+          CoachUI.isListening = true;
+          if (micStatus) micStatus.textContent = 'Listening (speak now)...';
+        };
+
+        CoachUI.recognizer.onresult = (event) => {
+          let transcript = '';
+          for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript + ' ';
+          }
+          const textarea = document.getElementById('arenaAnswerText');
+          if (textarea) textarea.value = transcript.trim();
+        };
+
+        CoachUI.recognizer.onerror = (e) => {
+          console.warn('[SpeechRecognition Error]', e);
+          CoachUI.isListening = false;
+          if (micStatus) micStatus.textContent = 'Click to speak';
+        };
+
+        CoachUI.recognizer.onend = () => {
+          CoachUI.isListening = false;
+          if (micStatus) micStatus.textContent = 'Click to speak';
+        };
+
+        CoachUI.recognizer.start();
+      } catch (err) {
+        console.error('[SpeechRecognition Start Failure]', err);
+        if (micStatus) micStatus.textContent = 'Mic unavailable';
+      }
+    },
+
+    submitAnswer: function() {
+      const textarea = document.getElementById('arenaAnswerText');
+      const answer = (textarea?.value || '').trim();
+
+      if (!answer) {
+        toast('Please speak or type an answer before submitting');
+        return;
+      }
+
+      if (CoachUI.isListening) {
+        CoachUI.recognizer?.stop();
+        CoachUI.isListening = false;
+      }
+
+      const evalResult = window.AJSInterviewCoach.evaluateAnswer(
+        CoachUI.activeQuestion,
+        answer,
+        CoachUI.currentSession.targetJob,
+        getResumeFullText()
+      );
+
+      CoachUI.sessionAnswers.push({
+        questionIndex: CoachUI.currentQuestionIndex,
+        question: CoachUI.activeQuestion.question,
+        stage: CoachUI.activeQuestion.stage,
+        answer: answer,
+        evaluation: evalResult
+      });
+
+      // Display feedback
+      const feedbackWrap = document.getElementById('arenaFeedbackWrap');
+      if (feedbackWrap) feedbackWrap.hidden = false;
+
+      const scorePill = document.getElementById('arenaScorePill');
+      if (scorePill) scorePill.textContent = `${evalResult.totalScore}/100`;
+
+      // 7 Rubric Chips
+      const chipsRow = document.getElementById('arenaRubricChipsRow');
+      if (chipsRow && evalResult.rubricScores) {
+        const rubricKeys = Object.keys(evalResult.rubricScores);
+        chipsRow.innerHTML = rubricKeys.map(k => `
+          <span class="metric-pill" style="font-size:10px">${escapeHTML(k)}: ${evalResult.rubricScores[k]}/10</span>
+        `).join('');
+      }
+
+      // Details: Strong, Missing, Immediate Improvement, Outline
+      const detailsEl = document.getElementById('arenaFeedbackDetails');
+      if (detailsEl) {
+        detailsEl.innerHTML = `
+          <div style="margin-bottom:8px">
+            <strong style="color:#0e6c59;font-size:12px">✓ What was strong:</strong>
+            <p style="margin:2px 0 0;font-size:12px;color:var(--ink)">${escapeHTML(evalResult.whatWasStrong)}</p>
+          </div>
+          <div style="margin-bottom:8px">
+            <strong style="color:#9c2a2a;font-size:12px">✗ What was unclear or missing:</strong>
+            <p style="margin:2px 0 0;font-size:12px;color:var(--ink)">${escapeHTML(evalResult.whatWasMissing)}</p>
+          </div>
+          <div style="margin-bottom:8px">
+            <strong style="color:#b56b0b;font-size:12px">⚡ Immediate Actionable Improvement:</strong>
+            <p style="margin:2px 0 0;font-size:12px;color:var(--ink)">${escapeHTML(evalResult.immediateImprovement)}</p>
+          </div>
+          <div style="background:#f8faf9;border-left:3px solid var(--accent);padding:8px 12px;border-radius:4px;font-size:11.5px">
+            <strong>Stronger Answer Outline (Add only if true):</strong>
+            <p style="margin:4px 0 0;line-height:1.5;color:#223d37">${escapeHTML(evalResult.truthfulOutline)}</p>
+          </div>
+        `;
+      }
+
+      const nextBtn = document.getElementById('arenaNextBtn');
+      if (nextBtn) {
+        const isLast = CoachUI.currentQuestionIndex + 1 >= CoachUI.currentSession.questions.length;
+        nextBtn.textContent = isLast ? 'Finish session & generate report →' : 'Next question →';
+      }
+    },
+
+    retryAnswer: function() {
+      const feedbackWrap = document.getElementById('arenaFeedbackWrap');
+      if (feedbackWrap) feedbackWrap.hidden = true;
+      // Remove last answer from history
+      CoachUI.sessionAnswers.pop();
+      toast('You can now provide a revised answer');
+    },
+
+    askFollowup: function() {
+      const last = CoachUI.sessionAnswers[CoachUI.sessionAnswers.length - 1];
+      if (!last || !last.evaluation || !last.evaluation.followupQuestion) {
+        toast('No specific follow-up needed for this question');
+        return;
+      }
+
+      const qText = document.getElementById('arenaQuestionText');
+      if (qText) qText.textContent = `[Follow-up]: ${last.evaluation.followupQuestion}`;
+
+      const feedbackWrap = document.getElementById('arenaFeedbackWrap');
+      if (feedbackWrap) feedbackWrap.hidden = true;
+
+      const textarea = document.getElementById('arenaAnswerText');
+      if (textarea) textarea.value = '';
+
+      toast('Follow-up question loaded');
+    },
+
+    nextQuestion: function() {
+      if (CoachUI.currentQuestionIndex + 1 < CoachUI.currentSession.questions.length) {
+        CoachUI.loadQuestion(CoachUI.currentQuestionIndex + 1);
+      } else {
+        CoachUI.completeSession();
+      }
+    },
+
+    pauseSession: function() {
+      clearInterval(CoachUI.timerInterval);
+      if (CoachUI.isListening && CoachUI.recognizer) {
+        CoachUI.recognizer.stop();
+        CoachUI.isListening = false;
+      }
+
+      if (Storage && CoachUI.currentSession) {
+        CoachUI.currentSession.activeQuestionIndex = CoachUI.currentQuestionIndex;
+        CoachUI.currentSession.answers = CoachUI.sessionAnswers;
+        Storage.savePausedInterviewSession(CoachUI.currentSession);
+      }
+
+      document.getElementById('coachArenaPanel').hidden = true;
+      document.getElementById('coachSetupPanel').hidden = false;
+      CoachUI.checkForPausedSession();
+      toast('Interview session paused. You can resume anytime.');
+    },
+
+    exitSession: function() {
+      clearInterval(CoachUI.timerInterval);
+      if (CoachUI.isListening && CoachUI.recognizer) {
+        CoachUI.recognizer.stop();
+        CoachUI.isListening = false;
+      }
+      document.getElementById('coachArenaPanel').hidden = true;
+      document.getElementById('coachCompletePanel').hidden = true;
+      document.getElementById('coachSetupPanel').hidden = false;
+    },
+
+    completeSession: function() {
+      clearInterval(CoachUI.timerInterval);
+      if (CoachUI.isListening && CoachUI.recognizer) {
+        CoachUI.recognizer.stop();
+        CoachUI.isListening = false;
+      }
+
+      document.getElementById('coachArenaPanel').hidden = true;
+      document.getElementById('coachCompletePanel').hidden = false;
+
+      const report = window.AJSInterviewCoach.generateFinalReport(
+        CoachUI.sessionAnswers,
+        CoachUI.currentSession.targetJob,
+        getResumeFullText()
+      );
+
+      // Render report elements
+      const overallScore = document.getElementById('reportOverallScore');
+      if (overallScore) overallScore.textContent = `${report.overallScore}/100`;
+
+      const stageList = document.getElementById('reportStageScoresList');
+      if (stageList && report.stageScores) {
+        stageList.innerHTML = Object.keys(report.stageScores).map(st => `
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0">
+            <span>${escapeHTML(st)}</span>
+            <strong>${report.stageScores[st]}%</strong>
+          </div>
+        `).join('');
+      }
+
+      const topImpr = document.getElementById('reportTopImprovementsList');
+      if (topImpr && report.topImprovements) {
+        topImpr.innerHTML = report.topImprovements.map(imp => `<li>${escapeHTML(imp)}</li>`).join('');
+      }
+
+      const planText = document.getElementById('reportPlanText');
+      if (planText) planText.textContent = report.studyPlan || 'Practice daily questions to maintain streak.';
+
+      // Record to storage
+      if (Storage) {
+        Storage.saveInterviewSession({
+          targetJobId: CoachUI.currentSession.targetJob?.id,
+          targetJobCompany: CoachUI.currentSession.targetJob?.company,
+          targetJobTitle: CoachUI.currentSession.targetJob?.title,
+          questionsAnswered: CoachUI.sessionAnswers.length,
+          avgScore: report.overallScore,
+          date: new Date().toISOString()
+        });
+        Storage.clearPausedInterviewSession();
+      }
+
+      CoachUI.renderStreakAndStats();
+      CoachUI.checkForPausedSession();
     }
-    toast(currentResumeData.remembered ? 'Saved to local device' : 'Kept in page memory');
-    renderResumeATSAnalysis();
-    renderCompareJob();
-    renderJobs();
+  };
+
+  // -------------------------------------------------------------
+  // 6. Scan Audit Controller (Transparency Table & Scan Status)
+  // -------------------------------------------------------------
+  function renderAudit(data) {
+    const list = jobs;
+    const auditData = data?.audit || {};
+
+    const detailEl = document.getElementById('auditDetailCount');
+    if (detailEl) detailEl.textContent = `${list.length}/${list.length}`;
+    const dateEl = document.getElementById('auditDateCount');
+    if (dateEl) dateEl.textContent = `${list.length}/${list.length}`;
+    const expEl = document.getElementById('auditExpCount');
+    if (expEl) expEl.textContent = `${list.length}/${list.length}`;
+    const skillEl = document.getElementById('auditSkillCount');
+    if (skillEl) skillEl.textContent = `${list.length}/${list.length}`;
+    const linkEl = document.getElementById('auditLinkCount');
+    if (linkEl) linkEl.textContent = 'HTTP 200';
+
+    // Daily Scan Status Panel
+    const scanDateEl = document.getElementById('auditScanDate');
+    if (scanDateEl) scanDateEl.textContent = `${data?.scan_date || 'Today'} · Asia/Kolkata`;
+
+    const suppEl = document.getElementById('auditSuppressedCount');
+    const suppCount = data?.summary?.duplicates_suppressed ?? duplicateGroups.reduce((n, g) => n + (g.suppressed_job_ids || g.ids || []).length, 0);
+    if (suppEl) suppEl.textContent = suppCount;
+
+    const deadEl = document.getElementById('auditDeadLinksCount');
+    if (deadEl) deadEl.textContent = data?.summary?.suppressed_dead_links ?? 0;
+
+    // Per Included Job Transparency Table
+    const tbody = document.getElementById('auditJobsTableBody');
+    if (tbody) {
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">No verified jobs currently loaded.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(j => {
+        const skillsFound = (j.skills || []).join(', ');
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHTML(j.title)}</strong>
+              <div style="font-size:11px;color:var(--muted)">${escapeHTML(j.company)}</div>
+            </td>
+            <td><code>${escapeHTML(j.id)}</code></td>
+            <td>${fmtDate(j.date)}</td>
+            <td>${escapeHTML(j.location)}</td>
+            <td>${escapeHTML(j.exp || '≤2 yrs')}</td>
+            <td><span style="font-size:11px">${escapeHTML(skillsFound)}</span></td>
+            <td><span class="badge verified">HTTP 200 Verified</span></td>
+            <td><span class="badge verified">HTTP 200 Verified</span></td>
+            <td><span style="font-size:11px;color:var(--muted)">Unique canonical kept</span></td>
+          </tr>`;
+      }).join('');
+    }
+  }
+
+  // -------------------------------------------------------------
+  // Data Loader & Fail-Closed Payload Handler
+  // -------------------------------------------------------------
+  async function loadPublishedScan() {
+    try {
+      const res = await fetch(`./data/latest.json?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (data && Array.isArray(data.jobs)) {
+        jobs = data.jobs;
+        duplicateGroups = data.duplicate_groups || [];
+        publishedScanMeta = data;
+
+        // Reconcile with persistent application storage:
+        // Preserves historical applications even when jobs leave latest.json!
+        if (Storage) {
+          Storage.reconcileWithScan(jobs);
+        }
+
+        // Populate company filters
+        const compFilter = document.getElementById('companyFilter');
+        if (compFilter) {
+          const uniqueComps = Array.from(new Set(jobs.map(j => j.company).filter(Boolean))).sort();
+          compFilter.innerHTML = '<option value="all">All companies</option>' +
+            uniqueComps.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+        }
+
+        // Update nav counts & foot date
+        const jobsNav = document.getElementById('jobsNavCount');
+        if (jobsNav) jobsNav.textContent = jobs.length;
+        const footDate = document.getElementById('sidebarFootDate');
+        if (footDate) footDate.textContent = `${data.scan_date || 'Today'} · Asia/Kolkata`;
+
+        const staleBanner = document.getElementById('staleScanBanner');
+        if (staleBanner) staleBanner.hidden = true;
+
+        // Render views
+        renderDashboard();
+        renderJobs();
+        renderApplicationsWorkspace();
+        renderAudit(data);
+
+        return data;
+      } else {
+        throw new Error('Malformed or empty scan payload');
+      }
+    } catch (err) {
+      console.warn('[App] Fail closed: could not load published scan:', err.message);
+      jobs = [];
+      duplicateGroups = [];
+
+      const staleBanner = document.getElementById('staleScanBanner');
+      if (staleBanner) {
+        staleBanner.hidden = false;
+        staleBanner.innerHTML = `
+          <span>⚠️ <strong>Scan data unavailable:</strong> Could not load verified scan payload (${escapeHTML(err.message)}). Fail-closed mode active. No unverified records are displayed.</span>
+          <button class="btn small" id="retryScanBtn" style="margin-top:6px">Reload latest published scan</button>
+        `;
+        document.getElementById('retryScanBtn')?.addEventListener('click', loadPublishedScan);
+      }
+
+      renderDashboard();
+      renderJobs();
+      renderApplicationsWorkspace();
+      return null;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // Company Research Outbound Links
+  // -------------------------------------------------------------
+  async function openCompanyResearch(companyName) {
+    const modal = document.getElementById('companyResearchModal');
+    const titleEl = document.getElementById('researchModalTitle');
+    const gridEl = document.getElementById('researchLinksGrid');
+    if (!modal || !gridEl) return;
+
+    if (titleEl) titleEl.textContent = `Company Research: ${companyName}`;
+
+    const aboutUrl = `https://www.google.com/search?q=${encodeURIComponent(companyName + ' official website')}`;
+    const careersUrl = `https://www.google.com/search?q=${encodeURIComponent(companyName + ' careers')}`;
+    const glassdoorUrl = `https://www.glassdoor.co.in/Search/results.htm?keyword=${encodeURIComponent(companyName)}`;
+    const redditUrl = `https://www.reddit.com/r/developersIndia/search/?q=${encodeURIComponent(companyName + ' data analyst interview')}`;
+    const ambitionboxUrl = `https://www.ambitionbox.com/search?q=${encodeURIComponent(companyName)}`;
+    const linkedinUrl = `https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(companyName)}`;
+
+    gridEl.innerHTML = `
+      <a class="research-link-card" href="${escapeHTML(aboutUrl)}" target="_blank" rel="noopener noreferrer">🌐 Official Website ↗</a>
+      <a class="research-link-card" href="${escapeHTML(careersUrl)}" target="_blank" rel="noopener noreferrer">💼 Careers Portal ↗</a>
+      <a class="research-link-card" href="${escapeHTML(glassdoorUrl)}" target="_blank" rel="noopener noreferrer">⭐ Glassdoor Reviews (Subjective) ↗</a>
+      <a class="research-link-card" href="${escapeHTML(redditUrl)}" target="_blank" rel="noopener noreferrer">💬 Reddit Discussions ↗</a>
+      <a class="research-link-card" href="${escapeHTML(ambitionboxUrl)}" target="_blank" rel="noopener noreferrer">🏢 AmbitionBox India Reports ↗</a>
+      <a class="research-link-card" href="${escapeHTML(linkedinUrl)}" target="_blank" rel="noopener noreferrer">👥 Official LinkedIn Identity ↗</a>
+    `;
+
+    modal.hidden = false;
   }
 
   // -------------------------------------------------------------
@@ -685,16 +1621,15 @@
     const statusEl = document.getElementById('aiStatusNotice');
     if (!outputEl) return;
 
-    // Check consent
     if (ai && !ai.hasConsent()) {
       showAIConsentModal(
-        () => runAIEnhancement(actionType), // onApproved
-        () => runLocalFallbackEnhancement(actionType) // onDeclined: run local fallback once, never re-prompt!
+        () => runAIEnhancement(actionType),
+        () => runLocalFallbackEnhancement(actionType)
       );
       return;
     }
 
-    outputEl.innerHTML = '<div style="padding:20px;text-align:center;color:#63716d">Analyzing resume content via Puter.js AI…</div>';
+    outputEl.innerHTML = '<div style="padding:20px;text-align:center;color:#63716d">Generating guidance via AI…</div>';
     if (statusEl) statusEl.textContent = 'Generating guidance via AI…';
 
     const resumeText = getResumeFullText();
@@ -710,7 +1645,7 @@
       } else if (actionType === 'improve_bullet') {
         const bullet = prompt('Paste a resume project bullet point to optimize:', currentResumeData.projects?.[0]?.bullet || '');
         if (!bullet) {
-          outputEl.innerHTML = '<div style="padding:15px;color:#63716d">No bullet point was entered.</div>';
+          outputEl.innerHTML = '<div style="padding:15px;color:#63716d">No bullet point entered.</div>';
           return;
         }
         result = await window.AJSResumeAgent.generateAIBulletImprovement(bullet);
@@ -720,11 +1655,11 @@
       }
 
       if (result && result.markdown) {
-        outputEl.innerHTML = `<div style="font-size:12px;line-height:1.65;white-space:pre-wrap;color:#14221f;font-family:inherit">${escapeHTML(result.markdown)}</div>`;
+        outputEl.innerHTML = `<div style="font-size:12px;line-height:1.65;white-space:pre-wrap;color:#14221f">${escapeHTML(result.markdown)}</div>`;
         if (statusEl) statusEl.textContent = result.source.includes('puter') ? 'Generated via Puter.js AI' : 'Generated via Local Rule Engine';
       }
     } catch (err) {
-      console.warn('[AI] Error in AI enhancement:', err);
+      console.warn('[AI Error]', err);
       runLocalFallbackEnhancement(actionType);
     }
   }
@@ -743,7 +1678,7 @@
     if (actionType === 'summary') {
       text = window.AJSResumeAgent.OfflineGenerators.draftSummary(skills, selectedJob?.title, selectedJob?.company);
     } else if (actionType === 'questions') {
-      const qList = (selectedJob?.skills || []).slice(0, 3).map(s => `- Tell me about a scenario where you used ${s} to solve a complex data quality or business reporting issue.`);
+      const qList = (selectedJob?.skills || []).slice(0, 3).map(s => `- Tell me about a scenario where you used ${s} to solve a data quality or reporting challenge.`);
       text = `### Tailored Interview Questions (Local Rubric)\n\n${qList.join('\n')}\n- Can you explain how you designed relationships or star schemas in your dashboard project?`;
     } else if (actionType === 'recruiter_review') {
       const ats = window.AJSResumeAgent.analyzeResumeATS(resumeText);
@@ -754,7 +1689,7 @@
       text = window.AJSResumeAgent.OfflineGenerators.improveBullet('Extracted customer data using SQL and created reporting dashboards.');
     }
 
-    outputEl.innerHTML = `<div style="font-size:12px;line-height:1.65;white-space:pre-wrap;color:#14221f;font-family:inherit">${escapeHTML(text)}</div>`;
+    outputEl.innerHTML = `<div style="font-size:12px;line-height:1.65;white-space:pre-wrap;color:#14221f">${escapeHTML(text)}</div>`;
     if (statusEl) statusEl.textContent = 'Generated via Local Deterministic Engine (Offline)';
   }
 
@@ -792,7 +1727,6 @@
       modal.hidden = true;
       if (window.AJSAIClient) window.AJSAIClient.revokeConsent();
       toast('Operating in offline local rubric mode');
-      // Critical fix: Invoke onDeclined local fallback once, NEVER onApproved!
       if (onDeclined) onDeclined();
     };
 
@@ -801,732 +1735,10 @@
   }
 
   // -------------------------------------------------------------
-  // Company Research Drawer Feature
-  // -------------------------------------------------------------
-  async function loadCompanyResearch() {
-    if (companyResearchData) return companyResearchData;
-    try {
-      const res = await fetch('./sources/company_research.json');
-      if (res.ok) {
-        companyResearchData = await res.json();
-      }
-    } catch (e) {
-      console.warn('[Research] Could not load company_research.json, using dynamic links:', e);
-    }
-    return companyResearchData;
-  }
-
-  async function openCompanyResearch(companyName) {
-    const modal = document.getElementById('companyResearchModal');
-    const titleEl = document.getElementById('researchModalTitle');
-    const gridEl = document.getElementById('researchLinksGrid');
-    if (!modal || !gridEl) return;
-
-    if (titleEl) titleEl.textContent = `Company Research: ${companyName}`;
-
-    await loadCompanyResearch();
-    const reg = (companyResearchData && companyResearchData.research_links) || {};
-    const key = (companyName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const meta = reg[key] || {};
-
-    const aboutUrl = meta.about_url || `https://www.google.com/search?q=${encodeURIComponent(companyName + ' official website')}`;
-    const careersUrl = meta.careers_url || `https://www.google.com/search?q=${encodeURIComponent(companyName + ' careers')}`;
-    const glassdoorUrl = meta.glassdoor_search_url || `https://www.glassdoor.co.in/Search/results.htm?keyword=${encodeURIComponent(companyName)}`;
-    const redditUrl = meta.reddit_search_url || `https://www.reddit.com/r/developersIndia/search/?q=${encodeURIComponent(companyName + ' data analyst interview')}`;
-    const ambitionboxUrl = meta.ambitionbox_search_url || `https://www.ambitionbox.com/search?q=${encodeURIComponent(companyName)}`;
-    const linkedinUrl = meta.linkedin_search_url || `https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(companyName)}`;
-
-    gridEl.innerHTML = `
-      <a class="research-link-card" href="${escapeHTML(aboutUrl)}" target="_blank" rel="noopener noreferrer">
-        🌐 Official About Page ↗
-      </a>
-      <a class="research-link-card" href="${escapeHTML(careersUrl)}" target="_blank" rel="noopener noreferrer">
-        💼 Official Careers Portal ↗
-      </a>
-      <a class="research-link-card" href="${escapeHTML(glassdoorUrl)}" target="_blank" rel="noopener noreferrer">
-        ⭐ Glassdoor Reviews (Subjective) ↗
-      </a>
-      <a class="research-link-card" href="${escapeHTML(redditUrl)}" target="_blank" rel="noopener noreferrer">
-        💬 Reddit Discussions (r/developersIndia) ↗
-      </a>
-      <a class="research-link-card" href="${escapeHTML(ambitionboxUrl)}" target="_blank" rel="noopener noreferrer">
-        🏢 AmbitionBox India Reports ↗
-      </a>
-      <a class="research-link-card" href="${escapeHTML(linkedinUrl)}" target="_blank" rel="noopener noreferrer">
-        👥 Official LinkedIn Identity ↗
-      </a>
-    `;
-
-    modal.hidden = false;
-  }
-
-  window.openCompanyResearch = openCompanyResearch;
-
-  // -------------------------------------------------------------
-  // Daily Interview Coach UI Controller
-  // -------------------------------------------------------------
-  const CoachUI = {
-    tracks: [],
-    currentSession: null,
-    currentQuestionIndex: 0,
-    activeQuestion: null,
-    questionStartTime: 0,
-    timerInterval: null,
-    recognizer: null,
-    isListening: false,
-    sessionAnswers: [],
-
-    init: async function() {
-      if (!Array.isArray(CoachUI.tracks) || !CoachUI.tracks.length) {
-        const loaded = await window.AJSInterviewCoach.loadQuestionBank();
-        CoachUI.tracks = Array.isArray(loaded) ? loaded : [];
-      }
-      CoachUI.renderTracks();
-      CoachUI.renderStreakAndStats();
-      CoachUI.renderDrills();
-    },
-
-    renderTracks: function() {
-      const container = document.getElementById('coachTrackGrid');
-      if (!container) return;
-
-      container.innerHTML = CoachUI.tracks.map(t => `
-        <div class="coach-track-card">
-          <div class="coach-track-head">
-            <div>
-              <h3>${escapeHTML(t.title)}</h3>
-              <p>${escapeHTML(t.description || '')}</p>
-            </div>
-          </div>
-          <div class="coach-track-actions">
-            <button class="btn small primary" data-start-session="${escapeHTML(t.id)}" data-duration="5">5 min (3 Qs)</button>
-            <button class="btn small" data-start-session="${escapeHTML(t.id)}" data-duration="10">10 min (5 Qs)</button>
-            <button class="btn small" data-start-session="${escapeHTML(t.id)}" data-duration="15">15 min (8 Qs)</button>
-          </div>
-        </div>
-      `).join('');
-
-      container.querySelectorAll('[data-start-session]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const trackId = btn.dataset.startSession;
-          const duration = parseInt(btn.dataset.duration || '5', 10);
-          CoachUI.startTrackSession(trackId, duration);
-        });
-      });
-    },
-
-    renderStreakAndStats: function() {
-      const storage = window.AJSStorage;
-      const data = storage ? storage.getInterviewData() : { streak: 0, sessionsCount: 0, questionsAnswered: 0 };
-
-      const streakEl = document.getElementById('coachStreakCount');
-      if (streakEl) streakEl.textContent = data.streak || 0;
-
-      const sessEl = document.getElementById('coachSessionsCount');
-      if (sessEl) sessEl.textContent = data.sessionsCount || 0;
-
-      const qEl = document.getElementById('coachQuestionsCount');
-      if (qEl) qEl.textContent = data.questionsAnswered || 0;
-
-      const avgEl = document.getElementById('coachAvgScore');
-      if (avgEl) {
-        if (data.recentScores && data.recentScores.length) {
-          const sum = data.recentScores.reduce((a, b) => a + b, 0);
-          avgEl.textContent = `${Math.round(sum / data.recentScores.length)}%`;
-        } else {
-          avgEl.textContent = '--';
-        }
-      }
-
-      // Fixed: 7-day activity bars using Asia/Kolkata date helper to prevent midnight shift!
-      const barsEl = document.getElementById('coach7DayBars');
-      if (barsEl && storage) {
-        const todayStr = storage.getLocalDateIST();
-        const days = [];
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dateStr = storage.getLocalDateIST(d);
-          const dayName = d.toLocaleDateString('en-US', { weekday: 'narrow' });
-          const matches = (data.history || []).filter(h => h.date === dateStr);
-          days.push({ name: dayName, count: matches.length });
-        }
-        barsEl.innerHTML = days.map(day => `
-          <div class="day-bar-col">
-            <div class="day-bar-fill ${day.count > 0 ? 'active' : ''}" style="height:${Math.min(100, Math.max(12, day.count * 35))}px" title="${day.count} sessions"></div>
-            <span>${day.name}</span>
-          </div>
-        `).join('');
-      }
-    },
-
-    renderDrills: function() {
-      const drillsEl = document.getElementById('coachDrillsList');
-      if (!drillsEl) return;
-      const drills = window.AJSInterviewCoach.COMMUNICATION_DRILLS || [];
-
-      drillsEl.innerHTML = drills.map(d => `
-        <div class="coach-drill-item">
-          <div>
-            <strong>${escapeHTML(d.title)}</strong>
-            <p>${escapeHTML(d.subtitle)}</p>
-          </div>
-          <button class="btn small" data-start-drill="${escapeHTML(d.id)}">Start drill (${d.targetSeconds}s)</button>
-        </div>
-      `).join('');
-
-      drillsEl.querySelectorAll('[data-start-drill]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const drill = drills.find(x => x.id === btn.dataset.startDrill);
-          if (drill) CoachUI.startCommunicationDrill(drill);
-        });
-      });
-    },
-
-    startTrackSession: async function(trackId, durationMinutes) {
-      if (!CoachUI.tracks || !CoachUI.tracks.length) {
-        CoachUI.tracks = await window.AJSInterviewCoach.loadQuestionBank();
-      }
-      const qCount = durationMinutes === 15 ? 8 : (durationMinutes === 10 ? 5 : 3);
-      let qs = [];
-
-      if (trackId === 'mixed_daily') {
-        qs = window.AJSInterviewCoach.getDailyMixedSession(CoachUI.tracks, qCount);
-      } else {
-        qs = window.AJSInterviewCoach.getQuestionsForTrack(CoachUI.tracks, trackId, qCount);
-      }
-
-      if (!qs.length) {
-        toast('No questions available for this track.');
-        return;
-      }
-
-      CoachUI.currentSession = {
-        trackId: trackId,
-        trackName: CoachUI.tracks.find(t => t.id === trackId)?.title || 'Mixed Practice',
-        durationMinutes: durationMinutes,
-        questions: qs
-      };
-      CoachUI.currentQuestionIndex = 0;
-      CoachUI.sessionAnswers = [];
-
-      CoachUI.showArena();
-      CoachUI.loadQuestion(0);
-    },
-
-    startJobPractice: async function(job) {
-      if (!CoachUI.tracks || !CoachUI.tracks.length) {
-        CoachUI.tracks = await window.AJSInterviewCoach.loadQuestionBank();
-      }
-      const qs = window.AJSInterviewCoach.getQuestionsForJob(CoachUI.tracks, job, 5);
-      CoachUI.currentSession = {
-        trackId: 'job_specific',
-        trackName: `Interview for ${job.title} (${job.company})`,
-        durationMinutes: 10,
-        questions: qs,
-        job: job
-      };
-      CoachUI.currentQuestionIndex = 0;
-      CoachUI.sessionAnswers = [];
-
-      CoachUI.showArena();
-      CoachUI.loadQuestion(0);
-    },
-
-    startCommunicationDrill: function(drill) {
-      CoachUI.currentSession = {
-        trackId: 'communication_drill',
-        trackName: drill.title,
-        durationMinutes: Math.round(drill.targetSeconds / 60),
-        questions: [{
-          id: drill.id,
-          question: drill.prompt,
-          sampleAnswerPoints: drill.structureChecklist,
-          rubricKeywords: ['problem', 'solution', 'impact', 'metrics', 'action', 'result']
-        }]
-      };
-      CoachUI.currentQuestionIndex = 0;
-      CoachUI.sessionAnswers = [];
-
-      CoachUI.showArena();
-      CoachUI.loadQuestion(0);
-    },
-
-    showArena: function() {
-      document.getElementById('coachSetupPanel').hidden = true;
-      document.getElementById('coachArenaPanel').hidden = false;
-      document.getElementById('coachCompletePanel').hidden = true;
-    },
-
-    loadQuestion: function(index) {
-      CoachUI.currentQuestionIndex = index;
-      const q = CoachUI.currentSession.questions[index];
-      CoachUI.activeQuestion = q;
-      CoachUI.questionStartTime = Date.now();
-
-      document.getElementById('arenaSessionTitle').textContent = CoachUI.currentSession.trackName;
-      document.getElementById('arenaQuestionCounter').textContent = `Question ${index + 1} of ${CoachUI.currentSession.questions.length}`;
-      document.getElementById('arenaQuestionText').textContent = q.question;
-
-      const answerInput = document.getElementById('arenaAnswerText');
-      if (answerInput) answerInput.value = '';
-      document.getElementById('arenaFeedbackWrap').hidden = true;
-      document.getElementById('arenaAnswerActions').hidden = false;
-
-      clearInterval(CoachUI.timerInterval);
-      const timerEl = document.getElementById('arenaTimerDisplay');
-      CoachUI.timerInterval = setInterval(() => {
-        const sec = Math.floor((Date.now() - CoachUI.questionStartTime) / 1000);
-        const m = String(Math.floor(sec / 60)).padStart(2, '0');
-        const s = String(sec % 60).padStart(2, '0');
-        if (timerEl) timerEl.textContent = `${m}:${s}`;
-      }, 1000);
-
-      const readAloud = document.getElementById('coachVoiceReadAloudToggle')?.checked;
-      if (readAloud && window.AJSInterviewCoach.Speech.isSynthesisSupported()) {
-        window.AJSInterviewCoach.Speech.speak(q.question);
-      }
-    },
-
-    toggleVoiceRecognition: function() {
-      const speech = window.AJSInterviewCoach.Speech;
-      if (!speech.isRecognitionSupported()) {
-        toast('Speech recognition not supported in this browser. Please type your answer.');
-        return;
-      }
-
-      const micBtn = document.getElementById('arenaMicBtn');
-      const micStatus = document.getElementById('arenaMicStatus');
-
-      if (CoachUI.isListening) {
-        if (CoachUI.recognizer) CoachUI.recognizer.stop();
-        CoachUI.isListening = false;
-        if (micBtn) micBtn.classList.remove('recording');
-        if (micStatus) micStatus.textContent = 'Microphone ready';
-        return;
-      }
-
-      CoachUI.recognizer = speech.createRecognizer(
-        res => {
-          const input = document.getElementById('arenaAnswerText');
-          if (input) {
-            input.value = res.final + (res.interim ? ' ' + res.interim : '');
-          }
-        },
-        err => {
-          toast('Microphone error: ' + err);
-          CoachUI.isListening = false;
-          if (micBtn) micBtn.classList.remove('recording');
-          if (micStatus) micStatus.textContent = 'Mic off';
-        },
-        () => {
-          CoachUI.isListening = false;
-          if (micBtn) micBtn.classList.remove('recording');
-          if (micStatus) micStatus.textContent = 'Mic stopped';
-        }
-      );
-
-      try {
-        CoachUI.recognizer.start();
-        CoachUI.isListening = true;
-        if (micBtn) micBtn.classList.add('recording');
-        if (micStatus) micStatus.textContent = 'Listening… speak clearly';
-      } catch (err) {
-        toast('Could not start microphone: ' + err.message);
-      }
-    },
-
-    // Fixed: Submit answer displays deterministic metrics immediately, then provides Puter AI coaching if consented!
-    submitAnswer: async function() {
-      clearInterval(CoachUI.timerInterval);
-      if (CoachUI.isListening && CoachUI.recognizer) {
-        CoachUI.recognizer.stop();
-        CoachUI.isListening = false;
-      }
-
-      const answerText = (document.getElementById('arenaAnswerText')?.value || '').trim();
-      if (!answerText) {
-        toast('Please speak or type an answer before evaluating.');
-        return;
-      }
-
-      const elapsedSec = Math.max(5, Math.floor((Date.now() - CoachUI.questionStartTime) / 1000));
-      const metrics = window.AJSInterviewCoach.analyzeTranscript(answerText, CoachUI.activeQuestion, elapsedSec);
-
-      CoachUI.sessionAnswers.push({
-        question: CoachUI.activeQuestion.question,
-        answer: answerText,
-        metrics: metrics
-      });
-
-      // 1. Display deterministic metrics immediately!
-      document.getElementById('arenaAnswerActions').hidden = true;
-      const feedbackWrap = document.getElementById('arenaFeedbackWrap');
-      feedbackWrap.hidden = false;
-
-      document.getElementById('arenaScorePill').textContent = `${metrics.score}/100`;
-      document.getElementById('arenaPacingPill').textContent = `${metrics.wpm} WPM · ${metrics.pacingAssessment}`;
-      document.getElementById('arenaFillersPill').textContent = `${metrics.totalFillers} fillers`;
-
-      const modelEl = document.getElementById('arenaSampleAnswerList');
-      if (modelEl) {
-        modelEl.innerHTML = (CoachUI.activeQuestion.sampleAnswerPoints || []).map(p => `<li>${escapeHTML(p)}</li>`).join('');
-      }
-
-      // 2. Coaching analysis (AI if consented, local rubric otherwise)
-      let coachDetailEl = document.getElementById('arenaCoachDetail');
-      if (!coachDetailEl) {
-        coachDetailEl = document.createElement('div');
-        coachDetailEl.id = 'arenaCoachDetail';
-        feedbackWrap.appendChild(coachDetailEl);
-      }
-
-      const ai = window.AJSAIClient;
-      if (ai && ai.hasConsent()) {
-        coachDetailEl.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px 0">Requesting AI interview coaching analysis…</div>';
-        Promise.race([
-          window.AJSInterviewCoach.generateAIFeedback(CoachUI.activeQuestion, answerText, metrics),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('AI response timed out')), 8000))
-        ]).then(res => {
-          coachDetailEl.innerHTML = `
-            <div class="ai-coaching-box" style="margin-top:10px;padding:12px;background:#f0f9f6;border:1px solid #cce8df;border-radius:8px;font-size:12px;line-height:1.6;white-space:pre-wrap">
-              <div style="font-weight:700;color:#106c59;margin-bottom:6px">🤖 Puter.js AI Coaching Feedback</div>
-              ${escapeHTML(res.feedbackText)}
-            </div>`;
-        }).catch(err => {
-          console.warn('[Coach] AI coaching timeout/error:', err);
-          const localFeedback = window.AJSInterviewCoach.generateLocalFeedback(CoachUI.activeQuestion, answerText, metrics);
-          coachDetailEl.innerHTML = `
-            <div class="local-coaching-box" style="margin-top:10px;padding:12px;background:#f9f9f9;border:1px solid #e2e8e5;border-radius:8px;font-size:12px;line-height:1.6;white-space:pre-wrap">
-              <div style="font-weight:700;color:var(--text);margin-bottom:6px">📋 Local Rubric Coach</div>
-              ${escapeHTML(localFeedback)}
-            </div>`;
-        });
-      } else {
-        const localFeedback = window.AJSInterviewCoach.generateLocalFeedback(CoachUI.activeQuestion, answerText, metrics);
-        coachDetailEl.innerHTML = `
-          <div class="local-coaching-box" style="margin-top:10px;padding:12px;background:#f9f9f9;border:1px solid #e2e8e5;border-radius:8px;font-size:12px;line-height:1.6;white-space:pre-wrap">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <strong style="color:var(--text)">📋 Local Rubric Coach</strong>
-              <button type="button" class="btn small" id="enableAICoachBtn">Get AI Coaching</button>
-            </div>
-            ${escapeHTML(localFeedback)}
-          </div>`;
-        document.getElementById('enableAICoachBtn')?.addEventListener('click', () => {
-          showAIConsentModal(() => {
-            CoachUI.submitAnswer();
-          });
-        });
-      }
-
-      // Next / Finish button
-      const nextBtn = document.getElementById('arenaNextBtn');
-      if (nextBtn) {
-        if (CoachUI.currentQuestionIndex + 1 < CoachUI.currentSession.questions.length) {
-          nextBtn.textContent = 'Next question →';
-        } else {
-          nextBtn.textContent = 'Finish session & view progress →';
-        }
-      }
-    },
-
-    nextQuestion: function() {
-      if (CoachUI.currentQuestionIndex + 1 < CoachUI.currentSession.questions.length) {
-        CoachUI.loadQuestion(CoachUI.currentQuestionIndex + 1);
-      } else {
-        CoachUI.completeSession();
-      }
-    },
-
-    completeSession: function() {
-      document.getElementById('coachArenaPanel').hidden = true;
-      document.getElementById('coachCompletePanel').hidden = false;
-
-      const scores = CoachUI.sessionAnswers.map(a => a.metrics.score);
-      const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / (scores.length || 1));
-
-      const sessionSummary = {
-        trackId: CoachUI.currentSession.trackId,
-        trackName: CoachUI.currentSession.trackName,
-        durationMinutes: CoachUI.currentSession.durationMinutes,
-        questionsAnswered: CoachUI.sessionAnswers.length,
-        avgScore: avgScore
-      };
-
-      if (Storage) {
-        Storage.saveInterviewSession(sessionSummary);
-      }
-
-      document.getElementById('completeAvgScore').textContent = `${avgScore}%`;
-      document.getElementById('completeQuestionsCount').textContent = CoachUI.sessionAnswers.length;
-
-      CoachUI.renderStreakAndStats();
-    },
-
-    exitSession: function() {
-      clearInterval(CoachUI.timerInterval);
-      if (CoachUI.isListening && CoachUI.recognizer) {
-        CoachUI.recognizer.stop();
-        CoachUI.isListening = false;
-      }
-      document.getElementById('coachArenaPanel').hidden = true;
-      document.getElementById('coachSetupPanel').hidden = false;
-      document.getElementById('coachCompletePanel').hidden = true;
-    }
-  };
-
-  // -------------------------------------------------------------
-  // ATS Keyword Checklist
-  // -------------------------------------------------------------
-  function renderChecklist() {
-    const container = document.getElementById('checkGroups');
-    if (!container) return;
-
-    const savedChecked = new Set(Storage ? Storage.getChecklist() : []);
-
-    container.innerHTML = checklistGroups.map(group => `
-      <div class="check-group">
-        <div class="check-group-title">
-          <h3>${escapeHTML(group.title)}</h3>
-        </div>
-        <div class="check-items">
-          ${group.items.map(([label, hint]) => {
-            const isChecked = savedChecked.has(label);
-            return `
-              <label class="check-item ${isChecked ? 'checked' : ''}">
-                <input type="checkbox" value="${escapeHTML(label)}" ${isChecked ? 'checked' : ''} />
-                <div>
-                  <strong>${escapeHTML(label)}</strong>
-                  <span>${escapeHTML(hint)}</span>
-                </div>
-              </label>`;
-          }).join('')}
-        </div>
-      </div>
-    `).join('');
-
-    container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        cb.closest('.check-item').classList.toggle('checked', cb.checked);
-        const currentChecked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(x => x.value);
-        if (Storage) Storage.saveChecklist(currentChecked);
-        updateChecklistProgress();
-      });
-    });
-
-    updateChecklistProgress();
-
-    // Populate role pack select
-    const packSelect = document.getElementById('rolePackSelect');
-    if (packSelect && !packSelect.options.length) {
-      packSelect.innerHTML = Object.keys(rolePacks).map(k => `<option value="${escapeHTML(k)}">${escapeHTML(k)}</option>`).join('');
-      const updatePack = () => {
-        const kwEl = document.getElementById('roleKeywords');
-        const kws = rolePacks[packSelect.value] || [];
-        if (kwEl) kwEl.innerHTML = kws.map(w => `<span class="chip">${escapeHTML(w)}</span>`).join('');
-      };
-      packSelect.addEventListener('change', updatePack);
-      updatePack();
-    }
-  }
-
-  function updateChecklistProgress() {
-    const container = document.getElementById('checkGroups');
-    if (!container) return;
-
-    const total = container.querySelectorAll('input[type="checkbox"]').length;
-    const checkedCount = container.querySelectorAll('input[type="checkbox"]:checked').length;
-    const pct = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
-
-    const bar = document.getElementById('progressFill');
-    if (bar) bar.style.width = `${pct}%`;
-    const txt = document.getElementById('progressText');
-    if (txt) txt.textContent = `${checkedCount} of ${total} checked`;
-    const pctEl = document.getElementById('progressPct');
-    if (pctEl) pctEl.textContent = `${pct}%`;
-    const navP = document.getElementById('navProgress');
-    if (navP) navP.textContent = `${pct}%`;
-  }
-
-  // -------------------------------------------------------------
-  // Dedupe & Audit Views
-  // -------------------------------------------------------------
-  function renderAudit(data) {
-    const list = jobs;
-    const auditData = data?.audit || {};
-
-    const detailEl = document.getElementById('auditDetailCount');
-    if (detailEl) detailEl.textContent = `${list.length}/${list.length}`;
-    const dateEl = document.getElementById('auditDateCount');
-    if (dateEl) dateEl.textContent = `${list.length}/${list.length}`;
-    const expEl = document.getElementById('auditExpCount');
-    if (expEl) expEl.textContent = `${list.length}/${list.length}`;
-    const skillEl = document.getElementById('auditSkillCount');
-    if (skillEl) skillEl.textContent = `${list.length}/${list.length}`;
-    const linkEl = document.getElementById('auditLinkCount');
-    if (linkEl) linkEl.textContent = 'HTTP 200';
-
-    const sourceDateEl = document.getElementById('auditSourceDate');
-    if (sourceDateEl) sourceDateEl.textContent = `${data?.scan_date || 'Today'} · Asia/Kolkata`;
-
-    const covTitle = document.getElementById('coverageTitle');
-    if (covTitle) covTitle.textContent = `${(data?.sources || []).length} official career sources`;
-
-    const cc = document.getElementById('companyCloud');
-    if (cc) {
-      const srcList = data?.sources || ['Amazon', 'Accenture', 'Swiggy', 'Razorpay', 'Zepto', 'CRED', 'Postman', 'Groww', 'InMobi', 'Freshworks'];
-      cc.innerHTML = srcList.map(c => `<span class="company-tag">${escapeHTML(c)}</span>`).join('');
-    }
-
-    const rl = document.getElementById('rejectionList');
-    if (rl) {
-      const samples = auditData.rejected_samples || [
-        'Citi · Business Analytics: Official page returns Job Not Found / Closed.',
-        'Wipro · Data Analyst: Requires 4+ years, above junior threshold.',
-        'Amazon · Financial Analyst: Requires 6+ years total experience.',
-        'Accenture · BI Associate: Posted >15 days ago; outside freshness window.'
-      ];
-      rl.innerHTML = samples.map(r => `<div class="rejection"><span>${escapeHTML(r)}</span></div>`).join('');
-    }
-  }
-
-  function renderDedupe(data) {
-    const shownEl = document.getElementById('dedupeShownCount');
-    if (shownEl) shownEl.textContent = jobs.length;
-
-    const suppEl = document.getElementById('dedupeSuppressedCount');
-    const suppCount = data?.summary?.duplicates_suppressed ?? duplicateGroups.reduce((n, g) => n + (g.suppressed_job_ids || g.ids || []).length, 0);
-    if (suppEl) suppEl.textContent = suppCount;
-
-    const deadEl = document.getElementById('dedupeDeadCount');
-    if (deadEl) deadEl.textContent = data?.summary?.suppressed_dead_links ?? 0;
-
-    const navCount = document.getElementById('dedupeNavCount');
-    if (navCount) navCount.textContent = suppCount;
-
-    const stateBannerText = document.getElementById('dedupeStateText');
-    if (stateBannerText) {
-      stateBannerText.textContent = `${jobs.length} displayed job IDs are reserved against future repeats.`;
-    }
-
-    const cl = document.getElementById('clusterList');
-    if (cl) {
-      cl.innerHTML = duplicateGroups.length ? duplicateGroups.map(g => `
-        <div class="cluster">
-          <div class="cluster-head">
-            <div><strong>${escapeHTML(g.title || '')} — ${escapeHTML(g.company || '')}</strong><p>Kept: ${escapeHTML(g.kept_job_id || g.shown || '')}<br>${escapeHTML(g.reason || '')}</p></div>
-            <span class="cluster-count">${(g.suppressed_job_ids || g.ids || []).length} suppressed</span>
-          </div>
-          <div class="id-list">${(g.suppressed_job_ids || g.ids || []).map(id => `<code>${escapeHTML(id)}</code>`).join('')}</div>
-        </div>`).join('') : '<div class="empty-state"><strong>No duplicate clusters in this scan</strong></div>';
-    }
-
-    const jp = document.getElementById('jsonPreview');
-    if (jp) jp.textContent = JSON.stringify(data || {}, null, 2);
-  }
-
-  // -------------------------------------------------------------
-  // Data Loader & Fail-Closed Payload Handler
-  // -------------------------------------------------------------
-  async function loadPublishedScan() {
-    try {
-      const res = await fetch(`./data/latest.json?v=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
-      if (data && Array.isArray(data.jobs)) {
-        jobs = data.jobs;
-        duplicateGroups = data.duplicate_groups || [];
-        publishedScanMeta = data;
-
-        // Populate dynamic company filter
-        const compFilter = document.getElementById('companyFilter');
-        if (compFilter) {
-          const uniqueComps = Array.from(new Set(jobs.map(j => j.company).filter(Boolean))).sort();
-          compFilter.innerHTML = '<option value="all">All companies</option>' +
-            uniqueComps.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
-        }
-
-        // Update Overview & Header statistics (Single Source of Truth)
-        const total = jobs.length;
-        const fresh = jobs.filter(j => j.window === 'fresh').length;
-        const backup = total - fresh;
-        const internships = jobs.filter(j => j.type === 'Internship').length;
-        const companiesHiring = new Set(jobs.map(j => j.company)).size;
-
-        document.getElementById('overviewHeroTitle').innerHTML = `${total} verified roles worth your time.<br/>Zero unverified noise.`;
-        document.getElementById('overviewHeroScore').textContent = `${total}/${total}`;
-        document.getElementById('heroFresh').textContent = `${fresh} fresh`;
-        document.getElementById('heroBackup').textContent = `${backup} backups`;
-        document.getElementById('heroCompanies').textContent = `${companiesHiring} companies hiring`;
-
-        document.getElementById('overviewTotal').textContent = total;
-        document.getElementById('overviewFresh').textContent = fresh;
-        document.getElementById('overviewBackup').textContent = backup;
-        document.getElementById('overviewInternships').textContent = internships;
-
-        const jobsNav = document.getElementById('jobsNavCount');
-        if (jobsNav) jobsNav.textContent = total;
-
-        const footDate = document.getElementById('sidebarFootDate');
-        if (footDate) footDate.textContent = `${data.scan_date || 'Today'} · Asia/Kolkata`;
-
-        // Render views
-        renderPriorities();
-        renderJobs();
-        renderApplications();
-        renderAudit(data);
-        renderDedupe(data);
-
-        // Hide stale banner if previously shown
-        const staleBanner = document.getElementById('staleScanBanner');
-        if (staleBanner) staleBanner.hidden = true;
-
-        return data;
-      } else {
-        throw new Error('Malformed or empty scan payload');
-      }
-    } catch (err) {
-      console.warn('[App] Fail closed: could not load published scan:', err.message);
-      // Fail closed: Never display old embedded fallback jobs as live/verified!
-      jobs = [];
-      duplicateGroups = [];
-
-      const staleBanner = document.getElementById('staleScanBanner');
-      if (staleBanner) {
-        staleBanner.hidden = false;
-        let hint = '';
-        if (typeof window !== 'undefined' && window.location.protocol === 'file:') {
-          hint = `<br/><span style="display:inline-block;margin-top:6px;font-size:11px;color:#854d0e">💡 <strong>Why you see this:</strong> You opened <code>docs/index.html</code> directly from your disk (<code>file://</code>). Web browsers block local file <code>fetch()</code> requests by default. To view with verified data, open the live site at <a href="https://charankumarda01.github.io/analytics-job-scout/" target="_blank" style="text-decoration:underline;font-weight:700">charankumarda01.github.io/analytics-job-scout/</a> or run <code>python server.py</code> and navigate to <a href="http://localhost:8000/analytics-job-scout/" target="_blank" style="text-decoration:underline;font-weight:700">http://localhost:8000/analytics-job-scout/</a>.</span>`;
-        }
-        staleBanner.innerHTML = `
-          <span>⚠️ <strong>Scan data unavailable:</strong> Could not load verified scan payload (${escapeHTML(err.message)}). Fail-closed mode active. No unverified records are displayed.${hint}</span>
-          <button class="btn small" id="retryScanBtn" style="margin-top:6px">Retry live scan</button>
-        `;
-        document.getElementById('retryScanBtn')?.addEventListener('click', loadPublishedScan);
-      }
-
-      document.getElementById('overviewHeroTitle').innerHTML = '0 roles available.<br/>Scan unavailable.';
-      document.getElementById('overviewHeroScore').textContent = '0/0';
-      document.getElementById('overviewTotal').textContent = '0';
-      document.getElementById('overviewFresh').textContent = '0';
-      document.getElementById('overviewBackup').textContent = '0';
-      document.getElementById('overviewInternships').textContent = '0';
-
-      const jobsNav = document.getElementById('jobsNavCount');
-      if (jobsNav) jobsNav.textContent = '0';
-
-      renderPriorities();
-      renderJobs();
-      return null;
-    }
-  }
-
-  // -------------------------------------------------------------
-  // Broken Controls Restoration & Event Bindings
+  // Master Event Bindings
   // -------------------------------------------------------------
   function bindEventControls() {
-    // 1. Navigation switching
+    // 1. Navigation Buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const view = btn.dataset.view;
@@ -1538,45 +1750,27 @@
       btn.addEventListener('click', () => switchView(btn.dataset.go));
     });
 
-    // Mobile menu
     document.getElementById('menuBtn')?.addEventListener('click', () => {
       document.getElementById('sidebar')?.classList.toggle('open');
     });
 
-    // 2. runDailyScan button handler
-    const runScanHandlers = [document.getElementById('runDailyScan'), document.getElementById('runScanTop')];
-    runScanHandlers.forEach(btn => {
+    // 2. Reload latest published scan buttons
+    const reloadButtons = [
+      document.getElementById('runScanTop'),
+      document.getElementById('dashReloadBtn'),
+      document.getElementById('auditReloadScanBtn'),
+      document.getElementById('retryScanBtn')
+    ];
+    reloadButtons.forEach(btn => {
       btn?.addEventListener('click', async () => {
-        toast('Refreshing latest verified scan…');
+        toast('Reloading latest published scan…');
         await loadPublishedScan();
         if (window.AJSWalkinAlerts) await window.AJSWalkinAlerts.loadWalkins();
-        toast('Refreshed verified jobs and alerts');
+        toast('Published scan reloaded');
       });
     });
 
-    // 3. exportApplications button handler (Exports CSV)
-    document.getElementById('exportApplications')?.addEventListener('click', () => {
-      const apps = Storage ? Storage.getApplications() : [];
-      if (!apps.length) {
-        toast('No applications tracked yet to export.');
-        return;
-      }
-      const rows = [
-        ['ID', 'Company', 'Title', 'Status', 'Applied Date', 'Apply URL'],
-        ...apps.map(a => [
-          `"${(a.id || '').replace(/"/g, '""')}"`,
-          `"${(a.company || '').replace(/"/g, '""')}"`,
-          `"${(a.title || '').replace(/"/g, '""')}"`,
-          `"${(a.status || 'Opened').replace(/"/g, '""')}"`,
-          `"${(a.appliedAt || '').replace(/"/g, '""')}"`,
-          `"${(a.apply_url || '').replace(/"/g, '""')}"`
-        ].join(','))
-      ];
-      download('my-applications.csv', rows.join('\n'), 'text/csv');
-      toast('Exported my-applications.csv');
-    });
-
-    // Top CSV export
+    // 3. Export CSV Top
     document.getElementById('exportCsvTop')?.addEventListener('click', () => {
       if (!jobs.length) {
         toast('No jobs loaded to export.');
@@ -1599,74 +1793,495 @@
       toast('Exported verified-analytics-jobs.csv');
     });
 
-    // 4. resetChecklist button handler
-    document.getElementById('resetChecklist')?.addEventListener('click', () => {
-      if (Storage) Storage.resetChecklist();
-      document.querySelectorAll('#checkGroups input[type="checkbox"]').forEach(cb => {
-        cb.checked = false;
-        cb.closest('.check-item')?.classList.remove('checked');
-      });
-      updateChecklistProgress();
-      toast('ATS checklist reset');
+    // 4. Follow-up toast actions
+    document.getElementById('closeFollowupToastBtn')?.addEventListener('click', hideApplyFollowupToast);
+    document.getElementById('followupStillApplyingBtn')?.addEventListener('click', hideApplyFollowupToast);
+    document.getElementById('followupNotYetBtn')?.addEventListener('click', hideApplyFollowupToast);
+    document.getElementById('followupAppliedBtn')?.addEventListener('click', () => {
+      const jobId = activeFollowupJobId;
+      hideApplyFollowupToast();
+      if (jobId) openMarkAppliedModal(jobId);
     });
 
-    // 5. copyKeywords button handler
-    document.getElementById('copyKeywords')?.addEventListener('click', () => {
-      const select = document.getElementById('rolePackSelect');
-      const packKey = select ? select.value : '';
-      const kws = rolePacks[packKey] || [];
-      if (kws.length) {
-        copyText(kws.join(', '));
-        toast(`Copied ${kws.length} keywords for ${packKey}`);
-      } else {
-        toast('No keywords selected');
+    // 5. Mark Applied Modal confirmation
+    document.getElementById('confirmMarkAppliedBtn')?.addEventListener('click', () => {
+      const modal = document.getElementById('markAppliedModal');
+      const jobId = modal?.dataset.targetJobId;
+      const dateVal = document.getElementById('markAppliedDateInput')?.value;
+      const noteVal = document.getElementById('markAppliedNoteInput')?.value;
+
+      if (Storage && jobId) {
+        Storage.confirmApplied(jobId, dateVal ? new Date(dateVal).toISOString() : new Date().toISOString());
+        if (noteVal) {
+          Storage.addApplicationNote(jobId, noteVal);
+        }
+        toast('Marked application as Applied!');
+        modal.hidden = true;
+        renderJobs();
+        renderApplicationsWorkspace();
+        renderDashboard();
       }
     });
 
-    // 6. copyJson & downloadJson handlers (Dedupe / State)
-    document.getElementById('copyJson')?.addEventListener('click', () => {
-      const exportData = publishedScanMeta || { scan_date: 'today', jobs: jobs };
-      copyText(JSON.stringify(exportData, null, 2));
-      toast('Copied scan state JSON to clipboard');
+    document.getElementById('cancelMarkAppliedBtn')?.addEventListener('click', () => {
+      document.getElementById('markAppliedModal').hidden = true;
     });
 
-    document.getElementById('downloadJson')?.addEventListener('click', () => {
-      const exportData = publishedScanMeta || { scan_date: 'today', jobs: jobs };
-      download(`scout-state-${publishedScanMeta?.scan_date || 'today'}.json`, JSON.stringify(exportData, null, 2), 'application/json');
-      toast('Downloaded state JSON');
+    // 6. Applications Workspace List / Board View Switching
+    document.getElementById('pipelineListViewBtn')?.addEventListener('click', () => {
+      currentViewMode = 'list';
+      document.getElementById('pipelineListViewBtn')?.classList.add('active');
+      document.getElementById('pipelineBoardViewBtn')?.classList.remove('active');
+      renderApplicationsWorkspace();
     });
 
-    // 7. Role / Location / Type scan preferences client-side persistence
-    const loadPreferencesToUI = () => {
-      if (!Storage) return;
-      const prefs = Storage.getPreferences();
-
-      document.querySelectorAll('#roleOptions input[type="checkbox"]').forEach(cb => {
-        cb.checked = prefs.roles.includes(cb.value);
-      });
-      document.querySelectorAll('#locationOptions input[type="checkbox"]').forEach(cb => {
-        cb.checked = prefs.locations.includes(cb.value);
-      });
-      document.querySelectorAll('#typeOptions input[type="checkbox"]').forEach(cb => {
-        cb.checked = prefs.types.includes(cb.value);
-      });
-    };
-
-    const savePreferencesFromUI = () => {
-      if (!Storage) return;
-      const roles = Array.from(document.querySelectorAll('#roleOptions input[type="checkbox"]:checked')).map(x => x.value);
-      const locations = Array.from(document.querySelectorAll('#locationOptions input[type="checkbox"]:checked')).map(x => x.value);
-      const types = Array.from(document.querySelectorAll('#typeOptions input[type="checkbox"]:checked')).map(x => x.value);
-      Storage.savePreferences({ roles, locations, types });
-      toast('Scan preferences saved');
-    };
-
-    loadPreferencesToUI();
-    document.querySelectorAll('.scan-config input[type="checkbox"]').forEach(cb => {
-      cb.addEventListener('change', savePreferencesFromUI);
+    document.getElementById('pipelineBoardViewBtn')?.addEventListener('click', () => {
+      currentViewMode = 'board';
+      document.getElementById('pipelineBoardViewBtn')?.classList.add('active');
+      document.getElementById('pipelineListViewBtn')?.classList.remove('active');
+      renderApplicationsWorkspace();
     });
 
-    // 8. Filters in Verified Jobs toolbar
+    // Workspace Filters
+    ['appSearchInput', 'appStatusFilter', 'appCompanyFilter', 'appScanHealthFilter', 'appSortFilter'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', renderApplicationsWorkspace);
+        el.addEventListener('change', renderApplicationsWorkspace);
+      }
+    });
+
+    // Workspace Backup & Export/Import Controls
+    document.getElementById('backupDataBtn')?.addEventListener('click', () => {
+      if (Storage) {
+        const json = Storage.exportApplicationsJSON(false);
+        download(`analytics-scout-backup-${new Date().toISOString().slice(0,10)}.json`, json, 'application/json');
+        toast('Backup file downloaded');
+      }
+    });
+
+    document.getElementById('exportAppsJsonBtn')?.addEventListener('click', () => {
+      if (Storage) {
+        const json = Storage.exportApplicationsJSON(false);
+        download(`my-applications-${new Date().toISOString().slice(0,10)}.json`, json, 'application/json');
+        toast('Exported applications JSON');
+      }
+    });
+
+    document.getElementById('exportApplications')?.addEventListener('click', () => {
+      if (Storage) {
+        const csv = Storage.exportApplicationsCSV();
+        download(`my-applications-${new Date().toISOString().slice(0,10)}.csv`, csv, 'text/csv');
+        toast('Exported applications CSV');
+      }
+    });
+
+    // Import file input handler
+    const importFileInput = document.getElementById('importAppsFileInput');
+    importFileInput?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const content = event.target?.result;
+          if (Storage) {
+            const preview = Storage.previewImportApplications(content);
+            pendingImportData = content;
+
+            // Show import preview modal
+            const modal = document.getElementById('importPreviewModal');
+            const stats = document.getElementById('importPreviewStats');
+            const warn = document.getElementById('importConflictWarning');
+
+            if (modal && stats) {
+              stats.innerHTML = `
+                <div><strong>Schema Version:</strong> ${preview.schema_version}</div>
+                <div><strong>Total in File:</strong> ${preview.total_incoming}</div>
+                <div><strong>New Additions:</strong> ${preview.additions_count}</div>
+                <div><strong>Updates:</strong> ${preview.updates_count}</div>
+                <div><strong>Conflicts (Older timestamps):</strong> ${preview.conflicts_count}</div>
+              `;
+              if (warn) warn.hidden = preview.conflicts_count === 0;
+              modal.hidden = false;
+            }
+          }
+        } catch (err) {
+          alert('Could not parse import file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      importFileInput.value = '';
+    });
+
+    document.getElementById('executeImportMergeBtn')?.addEventListener('click', () => {
+      if (Storage && pendingImportData) {
+        const res = Storage.executeImportApplications(pendingImportData, 'merge');
+        document.getElementById('importPreviewModal').hidden = true;
+        toast(`Imported: ${res.added} added, ${res.updated} updated`);
+        renderApplicationsWorkspace();
+      }
+    });
+
+    document.getElementById('executeImportOverwriteBtn')?.addEventListener('click', () => {
+      if (confirm('Overwrite existing records with incoming backup data?')) {
+        if (Storage && pendingImportData) {
+          const res = Storage.executeImportApplications(pendingImportData, 'overwrite');
+          document.getElementById('importPreviewModal').hidden = true;
+          toast(`Overwritten: ${res.added} added, ${res.updated} updated`);
+          renderApplicationsWorkspace();
+        }
+      }
+    });
+
+    document.getElementById('cancelImportBtn')?.addEventListener('click', () => {
+      document.getElementById('importPreviewModal').hidden = true;
+      pendingImportData = null;
+    });
+
+    // 7. Application Detail Drawer Actions
+    document.getElementById('closeAppDrawerBtn')?.addEventListener('click', closeApplicationDetail);
+    document.getElementById('appDetailDrawerBackdrop')?.addEventListener('click', (e) => {
+      if (e.target.id === 'appDetailDrawerBackdrop') closeApplicationDetail();
+    });
+
+    document.getElementById('drawerSaveReminderBtn')?.addEventListener('click', () => {
+      const nextAction = document.getElementById('drawerNextActionInput')?.value;
+      const reminderDate = document.getElementById('drawerReminderDateInput')?.value;
+      if (Storage && activeDetailAppId) {
+        Storage.setApplicationReminder(activeDetailAppId, nextAction, reminderDate);
+        toast('Reminder updated');
+        openApplicationDetail(activeDetailAppId);
+        renderApplicationsWorkspace();
+      }
+    });
+
+    document.getElementById('drawerSaveContactBtn')?.addEventListener('click', () => {
+      const recName = document.getElementById('drawerRecruiterName')?.value;
+      const recChan = document.getElementById('drawerContactChannel')?.value;
+      if (Storage && activeDetailAppId) {
+        const app = Storage.getApplication(activeDetailAppId);
+        if (app) {
+          app.recruiter_name = recName;
+          app.contact_channel = recChan;
+          Storage.saveApplication(app);
+          toast('Contact details saved');
+        }
+      }
+    });
+
+    document.getElementById('drawerSaveNotesBtn')?.addEventListener('click', () => {
+      const notes = document.getElementById('drawerNotesText')?.value;
+      if (Storage && activeDetailAppId) {
+        Storage.addApplicationNote(activeDetailAppId, notes);
+        toast('Note added to application');
+        openApplicationDetail(activeDetailAppId);
+      }
+    });
+
+    document.getElementById('drawerUpdateStatusBtn')?.addEventListener('click', () => {
+      if (!activeDetailAppId || !Storage) return;
+      const app = Storage.getApplication(activeDetailAppId);
+      const statuses = Object.keys(Storage.STATUS_ENUM);
+      const newStatus = prompt(`Choose status (${statuses.join(', ')}):`, app.status);
+      if (newStatus && Storage.STATUS_ENUM[newStatus.toLowerCase()]) {
+        Storage.updateApplicationStatus(activeDetailAppId, newStatus.toLowerCase());
+        toast(`Status updated to ${Storage.STATUS_LABELS[newStatus.toLowerCase()]}`);
+        openApplicationDetail(activeDetailAppId);
+        renderApplicationsWorkspace();
+        renderJobs();
+      }
+    });
+
+    document.getElementById('drawerAtsChecklistBtn')?.addEventListener('click', () => {
+      if (!activeDetailAppId) return;
+      closeApplicationDetail();
+      switchView('resume');
+      const compSelect = document.getElementById('compareJobSelect');
+      if (compSelect) {
+        compSelect.value = activeDetailAppId;
+        renderJobAtsMatch(activeDetailAppId);
+      }
+    });
+
+    document.getElementById('drawerPrepareInterviewBtn')?.addEventListener('click', () => {
+      if (!activeDetailAppId) return;
+      const app = Storage ? Storage.getApplication(activeDetailAppId) : null;
+      closeApplicationDetail();
+      switchView('coach');
+      if (app) CoachUI.startJobPractice(app);
+    });
+
+    document.getElementById('drawerArchiveBtn')?.addEventListener('click', () => {
+      if (Storage && activeDetailAppId) {
+        const app = Storage.getApplication(activeDetailAppId);
+        const newArchived = !app.archived;
+        Storage.archiveApplication(activeDetailAppId, newArchived);
+        toast(newArchived ? 'Application archived' : 'Application restored');
+        openApplicationDetail(activeDetailAppId);
+        renderApplicationsWorkspace();
+      }
+    });
+
+    document.getElementById('drawerDeleteBtn')?.addEventListener('click', () => {
+      if (confirm('Permanently delete this application record and all its timeline notes? (Consider archiving instead).')) {
+        if (Storage && activeDetailAppId) {
+          Storage.deleteApplication(activeDetailAppId);
+          toast('Application record deleted');
+          closeApplicationDetail();
+          renderApplicationsWorkspace();
+          renderJobs();
+        }
+      }
+    });
+
+    // 8. Resume upload & profiles
+    const fileInput = document.getElementById('resumeFileInput');
+    const dropzone = document.getElementById('resumeDropzone');
+    const rawTextArea = document.getElementById('resumeRawText');
+    const rememberCheckbox = document.getElementById('resumeRememberDeviceCheckbox');
+
+    async function handleResumeFile(file) {
+      if (!file) return;
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert(`File size exceeds 5MB limit.`);
+        return;
+      }
+
+      toast(`Parsing ${file.name} locally in your browser…`);
+      try {
+        if (!window.AJSResumeAgent) throw new Error('Resume agent is not ready.');
+        const text = await window.AJSResumeAgent.parseFile(file);
+        currentResumeData.fileName = file.name;
+        currentResumeData.rawText = text;
+        if (rawTextArea) rawTextArea.value = text;
+
+        if (Storage) {
+          Storage.saveResume(currentResumeData, currentResumeData.remembered);
+        }
+        renderResumeATSWorkspace();
+        renderDashboard();
+        toast(`Parsed ${file.name} successfully!`);
+      } catch (err) {
+        alert('Resume upload notice: ' + err.message + '\n\nTip: You can copy and paste text directly into the preview area.');
+      }
+    }
+
+    fileInput?.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if (file) {
+        handleResumeFile(file);
+        fileInput.value = '';
+      }
+    });
+
+    if (dropzone) {
+      dropzone.addEventListener('click', e => {
+        if (e.target !== fileInput) fileInput?.click();
+      });
+      ['dragenter', 'dragover'].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'dragend'].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+        });
+      });
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const file = e.dataTransfer?.files?.[0];
+        if (file) handleResumeFile(file);
+      });
+    }
+
+    if (rawTextArea) {
+      rawTextArea.addEventListener('input', () => {
+        currentResumeData.rawText = rawTextArea.value;
+        if (Storage) Storage.saveResume(currentResumeData, currentResumeData.remembered);
+        renderResumeATSWorkspace();
+      });
+    }
+
+    rememberCheckbox?.addEventListener('change', (e) => {
+      currentResumeData.remembered = e.target.checked;
+      if (Storage) Storage.saveResume(currentResumeData, currentResumeData.remembered);
+      toast(e.target.checked ? 'Resume saved to this device' : 'Kept in page memory only');
+    });
+
+    document.getElementById('saveResumeProfileBtn')?.addEventListener('click', () => {
+      const name = prompt('Name this resume profile (e.g. "Senior Analyst v2" or "SQL-Focused"):');
+      if (name && Storage) {
+        Storage.saveResumeProfile(name, getResumeFullText(), true);
+        populateResumeProfiles();
+        toast(`Profile "${name}" saved`);
+      }
+    });
+
+    document.getElementById('deleteResumeProfileBtn')?.addEventListener('click', () => {
+      const select = document.getElementById('resumeProfileSelect');
+      const val = select?.value;
+      if (!val) {
+        toast('Select a saved profile to delete');
+        return;
+      }
+      if (confirm(`Delete saved profile "${val}"?`)) {
+        if (Storage) {
+          Storage.deleteResumeProfile(val);
+          populateResumeProfiles();
+          toast(`Deleted profile "${val}"`);
+        }
+      }
+    });
+
+    document.getElementById('resumeProfileSelect')?.addEventListener('change', (e) => {
+      const name = e.target.value;
+      if (!name) return;
+      if (Storage) {
+        const profiles = Storage.getResumeProfiles();
+        const p = profiles.find(x => x.name === name);
+        if (p) {
+          currentResumeData.rawText = p.text;
+          currentResumeData.fileName = p.name;
+          if (rawTextArea) rawTextArea.value = p.text;
+          renderResumeATSWorkspace();
+          toast(`Loaded profile "${name}"`);
+        }
+      }
+    });
+
+    document.getElementById('forgetResumeBtn')?.addEventListener('click', () => {
+      if (confirm('Forget resume content from this browser?')) {
+        currentResumeData = { rawText: '', fileName: '', remembered: false };
+        if (Storage) Storage.forgetResume();
+        if (rawTextArea) rawTextArea.value = '';
+        renderResumeATSWorkspace();
+        renderDashboard();
+        toast('Resume cleared');
+      }
+    });
+
+    document.getElementById('deleteAllCareerDataBtn')?.addEventListener('click', () => {
+      if (confirm('Delete all career data (applications, resume profiles, interview history)?')) {
+        if (Storage) Storage.deleteAllCareerData();
+        currentResumeData = { rawText: '', fileName: '', remembered: false };
+        if (rawTextArea) rawTextArea.value = '';
+        renderResumeATSWorkspace();
+        renderApplicationsWorkspace();
+        renderDashboard();
+        toast('All career data deleted');
+      }
+    });
+
+    document.getElementById('compareJobSelect')?.addEventListener('change', (e) => {
+      renderJobAtsMatch(e.target.value);
+    });
+
+    document.getElementById('copyAtsChecklistBtn')?.addEventListener('click', () => {
+      const select = document.getElementById('compareJobSelect');
+      const allJobs = [...jobs, ...(Storage ? Storage.getApplications() : [])];
+      const job = allJobs.find(j => j.id === select?.value) || jobs[0];
+      if (job && window.AJSResumeAgent) {
+        const match = window.AJSResumeAgent.matchJobWithResume(job, getResumeFullText());
+        const text = (match.checklist || []).map(c => `[${c.priority.toUpperCase()}] ${c.item}: ${c.guidance}`).join('\n');
+        copyText(text);
+      }
+    });
+
+    document.getElementById('downloadAtsChecklistBtn')?.addEventListener('click', () => {
+      const select = document.getElementById('compareJobSelect');
+      const allJobs = [...jobs, ...(Storage ? Storage.getApplications() : [])];
+      const job = allJobs.find(j => j.id === select?.value) || jobs[0];
+      if (job && window.AJSResumeAgent) {
+        const match = window.AJSResumeAgent.matchJobWithResume(job, getResumeFullText());
+        const text = `ATS Checklist for ${job.company} - ${job.title}\n\n` +
+          (match.checklist || []).map(c => `[${c.priority.toUpperCase()}] ${c.item}\n${c.guidance}\n`).join('\n');
+        download(`ats-checklist-${(job.company || 'job').toLowerCase()}.txt`, text);
+      }
+    });
+
+    // 9. Coach Event Bindings
+    document.getElementById('startPersonalizedMockBtn')?.addEventListener('click', CoachUI.startSession);
+    document.getElementById('resumeSavedSessionBtn')?.addEventListener('click', CoachUI.resumePausedSession);
+    document.getElementById('arenaMicBtn')?.addEventListener('click', CoachUI.toggleVoiceRecognition);
+    document.getElementById('arenaSubmitBtn')?.addEventListener('click', CoachUI.submitAnswer);
+    document.getElementById('arenaNextBtn')?.addEventListener('click', CoachUI.nextQuestion);
+    document.getElementById('arenaRetryAnswerBtn')?.addEventListener('click', CoachUI.retryAnswer);
+    document.getElementById('arenaAskFollowupBtn')?.addEventListener('click', CoachUI.askFollowup);
+    document.getElementById('arenaPauseBtn')?.addEventListener('click', CoachUI.pauseSession);
+    document.getElementById('arenaStopBtn')?.addEventListener('click', CoachUI.exitSession);
+    document.getElementById('completeBackBtn')?.addEventListener('click', CoachUI.exitSession);
+
+    document.getElementById('reportSaveToAppBtn')?.addEventListener('click', () => {
+      if (Storage && CoachUI.currentSession?.targetJob?.id) {
+        const appId = CoachUI.currentSession.targetJob.id;
+        const lastAnswer = CoachUI.sessionAnswers[CoachUI.sessionAnswers.length - 1];
+        Storage.addApplicationInterviewSession(appId, {
+          date: new Date().toISOString(),
+          questionsAnswered: CoachUI.sessionAnswers.length,
+          avgScore: document.getElementById('reportOverallScore')?.textContent || '80%',
+          summary: 'Completed adaptive mock interview session.'
+        });
+        toast('Report linked to application record');
+      } else {
+        toast('Interview progress saved to coach history');
+      }
+    });
+
+    document.getElementById('reportDownloadBtn')?.addEventListener('click', () => {
+      const title = CoachUI.currentSession?.targetJob?.title || 'Junior Analyst';
+      const company = CoachUI.currentSession?.targetJob?.company || 'Target Company';
+      const score = document.getElementById('reportOverallScore')?.textContent || '--';
+      const text = `Interview Coach Report: ${company} - ${title}\n` +
+        `Readiness Score: ${score}\nDate: ${new Date().toLocaleDateString('en-IN')}\n\n` +
+        CoachUI.sessionAnswers.map((a, i) => `Q${i+1}: ${a.question}\nAnswer: ${a.answer}\nScore: ${a.evaluation.totalScore}/100\nFeedback: ${a.evaluation.whatWasStrong}\n`).join('\n---\n\n');
+      download(`interview-report-${company.toLowerCase()}.txt`, text);
+    });
+
+    document.getElementById('resetInterviewProgressBtn')?.addEventListener('click', () => {
+      if (confirm('Reset your interview streak and practice history?')) {
+        if (Storage) Storage.resetInterviewProgress();
+        CoachUI.renderStreakAndStats();
+        toast('Interview progress reset');
+      }
+    });
+
+    // 10. AI Action Buttons
+    document.querySelectorAll('[data-ai-action]').forEach(btn => {
+      btn.addEventListener('click', () => runAIEnhancement(btn.dataset.aiAction));
+    });
+
+    // 11. Suggest source modal
+    document.getElementById('suggestSourceTopBtn')?.addEventListener('click', () => {
+      document.getElementById('suggestSourceModal').hidden = false;
+    });
+    document.getElementById('closeSuggestModalBtn')?.addEventListener('click', () => {
+      document.getElementById('suggestSourceModal').hidden = true;
+    });
+    document.getElementById('submitSuggestIssueBtn')?.addEventListener('click', () => {
+      const name = (document.getElementById('suggestCompName')?.value || '').trim();
+      const url = (document.getElementById('suggestCareersUrl')?.value || '').trim();
+      if (!name || !url) {
+        alert('Please provide Company Name and Official Careers URL.');
+        return;
+      }
+      const title = encodeURIComponent(`[Source Suggestion]: ${name}`);
+      const body = encodeURIComponent(`### Company Source Suggestion\n- **Company Name**: ${name}\n- **Official Careers URL**: ${url}\n\n*Submitted via Analytics Scout modal.*`);
+      window.open(`https://github.com/charankumarda01/analytics-job-scout/issues/new?title=${title}&body=${body}`, '_blank');
+      document.getElementById('suggestSourceModal').hidden = true;
+    });
+
+    document.getElementById('closeResearchModalBtn')?.addEventListener('click', () => {
+      document.getElementById('companyResearchModal').hidden = true;
+    });
+
+    // 12. Find Jobs Toolbar Filters
     ['jobSearch', 'locationFilter', 'sizeFilter', 'freshnessFilter', 'companyFilter', 'sortFilter'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
@@ -1677,221 +2292,9 @@
 
     document.getElementById('savedToggle')?.addEventListener('click', () => {
       savedOnly = !savedOnly;
-      updateSaved();
+      const btn = document.getElementById('savedToggle');
+      if (btn) btn.innerHTML = `${savedOnly ? '♥' : '♡'} Saved only`;
       renderJobs();
-    });
-
-    // 9. Resume actions (Upload, Dropzone, Paste Textarea, and Storage)
-    const fileInput = document.getElementById('resumeFileInput') || document.getElementById('resumeFileUpload');
-    const dropzone = document.getElementById('resumeDropzone');
-    const rawTextArea = document.getElementById('resumeRawText') || document.getElementById('resumeTextEditArea');
-    const rememberCheckbox = document.getElementById('resumeRememberDeviceCheckbox') || document.getElementById('rememberResumeToggle');
-
-    async function handleResumeFile(file) {
-      if (!file) return;
-
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        alert(`File size ${(file.size / (1024 * 1024)).toFixed(1)}MB exceeds maximum allowed 5MB.`);
-        return;
-      }
-
-      toast(`Parsing ${file.name} locally…`);
-      try {
-        if (!window.AJSResumeAgent) {
-          throw new Error('Resume agent is not ready. Please refresh the page.');
-        }
-        const text = await window.AJSResumeAgent.parseFile(file);
-        currentResumeData.fileName = file.name;
-        currentResumeData.rawText = text;
-
-        if (rawTextArea) {
-          rawTextArea.value = text;
-        }
-
-        saveResume(currentResumeData.remembered);
-        toast(`Parsed ${file.name} successfully!`);
-      } catch (err) {
-        console.error('[Resume Upload Error]', err);
-        toast('Upload note: ' + err.message);
-        alert('Resume upload notice: ' + err.message + '\n\nTip: You can also copy and paste your resume text directly into the box below.');
-      }
-    }
-
-    // File input change
-    fileInput?.addEventListener('change', async e => {
-      const file = e.target.files?.[0];
-      if (file) {
-        await handleResumeFile(file);
-        fileInput.value = ''; // Reset so uploading the same file again works
-      }
-    });
-
-    // Dropzone click & drag-and-drop
-    if (dropzone) {
-      dropzone.addEventListener('click', e => {
-        if (e.target !== fileInput) {
-          fileInput?.click();
-        }
-      });
-
-      ['dragenter', 'dragover'].forEach(evt => {
-        dropzone.addEventListener(evt, e => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropzone.classList.add('dragover');
-        });
-      });
-
-      ['dragleave', 'dragend'].forEach(evt => {
-        dropzone.addEventListener(evt, e => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropzone.classList.remove('dragover');
-        });
-      });
-
-      dropzone.addEventListener('drop', async e => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropzone.classList.remove('dragover');
-        const file = e.dataTransfer?.files?.[0];
-        if (file) {
-          await handleResumeFile(file);
-        }
-      });
-    }
-
-    // Editable preview / paste textarea
-    if (rawTextArea) {
-      if (currentResumeData && currentResumeData.rawText) {
-        rawTextArea.value = currentResumeData.rawText;
-      }
-      let debounceTimer = null;
-      rawTextArea.addEventListener('input', () => {
-        currentResumeData.rawText = rawTextArea.value;
-        if (!currentResumeData.fileName) currentResumeData.fileName = 'Pasted Resume';
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          saveResume(currentResumeData.remembered);
-        }, 300);
-      });
-    }
-
-    // Remember on device toggle
-    if (rememberCheckbox) {
-      rememberCheckbox.checked = !!currentResumeData.remembered;
-      rememberCheckbox.addEventListener('change', e => {
-        saveResume(e.target.checked);
-      });
-    }
-
-    // Forget resume button
-    document.getElementById('forgetResumeBtn')?.addEventListener('click', () => {
-      if (confirm('Forget resume content from this browser?')) {
-        currentResumeData = {
-          rawText: '',
-          fileName: '',
-          updatedAt: null,
-          remembered: false,
-          name: '',
-          skills: [],
-          projects: []
-        };
-        if (Storage) Storage.forgetResume();
-        if (rawTextArea) rawTextArea.value = '';
-        renderResumeATSAnalysis();
-        renderCompareJob();
-        renderJobs();
-        toast('Resume cleared from memory and storage');
-      }
-    });
-
-    // Delete all data button
-    const deleteBtn = document.getElementById('deleteAllCareerDataBtn') || document.getElementById('deleteAllDataBtn');
-    deleteBtn?.addEventListener('click', () => {
-      if (confirm('Delete all career data (resume, mock interviews, tracked applications, preferences)?')) {
-        if (Storage) Storage.deleteAllCareerData();
-        currentResumeData = { rawText: '', skills: [] };
-        if (rawTextArea) rawTextArea.value = '';
-        renderResumeATSAnalysis();
-        renderApplications();
-        CoachUI.renderStreakAndStats();
-        toast('All career data deleted');
-      }
-    });
-
-    // AI suggestion buttons
-    document.querySelectorAll('[data-ai-action]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        runAIEnhancement(btn.dataset.aiAction);
-      });
-    });
-
-    document.getElementById('compareJobSelect')?.addEventListener('change', renderCompareJob);
-
-    // 10. Coach arena actions
-    document.getElementById('arenaMicBtn')?.addEventListener('click', CoachUI.toggleVoiceRecognition);
-    document.getElementById('arenaSubmitBtn')?.addEventListener('click', CoachUI.submitAnswer);
-    document.getElementById('arenaNextBtn')?.addEventListener('click', CoachUI.nextQuestion);
-    document.getElementById('arenaExitBtn')?.addEventListener('click', CoachUI.exitSession);
-    document.getElementById('completeBackBtn')?.addEventListener('click', CoachUI.exitSession);
-    document.getElementById('startDailyMixBtn')?.addEventListener('click', () => CoachUI.startTrackSession('mixed_daily', 10));
-
-    // Reset coach progress
-    document.getElementById('resetCoachProgressBtn')?.addEventListener('click', () => {
-      if (confirm('Reset your interview streak and practice history?')) {
-        if (Storage) Storage.resetInterviewProgress();
-        CoachUI.renderStreakAndStats();
-        toast('Interview progress reset');
-      }
-    });
-
-    // 11. Suggest a Company Source feature
-    document.getElementById('suggestSourceTopBtn')?.addEventListener('click', () => {
-      document.getElementById('suggestSourceModal').hidden = false;
-    });
-
-    document.getElementById('closeSuggestModalBtn')?.addEventListener('click', () => {
-      document.getElementById('suggestSourceModal').hidden = true;
-    });
-
-    document.getElementById('submitSuggestIssueBtn')?.addEventListener('click', () => {
-      const name = (document.getElementById('suggestCompName')?.value || '').trim();
-      const url = (document.getElementById('suggestCareersUrl')?.value || '').trim();
-      const notes = (document.getElementById('suggestNotes')?.value || '').trim();
-
-      if (!name || !url) {
-        alert('Please provide at least the Company Name and Official Careers URL.');
-        return;
-      }
-
-      const title = encodeURIComponent(`[Source Suggestion]: ${name}`);
-      const body = encodeURIComponent(`### Company Source Suggestion\n- **Company Name**: ${name}\n- **Official Careers / ATS URL**: ${url}\n- **Notes**: ${notes}\n\n*Submitted via Analytics Job Scout community sourcing modal.*`);
-      const ghUrl = `https://github.com/charankumarda01/analytics-job-scout/issues/new?title=${title}&body=${body}`;
-      window.open(ghUrl, '_blank', 'noopener,noreferrer');
-      document.getElementById('suggestSourceModal').hidden = true;
-    });
-
-    document.getElementById('downloadSuggestJsonBtn')?.addEventListener('click', () => {
-      const name = (document.getElementById('suggestCompName')?.value || '').trim();
-      const url = (document.getElementById('suggestCareersUrl')?.value || '').trim();
-      const notes = (document.getElementById('suggestNotes')?.value || '').trim();
-
-      const payload = {
-        company_name: name,
-        official_careers_url: url,
-        notes: notes,
-        suggested_at: new Date().toISOString()
-      };
-      download(`company-suggestion-${(name || 'new').toLowerCase().replace(/\s+/g, '-')}.json`, JSON.stringify(payload, null, 2), 'application/json');
-      toast('Downloaded suggestion JSON');
-      document.getElementById('suggestSourceModal').hidden = true;
-    });
-
-    // Close Company Research modal
-    document.getElementById('closeResearchModalBtn')?.addEventListener('click', () => {
-      document.getElementById('companyResearchModal').hidden = true;
     });
   }
 
@@ -1900,14 +2303,10 @@
   // -------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', async () => {
     bindEventControls();
-    renderChecklist();
-    updateSaved();
-    renderApplications();
-    renderResumeATSAnalysis();
 
     // Populate resume text editor if resume exists
     if (currentResumeData && currentResumeData.rawText) {
-      const rawTextArea = document.getElementById('resumeRawText') || document.getElementById('resumeTextEditArea');
+      const rawTextArea = document.getElementById('resumeRawText');
       if (rawTextArea) rawTextArea.value = currentResumeData.rawText;
     }
 
@@ -1924,6 +2323,7 @@
     getJobs: () => jobs,
     switchView: switchView,
     renderJobs: renderJobs,
+    openApp: openApplicationDetail,
     loadPublishedScan: loadPublishedScan,
     CoachUI: CoachUI
   };

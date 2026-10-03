@@ -41,31 +41,37 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+          npm ci || npm install
+          npx playwright install --with-deps chromium
 
       - name: Validate Python syntax
         run: |
           python -m compileall scanner tests server.py
 
-      - name: Validate JavaScript syntax
+      - name: Validate JavaScript syntax individually
         run: |
-          node -c docs/js/storage.js docs/js/ai-client.js docs/js/resume-agent.js docs/js/interview-coach.js docs/js/walkin-alerts.js docs/js/app.js
+          for file in docs/js/*.js tests/*.test.js; do
+            node --check "$file"
+          done
 
       - name: Run Python unit & schema tests
         run: |
-          python -m unittest discover -s tests -p "test_*.py"
+          pytest
 
       - name: Run Node unit tests
         run: |
-          node tests/test_storage.test.js
-          node tests/test_interview_scoring.test.js
-          node tests/test_resume_ats.test.js
+          npm run test:node
+
+      - name: Run Playwright E2E tests
+        run: |
+          npx playwright test
 
       - name: Run strict official-source scan
         run: python server.py --scan-only --output docs/data/latest.json
 
       - name: Verify payload safety & schema
         run: |
-          python -m unittest tests/test_payload_schema.py
+          pytest tests/test_payload_schema.py
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

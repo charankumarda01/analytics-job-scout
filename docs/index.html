@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <meta name="description" content="Analytics Job Scout v2 - Verified junior analytics jobs, Resume AI, and Daily Interview Coach." />
-  <title>Analytics Job Scout v2 — Career Workspace</title>
+  <meta name="description" content="Analytics Job Scout v2 - Verified junior analytics jobs, Applications Workspace, ATS Checklist, Audit and Personalized Interview Coach." />
+  <title>Analytics Job Scout v2 — Applications Workspace &amp; Career Coach</title>
 
   <!-- Modular Master Stylesheet -->
   <link rel="stylesheet" href="./assets/app.css" />
@@ -26,62 +26,47 @@
         </div>
         <div>
           <div class="brand-name">Analytics Scout <span style="font-size:10px;color:#7ce0c3;font-weight:800;vertical-align:super">v2</span></div>
-          <div class="brand-sub">Verified career workspace</div>
+          <div class="brand-sub">Career Workspace &amp; Coach</div>
         </div>
       </div>
 
-      <div class="nav-label">Workspace</div>
+      <div class="nav-label">Navigation</div>
       <nav class="nav">
+        <!-- 7 Canonical Information Architecture Destinations -->
         <button class="nav-btn active" data-view="overview" id="nav-overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          Overview
-        </button>
-        <button class="nav-btn" data-view="daily" id="nav-daily">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg>
-          Daily live scan <span class="nav-count" id="dailyNavBadge">Run</span>
+          Dashboard
         </button>
         <button class="nav-btn" data-view="jobs" id="nav-jobs">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg>
-          Verified jobs <span class="nav-count" id="jobsNavCount">0</span>
-        </button>
-        <button class="nav-btn" data-view="walkins" id="nav-walkins">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Walk-in Alerts <span class="nav-count" id="walkinNavCount">0</span>
+          Find Jobs <span class="nav-count" id="jobsNavCount">0</span>
         </button>
         <button class="nav-btn" data-view="applications" id="nav-applications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          My applications <span class="nav-count" id="applicationNavCount">0</span>
+          My Applications <span class="nav-count" id="applicationNavCount">0</span>
         </button>
-
-        <div class="nav-label" style="margin-top:10px">Career AI Tools</div>
         <button class="nav-btn" data-view="resume" id="nav-resume">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-          Resume AI <span class="nav-count" id="resumeNavBadge" style="background:#168c73;color:white">AI</span>
+          ATS &amp; Resume <span class="nav-count" id="resumeNavBadge" style="background:#168c73;color:white">Local</span>
         </button>
         <button class="nav-btn" data-view="coach" id="nav-coach">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-          Interview Coach <span class="nav-count" id="coachNavBadge">🔥 Daily</span>
+          Interview Coach <span class="nav-count" id="coachNavBadge">Adaptive</span>
         </button>
-        <button class="nav-btn" data-view="ats" id="nav-ats">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6M8 9h2"/></svg>
-          ATS checklist <span class="nav-count" id="navProgress">0%</span>
+        <button class="nav-btn" data-view="walkins" id="nav-walkins">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Walk-ins <span class="nav-count" id="walkinNavCount">0</span>
         </button>
-
-        <div class="nav-label" style="margin-top:10px">Intelligence</div>
         <button class="nav-btn" data-view="audit" id="nav-audit">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          Scan audit
-        </button>
-        <button class="nav-btn" data-view="dedupe" id="nav-dedupe">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
-          Dedupe state <span class="nav-count" id="dedupeNavCount">14</span>
+          Scan Audit
         </button>
       </nav>
 
       <div class="sidebar-foot">
         <div class="eyebrow">Last verified scan</div>
         <strong id="sidebarFootDate">Daily at 08:30 IST</strong>
-        <p>100% official company career portals. No scraper intermediaries or fabricated jobs.</p>
+        <p>100% official company career portals. No scraper intermediaries or unverified walk-ins.</p>
       </div>
     </aside>
 
@@ -93,7 +78,7 @@
           <button class="btn mobile-menu" id="menuBtn" aria-label="Open menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
-          <div class="crumb"><span>Workspace</span><span>›</span><strong id="crumbName">Overview</strong></div>
+          <div class="crumb"><span>Workspace</span><span>›</span><strong id="crumbName">Dashboard</strong></div>
         </div>
         <div class="top-actions">
           <span class="verified-pill"><span class="status-dot"></span>Official sources verified</span>
@@ -102,7 +87,7 @@
           </button>
           <button class="btn primary" id="runScanTop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6"/></svg>
-            Daily scan
+            Reload latest published scan
           </button>
           <button class="btn" id="exportCsvTop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
@@ -113,160 +98,131 @@
 
       <div class="content">
 
-        <!-- 1. OVERVIEW VIEW -->
-        <section class="view active" id="view-overview">
+        <!-- 1. DASHBOARD VIEW (Formerly Overview) -->
+        <section class="view active" id="view-overview" aria-label="Dashboard">
           <div id="staleScanBanner" class="stale-scan-banner" hidden>
             <span>⚠️ <strong>Notice:</strong> Scan data is currently unavailable or stale. No unverified fallback jobs are shown.</span>
-            <button class="btn small" id="retryScanBtn">Retry live scan</button>
+            <button class="btn small" id="retryScanBtn">Reload latest published scan</button>
           </div>
           <div id="walkinAlertBanner" hidden></div>
 
-          <div class="hero">
-            <div class="hero-copy">
-              <div class="eyebrow">Today’s verified scan</div>
-              <h1 id="overviewHeroTitle">Verified junior roles.<br/>Zero unverified noise.</h1>
-              <p>Junior analytics opportunities across Bengaluru, Hyderabad, Chennai, and Remote India, verified for explicit date, experience (≤2 yrs), skills, and live application endpoints.</p>
-              <div class="hero-tags">
-                <span class="hero-tag" id="heroFresh">-- fresh</span>
-                <span class="hero-tag" id="heroBackup">-- backups</span>
-                <span class="hero-tag" id="heroCompanies">-- companies hiring</span>
-                <span class="hero-tag">Strict duplicate control</span>
+          <!-- Next Best Action Card -->
+          <div class="panel" id="dashboardNextActionCard" style="background:linear-gradient(135deg,#0d3830 0%,#165044 100%);color:white;border:none;margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+              <div>
+                <span class="eyebrow" style="color:#7ee4c8">Next Best Action</span>
+                <h2 id="nextActionTitle" style="color:white;font-size:18px;margin:4px 0 6px">Select your priority job to apply or prepare</h2>
+                <p id="nextActionSubtitle" style="color:#cbe8e0;font-size:12px;margin:0;max-width:680px">
+                  Explore verified openings, track your application lifecycle, or run personalized mock interview prep.
+                </p>
+              </div>
+              <div style="display:flex;gap:8px" id="nextActionBtnWrap">
+                <button class="btn primary" id="nextActionPrimaryBtn" data-go="jobs">Find Jobs →</button>
+                <button class="btn" id="nextActionSecondaryBtn" data-go="applications" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.25)">My Applications</button>
               </div>
             </div>
-            <div class="hero-side">
-              <div class="hero-score"><div class="hero-score-inner"><strong id="overviewHeroScore">--</strong><span>live apply links</span></div></div>
-            </div>
+          </div>
+
+          <!-- Explicit Separation: Today's Verified Scan vs Your Applications (Honest Distinction) -->
+          <div class="section-head" style="margin:8px 0 10px">
+            <div><div class="eyebrow">Today’s Verified Scan (Asia/Kolkata 08:30 IST)</div><h2 style="font-size:16px;margin:2px 0">Live Official Job Market</h2></div>
+            <span class="badge verified" id="scanFreshnessBadge">Verified Scan Active</span>
           </div>
 
           <div class="metrics">
             <div class="metric">
-              <div class="metric-top"><span class="metric-label">Verified matches</span></div>
-              <strong id="overviewTotal">--</strong><div class="metric-note">Passed all five verification checks</div>
+              <div class="metric-top"><span class="metric-label">Verified Matches</span></div>
+              <strong id="overviewTotal">--</strong><div class="metric-note">Passed all verification gates</div>
             </div>
             <div class="metric blue">
-              <div class="metric-top"><span class="metric-label">Fresh priority</span></div>
-              <strong id="overviewFresh">--</strong><div class="metric-note">Posted in the last 0–5 days</div>
+              <div class="metric-top"><span class="metric-label">Fresh Priority</span></div>
+              <strong id="overviewFresh">--</strong><div class="metric-note">Posted 0–5 days ago</div>
             </div>
             <div class="metric amber">
-              <div class="metric-top"><span class="metric-label">Backup window</span></div>
+              <div class="metric-top"><span class="metric-label">Backup Window</span></div>
               <strong id="overviewBackup">--</strong><div class="metric-note">Posted 6–15 days ago</div>
             </div>
             <div class="metric gray">
-              <div class="metric-top"><span class="metric-label">Internships</span></div>
-              <strong id="overviewInternships">--</strong><div class="metric-note">Verified intern openings</div>
+              <div class="metric-top"><span class="metric-label">Zero Unverified</span></div>
+              <strong id="overviewWalkinsCount">0</strong><div class="metric-note">Unsafe walk-ins eradicated</div>
             </div>
           </div>
 
-          <div class="resume-cta-banner" id="overviewResumeBanner">
-            <div class="resume-cta-left">
-              <div class="resume-cta-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-              </div>
-              <div>
-                <strong>Resume AI & ATS Match Inspector Active</strong>
-                <p>Upload your resume to see deterministic ATS match scores, missing keyword checklists, and mock interview practice for every verified job.</p>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn primary small" data-go="resume">Resume AI →</button>
-              <button class="btn small" data-go="coach">Interview Coach →</button>
-            </div>
+          <!-- Section: Your Applications Workspace Snapshot -->
+          <div class="section-head" style="margin:24px 0 10px">
+            <div><div class="eyebrow">Your Private Career Workspace</div><h2 style="font-size:16px;margin:2px 0">Application Pipeline Status</h2></div>
+            <button class="text-link" data-go="applications">Open My Applications Workspace →</button>
           </div>
 
-          <div class="section-head">
-            <div><div class="eyebrow">Action queue</div><h2>Apply first</h2><p>Best balance of role fit, freshness, and junior experience.</p></div>
+          <div class="metrics" id="dashboardAppMetrics">
+            <div class="metric"><div class="metric-top"><span class="metric-label">Ready to apply</span></div><strong id="dashReadyCount">0</strong><div class="metric-note">Verified unapplied</div></div>
+            <div class="metric blue"><div class="metric-top"><span class="metric-label">Saved</span></div><strong id="dashSavedCount">0</strong><div class="metric-note">Bookmarked for review</div></div>
+            <div class="metric amber"><div class="metric-top"><span class="metric-label">Applying / In Progress</span></div><strong id="dashApplyingCount">0</strong><div class="metric-note">Portal opened</div></div>
+            <div class="metric green" style="background:#eaf8f4;border-color:#b5e2d6"><div class="metric-top"><span class="metric-label">Submitted</span></div><strong id="dashAppliedCount" style="color:#0e6c59">0</strong><div class="metric-note">Formally submitted</div></div>
+            <div class="metric" style="background:#f6f0fd;border-color:#ded0fa"><div class="metric-top"><span class="metric-label">Interviews / Tests</span></div><strong id="dashInterviewCount" style="color:#5f2ca0">0</strong><div class="metric-note">Active evaluation</div></div>
+          </div>
+
+          <!-- Follow-ups due and Urgent tasks -->
+          <div class="panel" id="dashboardFollowupsCard" style="margin-top:16px" hidden>
+            <div class="panel-title">
+              <div><h3>⚠️ Action Required on Applications</h3><span>Follow-ups, status updates, or interview sessions</span></div>
+              <button class="btn small" data-go="applications">View Queue</button>
+            </div>
+            <div id="dashboardFollowupsList"></div>
+          </div>
+
+          <!-- Ready-to-apply jobs (Priority Grid) -->
+          <div class="section-head" style="margin-top:24px">
+            <div><div class="eyebrow">Action queue</div><h2>Ready to apply</h2><p>Top junior roles verified for ≤2 years experience, explicit posting dates, and live apply endpoints.</p></div>
             <button class="text-link" id="viewAllJobsLink" data-go="jobs">View all verified roles →</button>
           </div>
           <div class="priority-grid" id="priorityGrid"></div>
 
+          <!-- Scan Health & Coverage Distribution -->
           <div class="split">
             <div class="panel">
-              <div class="panel-title"><div><h3>Opportunity distribution</h3><span>Final verified shortlist</span></div><span>10 roles</span></div>
-              <div class="bars">
-                <div class="bar-row"><span class="bar-label">Bengaluru</span><div class="bar-track"><div class="bar-fill" id="barBengaluru" style="width:70%"></div></div><span class="bar-value" id="countBengaluru">7</span></div>
-                <div class="bar-row"><span class="bar-label">Hyderabad</span><div class="bar-track"><div class="bar-fill blue" id="barHyderabad" style="width:30%"></div></div><span class="bar-value" id="countHyderabad">3</span></div>
-                <div class="bar-row"><span class="bar-label">Chennai</span><div class="bar-track"><div class="bar-fill" id="barChennai" style="width:0%"></div></div><span class="bar-value" id="countChennai">0</span></div>
-                <div class="bar-row"><span class="bar-label">Remote India</span><div class="bar-track"><div class="bar-fill blue" id="barRemoteIndia" style="width:0%"></div></div><span class="bar-value" id="countRemoteIndia">0</span></div>
+              <div class="panel-title"><div><h3>Published Scan Health</h3><span>Updated daily at 08:30 IST</span></div><span class="badge verified" id="dashScanStatusBadge">Passing</span></div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">
+                <div><strong>Scan Timestamp:</strong> <span id="dashScanTimestamp">Today · Asia/Kolkata</span></div>
+                <div><strong>Payload Age:</strong> <span id="dashScanAge">Fresh</span></div>
+                <div><strong>Active Official Sources:</strong> Amazon Jobs (IN), Accenture India Careers</div>
+                <div><strong>Suppressed Clones &amp; Dead Links:</strong> <span id="dashSuppressedCount">0</span> duplicates suppressed</div>
+              </div>
+              <div style="margin-top:12px">
+                <button class="btn small" id="dashReloadBtn">Reload latest published scan</button>
+                <a class="btn small" href="https://github.com/charankumarda01/analytics-job-scout/actions" target="_blank" rel="noopener noreferrer">View GitHub Actions workflow ↗</a>
               </div>
             </div>
+
             <div class="panel">
-              <div class="callout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01"/><path d="M10.3 3.7 2.2 18a2 2 0 0 0 1.8 3h16a2 2 0 0 0 1.8-3L13.7 3.7a2 2 0 0 0-3.4 0z"/></svg>
-                <div><strong>Junior analytics criteria</strong><p>All roles are filtered for ≤ 2 years minimum experience. Every role requires at least two analytics skills.</p></div>
+              <div class="panel-title"><div><h3>ATS &amp; Interview Work in Progress</h3><span>Local &amp; Private</span></div></div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.6">
+                <div style="margin-bottom:8px">
+                  <strong>Current Resume:</strong> <span id="dashResumeName">No resume loaded</span>
+                </div>
+                <div style="margin-bottom:8px">
+                  <strong>ATS Keyword Coverage:</strong> <span id="dashAtsCoverage">0%</span>
+                </div>
+                <div>
+                  <strong>Interview Streak:</strong> <span id="dashCoachStreak">0 days</span>
+                </div>
               </div>
-              <div class="coverage-list" style="margin-top:14px">
-                <div class="coverage-item"><span class="coverage-city"><i class="city-dot"></i>Amazon</span><strong id="countAmazon">6 roles</strong></div>
-                <div class="coverage-item"><span class="coverage-city"><i class="city-dot"></i>Accenture</span><strong id="countAccenture">4 roles</strong></div>
-                <div class="coverage-item"><span class="coverage-city"><i class="city-dot empty"></i>Other 15 firms</span><strong>0 passed today</strong></div>
+              <div style="margin-top:14px;display:flex;gap:8px">
+                <button class="btn small primary" data-go="resume">Open ATS &amp; Resume</button>
+                <button class="btn small" data-go="coach">Open Interview Coach</button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 2. DAILY LIVE SCAN VIEW -->
-        <section class="view" id="view-daily">
+        <!-- 2. FIND JOBS VIEW -->
+        <section class="view" id="view-jobs" aria-label="Find Jobs">
           <div class="page-title">
-            <div><div class="eyebrow">Automated schedule</div><h1>Daily live scan</h1><p>Runs automatically every day at 08:30 IST through GitHub Actions. Filter criteria can be saved in this browser.</p></div>
-            <span class="verified-pill"><span class="status-dot"></span><span id="dailySourceStatus">Official scan connected</span></span>
-          </div>
-
-          <div class="daily-hero">
             <div>
-              <div class="eyebrow">Scheduled Daily Scan</div>
-              <h2 id="dailyGreeting">10 verified opportunities live</h2>
-              <p id="dailyStatusText">Scanned official Amazon and Accenture career portals. Keeps roles posted 0-15 days ago with verified junior requirements.</p>
+              <div class="eyebrow">Verified Directory</div>
+              <h1>Verified junior analytics roles</h1>
+              <p>Every role has an explicit date (0–15 days old), junior requirement (≤2 yrs), at least 2 analytics skills, and a live official Apply link.</p>
             </div>
-            <div class="daily-stamp"><span id="dailyDay">30</span><small id="dailyMonth">SEP 2026</small></div>
-          </div>
-
-          <div class="scan-layout">
-            <div class="panel scan-config">
-              <div class="panel-title"><div><h3>What should I scan?</h3><span>Preferences saved in this browser</span></div><span>Official sources</span></div>
-              <div class="option-block">
-                <label class="option-label">Roles</label>
-                <div class="option-chips" id="roleOptions">
-                  <label class="option-chip"><input type="checkbox" value="data-analyst" checked><span>Data Analyst</span></label>
-                  <label class="option-chip"><input type="checkbox" value="sql" checked><span>Junior SQL</span></label>
-                  <label class="option-chip"><input type="checkbox" value="power-bi" checked><span>Power BI</span></label>
-                  <label class="option-chip"><input type="checkbox" value="analytics" checked><span>Analytics / Reporting</span></label>
-                  <label class="option-chip"><input type="checkbox" value="any-analyst" checked><span>Any Analyst</span></label>
-                  <label class="option-chip"><input type="checkbox" value="data-scientist" checked><span>Junior Data Scientist</span></label>
-                </div>
-              </div>
-              <div class="option-block">
-                <label class="option-label">Locations</label>
-                <div class="option-chips" id="locationOptions">
-                  <label class="option-chip"><input type="checkbox" value="Hyderabad" checked><span>Hyderabad</span></label>
-                  <label class="option-chip"><input type="checkbox" value="Bengaluru" checked><span>Bengaluru</span></label>
-                  <label class="option-chip"><input type="checkbox" value="Chennai" checked><span>Chennai</span></label>
-                  <label class="option-chip"><input type="checkbox" value="Remote India" checked><span>Remote India</span></label>
-                </div>
-              </div>
-              <div class="option-block">
-                <label class="option-label">Employment Type</label>
-                <div class="option-chips" id="typeOptions">
-                  <label class="option-chip"><input type="checkbox" value="jobs" checked><span>Jobs</span></label>
-                  <label class="option-chip"><input type="checkbox" value="internships" checked><span>Internships</span></label>
-                </div>
-              </div>
-              <div class="scan-actions" style="margin-top:14px">
-                <button class="btn primary" id="runDailyScan">Refresh latest verified jobs</button>
-              </div>
-            </div>
-            <div class="panel">
-              <div class="panel-title"><div><h3>Scanner status</h3><span>Daily GitHub Actions run</span></div><span>08:30 IST</span></div>
-              <p style="font-size:12px;color:var(--muted)">The scanner runs non-interactively on GitHub Actions. Results are committed to <code>docs/data/latest.json</code> and deployed cleanly to GitHub Pages.</p>
-              <div class="callout" style="margin-top:12px">
-                <div><strong>Zero paid dependencies</strong><p>Static deployment on GitHub Pages with browser-based AI progressive enhancement.</p></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 3. VERIFIED JOBS VIEW -->
-        <section class="view" id="view-jobs">
-          <div class="page-title">
-            <div><div class="eyebrow">Verified Directory</div><h1>Verified junior analytics roles</h1><p>Every role has an explicit date (0–15 days old), junior requirement (≤2 yrs), at least 2 analytics skills, and a live official Apply link.</p></div>
             <button class="btn" id="savedToggle">♡ Saved only <span>0</span></button>
           </div>
 
@@ -287,82 +243,126 @@
           <div class="jobs-list" id="jobsList"></div>
         </section>
 
-        <!-- 3b. WALKIN ALERTS VIEW -->
-        <section class="view" id="view-walkins">
+        <!-- 3. MY APPLICATIONS WORKSPACE -->
+        <section class="view" id="view-applications" aria-label="My Applications Workspace">
           <div class="page-title">
             <div>
-              <div class="eyebrow">Verified Events</div>
-              <h1>Walk-in Recruitment Alerts</h1>
-              <p>Verified, date-aware walk-in recruitment drives for junior analytics roles with official registration or event notice.</p>
+              <div class="eyebrow">First-Class Applications Workspace</div>
+              <h1>My Applications</h1>
+              <p>Privacy-first browser storage (Schema v3). Never auto-submits. Persists across daily scan refreshes and app updates.</p>
             </div>
-            <div class="walkin-feed-actions">
-              <button class="btn" id="subscribeWalkinsBtn">🔔 Enable alerts</button>
-              <a class="btn" href="./data/walkins.ics" download="walkins.ics">📅 Calendar feed (.ics)</a>
-              <a class="btn" href="./data/walkins.xml" target="_blank" rel="noopener">📡 RSS feed</a>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <div class="field">
-              <label for="walkinCityFilter">City</label>
-              <select id="walkinCityFilter">
-                <option value="all">All cities</option>
-                <option value="Bengaluru">Bengaluru</option>
-                <option value="Hyderabad">Hyderabad</option>
-                <option value="Chennai">Chennai</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="walkinSizeFilter">Company size</label>
-              <select id="walkinSizeFilter">
-                <option value="all">All sizes</option>
-                <option value="Startup">Startup</option>
-                <option value="Mid-size">Mid-size</option>
-                <option value="Enterprise">Enterprise</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="walkinStatusFilter">Status</label>
-              <select id="walkinStatusFilter">
-                <option value="all">All events</option>
-                <option value="attending">Marked attending</option>
-                <option value="saved">Saved</option>
-              </select>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn primary small" id="backupDataBtn">💾 Back up my data</button>
+              <button class="btn small" id="exportAppsJsonBtn">Export JSON</button>
+              <button class="btn small" id="exportApplications">Export CSV</button>
+              <label class="btn small" style="cursor:pointer">
+                <span>Import data</span>
+                <input type="file" id="importAppsFileInput" accept=".json" style="display:none" />
+              </label>
             </div>
           </div>
 
-          <div class="results-meta" style="margin:14px 0;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
-            <span id="walkinsResultCount">Loading verified walk-ins…</span>
-            <span>Sorted by nearest event date</span>
-          </div>
-
-          <div class="jobs-list" id="walkinsList"></div>
-        </section>
-
-        <!-- 4. MY APPLICATIONS VIEW -->
-        <section class="view" id="view-applications">
-          <div class="page-title">
-            <div><div class="eyebrow">Application Tracker</div><h1>My applications</h1><p>Local-only tracker. We never auto-submit applications or request company credentials.</p></div>
-            <button class="btn" id="exportApplications">Export CSV</button>
-          </div>
-
+          <!-- Honest Overview Counts -->
           <div class="metrics" id="applicationMetrics"></div>
 
-          <div class="panel" style="margin-top:16px">
-            <div class="panel-title"><div><h3>Tracked jobs</h3><span>Managed in browser local storage</span></div></div>
-            <div class="application-list" id="applicationList"></div>
+          <!-- Action Queue Container -->
+          <div class="section-head" style="margin-top:20px">
+            <div><div class="eyebrow">Prioritized Next Actions</div><h2>Application Action Queue</h2><p>Concrete tasks to keep your applications moving forward. Every item explains why it is listed.</p></div>
+          </div>
+          <div class="action-queue-grid" id="actionQueueList"></div>
+
+          <!-- Pipeline Controls & List / Board Switching -->
+          <div class="panel" style="margin-top:24px">
+            <div class="panel-title" style="flex-wrap:wrap">
+              <div>
+                <h3>Application Pipeline</h3>
+                <span id="pipelineCountText">0 applications tracked</span>
+              </div>
+              <div class="view-switch-row" style="display:flex;gap:6px">
+                <button class="btn small active" id="pipelineListViewBtn">List View</button>
+                <button class="btn small" id="pipelineBoardViewBtn">Kanban Board</button>
+              </div>
+            </div>
+
+            <!-- Toolbar Filters -->
+            <div class="toolbar" style="margin-bottom:14px">
+              <div class="field">
+                <label for="appSearchInput">Search</label>
+                <input type="text" id="appSearchInput" placeholder="Filter by company, title, or notes…" />
+              </div>
+              <div class="field">
+                <label for="appStatusFilter">Status</label>
+                <select id="appStatusFilter">
+                  <option value="all">All statuses</option>
+                  <option value="saved">Saved for later</option>
+                  <option value="applying">Application in progress</option>
+                  <option value="applied">Applied</option>
+                  <option value="assessment">Assessment / test</option>
+                  <option value="recruiter_screen">Recruiter screening</option>
+                  <option value="interview">Interviewing</option>
+                  <option value="final_round">Final round</option>
+                  <option value="offer">Offer received</option>
+                  <option value="rejected">Not selected</option>
+                  <option value="withdrawn">Withdrawn</option>
+                  <option value="closed">Closed / unknown</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="appCompanyFilter">Company</label>
+                <select id="appCompanyFilter"><option value="all">All companies</option></select>
+              </div>
+              <div class="field">
+                <label for="appScanHealthFilter">Scan Presence</label>
+                <select id="appScanHealthFilter">
+                  <option value="all">All</option>
+                  <option value="in_scan">In today's scan</option>
+                  <option value="not_in_scan">Not in today's scan (retained)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="appSortFilter">Sort by</label>
+                <select id="appSortFilter">
+                  <option value="updated">Recently updated</option>
+                  <option value="applied">Date applied</option>
+                  <option value="nextAction">Next action date</option>
+                  <option value="company">Company name</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Table View Container -->
+            <div id="applicationListViewContainer">
+              <div class="app-table-wrap">
+                <table class="app-table" id="applicationsTable" aria-label="Tracked Applications Table">
+                  <thead>
+                    <tr>
+                      <th>Role &amp; Company</th>
+                      <th>Status</th>
+                      <th>Scan Presence</th>
+                      <th>Next Action</th>
+                      <th>Timeline</th>
+                      <th style="text-align:right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="applicationTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Kanban Board View Container (Hidden on narrow screens via CSS) -->
+            <div id="applicationBoardViewContainer" class="kanban-board" hidden></div>
           </div>
         </section>
 
-        <!-- 5. RESUME AI VIEW (NEW FIRST-CLASS AREA) -->
-        <section class="view" id="view-resume">
+        <!-- 4. ATS & RESUME WORKSPACE -->
+        <section class="view" id="view-resume" aria-label="ATS &amp; Resume Workspace">
           <div class="page-title">
             <div>
-              <div class="eyebrow">Browser-Based Intelligence</div>
-              <h1>Resume AI & ATS Analyzer</h1>
-              <p>Upload, parse, inspect, match, and tailor your resume. Works 100% offline with optional Puter.js AI upon explicit consent.</p>
+              <div class="eyebrow">Job-Specific Keyword Intelligence</div>
+              <h1>ATS &amp; Resume Workspace</h1>
+              <p>Upload, parse, match, and tailor your resume against verified roles. Deterministic 100% offline analysis. AI requires explicit consent.</p>
             </div>
-            <div style="display:flex;gap:8px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
               <span class="badge" id="resumeStorageBadge" style="background:#fff3dd;color:#b56b0b">In page memory only (private)</span>
               <button class="btn small" id="forgetResumeBtn">Forget resume</button>
               <button class="btn small" id="deleteAllCareerDataBtn" style="color:var(--red)">Delete all data</button>
@@ -373,23 +373,27 @@
           <div class="resume-privacy-card">
             <div class="resume-privacy-icon">🛡️</div>
             <div class="resume-privacy-copy">
-              <strong>Zero-Server Privacy Architecture</strong>
-              <p>Your resume is parsed locally in your browser (using PDF.js and Mammoth). Text is kept in page memory by default unless you explicitly check "Remember on this device". No credentials or files are ever sent to custom servers, and applications are never auto-submitted. Third-party AI (Puter.js) is strictly optional and only invoked when you click an AI action.</p>
+              <strong>Privacy Architecture &amp; Consent Rules</strong>
+              <p>
+                Resume parsing is 100% local in your browser via PDF.js and Mammoth. We never store raw resumes permanently without explicit opt-in, never send resume text to external AI without per-action consent, and never promise third-party non-retention. All keyword analysis is calculated locally.
+              </p>
             </div>
           </div>
 
           <div class="resume-layout">
-            <!-- Left Column: Upload, Raw Text, and Deterministic ATS Score -->
+            <!-- Left Column: Upload, Raw Text, and Job-Specific ATS Analysis -->
             <div class="resume-main-col">
               
-              <!-- Upload Dropzone & Paste Fallback -->
+              <!-- Upload Dropzone & Profiles -->
               <div class="panel">
                 <div class="panel-title">
                   <div><h3>Resume Input</h3><span>Accepts PDF, DOCX, or TXT (Max 5MB)</span></div>
-                  <label class="remember-checkbox-label">
-                    <input type="checkbox" id="resumeRememberDeviceCheckbox" />
-                    <span>Remember on this device</span>
-                  </label>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <label class="remember-checkbox-label">
+                      <input type="checkbox" id="resumeRememberDeviceCheckbox" />
+                      <span>Remember on this device</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div class="resume-dropzone" id="resumeDropzone">
@@ -398,9 +402,19 @@
                   </div>
                   <div class="resume-drop-text">
                     <strong>Drag and drop your resume here, or <span style="color:var(--accent);text-decoration:underline">browse files</span></strong>
-                    <span>Supports .pdf, .docx, .txt (up to 5MB) · Extracted locally</span>
+                    <span>Supports .pdf, .docx, .txt (up to 5MB) · Extracted locally in your browser</span>
                   </div>
                   <input type="file" id="resumeFileInput" accept=".pdf,.docx,.txt" aria-label="Upload resume file" />
+                </div>
+
+                <!-- Resume Profiles Management -->
+                <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                  <label for="resumeProfileSelect" style="font-size:11px;font-weight:700;color:var(--muted)">SAVED PROFILES:</label>
+                  <select id="resumeProfileSelect" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--line)">
+                    <option value="">(Current Session Resume)</option>
+                  </select>
+                  <button class="btn small" id="saveResumeProfileBtn">Save as named profile</button>
+                  <button class="btn small" id="deleteResumeProfileBtn" style="color:var(--red)">Delete profile</button>
                 </div>
 
                 <div style="margin-top:14px">
@@ -413,11 +427,14 @@
                 </div>
               </div>
 
-              <!-- Deterministic ATS Analysis Panel -->
+              <!-- Job-Specific ATS Analysis Panel -->
               <div class="panel">
                 <div class="panel-title">
-                  <div><h3>Explainable Local ATS Analysis</h3><span>Deterministic 0–100 rubric · No AI required</span></div>
-                  <span class="badge verified" id="atsScoreGrade">Needs Work</span>
+                  <div>
+                    <h3>Job-Specific ATS Match Analysis</h3>
+                    <span id="atsFormulaExplanation">Formula: Required Skills (60%) + Preferred Skills (40%)</span>
+                  </div>
+                  <span class="badge verified" id="atsScoreGrade">No Role Selected</span>
                 </div>
 
                 <div class="ats-gauge-row">
@@ -426,45 +443,57 @@
                     <span>/ 100</span>
                   </div>
                   <div class="ats-gauge-details">
-                    <strong style="font-size:14px;display:block">Objective Scoring Rubric</strong>
-                    <p style="font-size:11px;color:var(--muted);margin:3px 0 0">
-                      Points are awarded for verified contact links, standard sections, analytics tools (SQL, Excel, Power BI, Python), quantified metrics, and strong action verbs. Cliché phrases trigger small deductions.
+                    <strong style="font-size:14px;display:block" id="atsTargetJobTitle">Select a target role</strong>
+                    <p style="font-size:11px;color:var(--muted);margin:3px 0 0" id="atsPlainFormulaDesc">
+                      Grounds match score in verified requirements and resume evidence quotes.
                     </p>
                   </div>
                 </div>
 
-                <div class="section-head" style="margin:18px 0 8px">
-                  <div><div class="eyebrow">Exact Rubric Breakdown</div></div>
+                <!-- Prioritized Checklist (Critical, Useful, Optional) -->
+                <div class="section-head" style="margin:20px 0 8px">
+                  <div>
+                    <div class="eyebrow">Actionable Tailoring Checklist</div>
+                    <p style="font-size:11px;color:#a35200;margin:2px 0 0">
+                      ⚠️ <strong>Anti-Fabrication Rule:</strong> Suggestions below say “Add only if true”. Never invent skills or copy keywords without genuine hands-on experience.
+                    </p>
+                  </div>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn small" id="copyAtsChecklistBtn">Copy checklist</button>
+                    <button class="btn small" id="downloadAtsChecklistBtn">Download checklist</button>
+                  </div>
                 </div>
-                <div class="ats-breakdown-list" id="atsBreakdownList"></div>
 
-                <div class="section-head" style="margin:18px 0 8px">
-                  <div><div class="eyebrow">Detected Technical Skills</div></div>
-                </div>
-                <div class="skill-chips-row" id="atsSkillsFoundWrap"></div>
+                <div id="jobAtsChecklistContainer" style="margin-top:10px"></div>
 
-                <div class="section-head" style="margin:18px 0 8px">
-                  <div><div class="eyebrow">Actionable Recommendations</div></div>
+                <!-- Skills Evidence Breakdown -->
+                <div class="section-head" style="margin:20px 0 8px">
+                  <div><div class="eyebrow">Required Skills Evidence</div></div>
                 </div>
-                <ul class="ats-recommendations-list" id="atsRecommendationsList"></ul>
+                <div id="requiredSkillsEvidenceList"></div>
+
+                <div class="section-head" style="margin:20px 0 8px">
+                  <div><div class="eyebrow">Preferred Skills Evidence</div></div>
+                </div>
+                <div id="preferredSkillsEvidenceList"></div>
               </div>
 
               <!-- Optional AI Career Guidance (Progressive Enhancement) -->
               <div class="panel">
                 <div class="panel-title">
-                  <div><h3>AI Career Review & Tailoring</h3><span>Optional Puter.js integration with offline fallback</span></div>
+                  <div><h3>AI Career Review &amp; Tailoring</h3><span>Optional Puter.js integration with offline fallback</span></div>
                   <span class="badge" id="aiStatusNotice">Ready</span>
                 </div>
                 <p style="font-size:11px;color:var(--muted);margin-bottom:12px">
-                  Select an AI action below. Data is treated strictly as passive text, prompt-injection isolated, and never stored on third-party servers.
+                  Select an AI action below. Requires explicit per-action consent before data transmission. Declining uses deterministic offline generators.
                 </p>
 
                 <div class="ai-actions-grid">
-                  <button class="btn small" id="aiRecruiterReviewBtn">Recruiter-Style Review</button>
-                  <button class="btn small" id="aiCoverLetterBtn">Draft Tailored Cover Letter</button>
-                  <button class="btn small" id="aiImproveBulletBtn">Optimize Selected Bullet (XYZ)</button>
-                  <button class="btn small" id="aiSummaryBtn">Draft Professional Summary</button>
-                  <button class="btn small" id="aiQuestionsBtn">Generate Likely Interview Questions</button>
+                  <button class="btn small" id="aiRecruiterReviewBtn" data-ai-action="recruiter_review">Recruiter-Style Review</button>
+                  <button class="btn small" id="aiCoverLetterBtn" data-ai-action="cover_letter">Draft Tailored Cover Letter</button>
+                  <button class="btn small" id="aiImproveBulletBtn" data-ai-action="bullet_xyz">Optimize Selected Bullet (XYZ)</button>
+                  <button class="btn small" id="aiSummaryBtn" data-ai-action="summary">Draft Professional Summary</button>
+                  <button class="btn small" id="aiQuestionsBtn" data-ai-action="interview_questions">Generate Likely Interview Questions</button>
                 </div>
 
                 <div class="ai-output-box" id="aiOutputBox" style="margin-top:14px">
@@ -476,7 +505,7 @@
                     </div>
                   </div>
                   <div id="aiSuggestionsOutput" class="ai-output-content">
-                    Click any action above to generate customized, recruiter-grade suggestions.
+                    Click any action above to generate customized suggestions.
                   </div>
                 </div>
               </div>
@@ -486,12 +515,12 @@
             <!-- Right Column: Real-time Job Compatibility Matcher -->
             <aside class="resume-sidebar-col">
               <div class="match-inspector-card">
-                <div class="eyebrow">Real-Time Job Matcher</div>
-                <h3>Compare with verified roles</h3>
-                <p>Select any live opening to test your keyword match score and identify gaps.</p>
+                <div class="eyebrow">Target Role Selector</div>
+                <h3>Compare with opening</h3>
+                <p>Select any verified opening to calculate match and missing keywords.</p>
 
                 <div class="input-wrap" style="margin-bottom:10px">
-                  <label for="compareJobSelect" style="color:#88d5bf;font-size:10px;font-weight:700">TARGET JOB OPENING</label>
+                  <label for="compareJobSelect" style="color:#88d5bf;font-size:10px;font-weight:700">TARGET OPENING</label>
                   <select id="compareJobSelect" class="select" style="background:#19443b;border-color:rgba(255,255,255,.15);color:white;width:100%"></select>
                 </div>
 
@@ -507,7 +536,7 @@
 
                 <div class="match-skills-breakdown">
                   <div>
-                    <span style="color:#81d8c1;font-weight:700">Matched Skills in your Resume:</span>
+                    <span style="color:#81d8c1;font-weight:700">Matched Skills with Quotes:</span>
                     <div class="match-chips-list" id="inspectMatchedSkills"></div>
                   </div>
                   <div style="margin-top:10px">
@@ -520,22 +549,64 @@
           </div>
         </section>
 
-        <!-- 6. DAILY INTERVIEW COACH VIEW (NEW FIRST-CLASS AREA) -->
-        <section class="view" id="view-coach">
+        <!-- 5. PERSONALIZED INTERVIEW COACH VIEW -->
+        <section class="view" id="view-coach" aria-label="Personalized Interview Coach">
           <div class="page-title">
             <div>
-              <div class="eyebrow">Practice Arena</div>
-              <h1>Daily Interview Coach</h1>
-              <p>Text and speech mock interviews, communication drills, deterministic rubric scoring, and daily streak tracking.</p>
+              <div class="eyebrow">End-to-End Career Coach</div>
+              <h1>Personalized Interview Coach</h1>
+              <p>Adaptive mock interviews grounded in target job requirements, resume projects, and ATS gaps. Evaluates one question at a time.</p>
             </div>
             <div style="display:flex;gap:8px">
               <button class="btn small" id="exportInterviewProgressBtn">Export Progress JSON</button>
-              <button class="btn small" id="resetInterviewProgressBtn" style="color:var(--red)">Reset Streak</button>
+              <button class="btn small" id="resetInterviewProgressBtn" style="color:var(--red)">Reset History</button>
             </div>
           </div>
 
           <!-- Coach Setup Panel -->
           <div id="coachSetupPanel">
+            <!-- Active Job & Resume Selector -->
+            <div class="panel" style="margin-bottom:16px;background:#f8faf9">
+              <div class="panel-title">
+                <div><h3>1. Interview Session Configuration</h3><span>Ground mock in target role and resume projects</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+                <div class="field">
+                  <label for="coachTargetJobSelect">Target Job Opening *</label>
+                  <select id="coachTargetJobSelect"></select>
+                </div>
+                <div class="field">
+                  <label for="coachTargetStageSelect">Target Interview Stage</label>
+                  <select id="coachTargetStageSelect">
+                    <option value="full_loop" selected>Full End-to-End Loop (Intro to Closing)</option>
+                    <option value="screening">Recruiter Screening</option>
+                    <option value="technical">Technical Analytics (SQL, BI, Excel)</option>
+                    <option value="behavioral">Behavioral (STAR Method)</option>
+                    <option value="case_study">Hypothetical Business Case Study</option>
+                    <option value="hiring_manager">Hiring Manager Round</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="coachSessionMinutesSelect">Session Length</label>
+                  <select id="coachSessionMinutesSelect">
+                    <option value="15">Quick Practice (10–15 mins · 4 Qs)</option>
+                    <option value="30" selected>Standard Interview (30–40 mins · 7 Qs)</option>
+                    <option value="60">Full End-to-End Mock (45–60 mins · 10 Qs)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Voice & Privacy Notice -->
+              <div style="margin-top:14px;padding:10px 14px;background:#edf5f2;border-radius:8px;font-size:11.5px;color:#175244">
+                <strong>🎙️ Speech &amp; Audio Privacy:</strong>
+                Speech recognition uses your browser’s local SpeechRecognition API. Audio is never uploaded or saved. All text processing operates deterministically offline unless Puter AI is explicitly consented to.
+              </div>
+
+              <div style="margin-top:16px;display:flex;justify-content:flex-end">
+                <button class="btn primary" id="startPersonalizedMockBtn">Start Adaptive Mock Interview →</button>
+              </div>
+            </div>
+
             <!-- Streak & Progress Stats -->
             <div class="coach-streak-grid">
               <div class="coach-stat-card streak-card">
@@ -555,7 +626,7 @@
               <div class="coach-stat-card">
                 <span class="eyebrow">Questions Answered</span>
                 <strong id="coachQuestionsCount">0</strong>
-                <p>Technical & behavioral queries</p>
+                <p>Technical &amp; behavioral queries</p>
               </div>
               <div class="coach-stat-card">
                 <span class="eyebrow">Recent Avg Score</span>
@@ -564,43 +635,15 @@
               </div>
             </div>
 
-            <!-- 7-Day Activity Chart -->
-            <div class="panel" style="margin-top:16px">
-              <div class="panel-title">
-                <div><h3>7-Day Practice Activity</h3><span>Keep your daily momentum active</span></div>
+            <!-- Interrupted Session Recovery Banner (if any) -->
+            <div id="coachResumeSessionBanner" class="panel" style="margin-top:16px;background:#eef7ff;border-color:#b8dcff" hidden>
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                <div>
+                  <strong>Paused Interview Session Available</strong>
+                  <p id="coachResumeSessionText" style="margin:2px 0 0;font-size:12px;color:var(--muted)">You have an unfinished session.</p>
+                </div>
+                <button class="btn primary small" id="resumeSavedSessionBtn">Resume Session →</button>
               </div>
-              <div class="seven-day-bars" id="coach7DayBars"></div>
-            </div>
-
-            <!-- Daily Balanced Session Quick Start -->
-            <div class="coach-quickstart-banner">
-              <div>
-                <span class="eyebrow" style="color:#7ce0c3">Daily Recommended Routine</span>
-                <h3 style="margin:4px 0 2px;color:white;font-size:16px">Balanced 5-Question Daily Mock Session</h3>
-                <p style="margin:0;color:#bad0ca;font-size:11.5px">Covers Introduction, SQL, Excel/BI, Business Metrics Case Study, and Behavioral STAR questions.</p>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <select id="coachSessionMinutesSelect" class="select" style="background:#174a3f;border-color:rgba(255,255,255,.2);color:white">
-                  <option value="5">5 Minutes (3 Qs)</option>
-                  <option value="10" selected>10 Minutes (5 Qs)</option>
-                  <option value="15">15 Minutes (8 Qs)</option>
-                </select>
-                <button class="btn primary" id="startDailyMixedSessionBtn">Start Daily Mock →</button>
-              </div>
-            </div>
-
-            <!-- 10 Topic Tracks -->
-            <div class="section-head" style="margin-top:24px">
-              <div><div class="eyebrow">Curated Question Tracks</div><h2>Technical & Behavioral Deep-Dives</h2><p>120+ curated junior analytics questions with expected rubric keywords.</p></div>
-            </div>
-            <div class="coach-tracks-grid" id="coachTracksList"></div>
-
-            <!-- Focused Communication Drills Mode -->
-            <div class="section-head" style="margin-top:28px">
-              <div><div class="eyebrow">Spoken Communication Drills</div><h2>60-Second Focused Drills</h2><p>Hone your executive presence, storytelling, and conciseness.</p></div>
-            </div>
-            <div class="panel">
-              <div class="coach-drills-list" id="coachDrillsList"></div>
             </div>
           </div>
 
@@ -608,21 +651,23 @@
           <div id="coachArenaPanel" hidden>
             <div class="arena-header">
               <div>
-                <span class="eyebrow" id="arenaSessionTitle">Interview Session</span>
-                <h2 id="arenaQuestionCounter" style="margin:2px 0;font-size:18px">Question 1 of 5</h2>
+                <span class="eyebrow" id="arenaSessionTitle">Adaptive Interview Session</span>
+                <h2 id="arenaQuestionCounter" style="margin:2px 0;font-size:18px">Question 1 of 7</h2>
+                <span id="arenaStageTag" class="badge verified">Technical Round</span>
               </div>
               <div style="display:flex;align-items:center;gap:12px">
                 <div class="arena-timer" id="arenaTimerDisplay">00:00</div>
+                <button class="btn small" id="arenaPauseBtn">Pause session</button>
                 <button class="btn small" id="arenaStopBtn">Exit session</button>
               </div>
             </div>
 
             <div class="arena-question-card">
-              <h3 id="arenaQuestionText" style="margin:0;font-size:18px;line-height:1.4">Loading question…</h3>
+              <h3 id="arenaQuestionText" style="margin:0;font-size:17px;line-height:1.45">Loading question…</h3>
               <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
                 <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);cursor:pointer">
                   <input type="checkbox" id="coachVoiceReadAloudToggle" checked />
-                  <span>Interviewer read-aloud (SpeechSynthesis)</span>
+                  <span>Read aloud question (SpeechSynthesis)</span>
                 </label>
               </div>
             </div>
@@ -633,132 +678,166 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
                   <span id="arenaMicStatus">Click to speak</span>
                 </button>
-                <span style="font-size:11px;color:var(--muted)">Speak or type below · Audio is never recorded</span>
+                <span style="font-size:11px;color:var(--muted)">Speak or type below · Audio is never stored</span>
               </div>
-              <textarea id="arenaAnswerText" class="arena-textarea" placeholder="Speak through the microphone or type your complete interview response here..."></textarea>
+              <textarea id="arenaAnswerText" class="arena-textarea" placeholder="Type or speak your complete interview response here. Use STAR method for behavioral and explain analytical reasoning for technical questions..."></textarea>
               <div class="arena-actions" id="arenaAnswerActions">
                 <button class="btn primary" id="arenaSubmitBtn">Submit answer for review</button>
               </div>
             </div>
 
-            <!-- Post-Answer Feedback Wrap (Revealed AFTER answering) -->
+            <!-- Post-Answer Coaching Feedback Wrap (Revealed AFTER answering) -->
             <div class="arena-feedback-panel" id="arenaFeedbackWrap" hidden>
               <div class="section-head" style="margin:0 0 10px">
-                <div><div class="eyebrow">Answer Assessment</div><h3>Transcript Metrics & Guidance</h3></div>
-                <span class="badge verified" id="arenaScorePill">85/100</span>
+                <div><div class="eyebrow">Answer Assessment</div><h3>Concise Coaching Feedback</h3></div>
+                <span class="badge verified" id="arenaScorePill">--/100</span>
               </div>
 
-              <div class="feedback-chips-row">
-                <span class="metric-pill" id="arenaPacingPill">120 WPM</span>
-                <span class="metric-pill" id="arenaFillersPill">0 fillers</span>
-                <span class="metric-pill" style="background:#eaf4fd;color:#185a9d">Approximate transcript heuristics</span>
-              </div>
+              <!-- 7 Rubric Dimension Scores -->
+              <div class="feedback-chips-row" id="arenaRubricChipsRow"></div>
 
-              <div style="margin-top:14px">
-                <strong style="font-size:12px;color:var(--ink);display:block">Key Model Answer Points:</strong>
-                <ul id="arenaSampleAnswerList" style="margin:6px 0 0;padding-left:18px;font-size:11.5px;color:#33423e;line-height:1.55"></ul>
-              </div>
+              <!-- Strong, Missing, Immediate Improvement, Outline -->
+              <div style="margin-top:14px" id="arenaFeedbackDetails"></div>
 
-              <div style="margin-top:16px;display:flex;justify-content:flex-end">
+              <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <div style="display:flex;gap:8px">
+                  <button class="btn small" id="arenaRetryAnswerBtn">Retry answer</button>
+                  <button class="btn small" id="arenaAskFollowupBtn">Ask follow-up</button>
+                </div>
                 <button class="btn primary" id="arenaNextBtn">Next question →</button>
               </div>
             </div>
           </div>
 
-          <!-- Session Complete Panel (Hidden by default) -->
+          <!-- Session Complete / Final Report Panel (Hidden by default) -->
           <div id="coachCompletePanel" hidden>
-            <div class="panel" style="text-align:center;padding:36px 20px">
-              <div style="font-size:48px">🎉</div>
-              <h2 style="font-size:24px;margin:8px 0 4px">Session Complete!</h2>
-              <p style="color:var(--muted);font-size:13px;max-width:500px;margin:0 auto 20px">
-                Great job investing in your career today. Your practice session has been recorded in your local daily streak.
-              </p>
-              <div style="display:inline-flex;gap:24px;background:#f3f6f3;padding:16px 28px;border-radius:14px;margin-bottom:24px">
-                <div><span style="font-size:11px;color:var(--muted);text-transform:uppercase">Average Score</span><strong id="completeAvgScore" style="display:block;font-size:24px;color:var(--accent-dark)">85%</strong></div>
-                <div><span style="font-size:11px;color:var(--muted);text-transform:uppercase">Questions Answered</span><strong id="completeQuestionsCount" style="display:block;font-size:24px">5</strong></div>
+            <div class="panel" style="padding:28px 24px">
+              <div style="text-align:center;margin-bottom:20px">
+                <div style="font-size:40px">🎯</div>
+                <h2 style="font-size:22px;margin:6px 0 4px">Personalized Interview Report</h2>
+                <p style="color:var(--muted);font-size:12.5px" id="reportSubtitle">Session completed and evaluated against verified junior analytics standards.</p>
               </div>
-              <div>
-                <button class="btn primary" id="completeBackBtn">Back to Interview Coach</button>
+
+              <div class="split" style="margin-bottom:20px">
+                <div class="panel" style="background:#f8faf9">
+                  <div class="eyebrow">Overall Readiness Score</div>
+                  <strong id="reportOverallScore" style="font-size:32px;color:var(--accent-dark);display:block">--</strong>
+                  <div id="reportStageScoresList" style="margin-top:10px"></div>
+                </div>
+                <div class="panel" style="background:#f8faf9">
+                  <div class="eyebrow">Top 5 Targeted Improvements</div>
+                  <ul id="reportTopImprovementsList" style="font-size:12px;padding-left:18px;line-height:1.6;margin:6px 0 0"></ul>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-bottom:20px">
+                <div class="panel-title"><div><h3>Personalized Study Plan</h3><span>Tailored to your weak areas and target role</span></div></div>
+                <div id="reportPlanText" style="font-size:12px;line-height:1.65;white-space:pre-wrap"></div>
+              </div>
+
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+                <button class="btn primary" id="reportSaveToAppBtn">Save Report to Application</button>
+                <button class="btn" id="reportDownloadBtn">Download Report TXT</button>
+                <button class="btn" id="completeBackBtn">Back to Interview Coach</button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 7. ATS CHECKLIST VIEW -->
-        <section class="view" id="view-ats">
+        <!-- 6. WALKIN ALERTS VIEW (Empty, Safe & Verified) -->
+        <section class="view" id="view-walkins" aria-label="Walk-in Alerts">
           <div class="page-title">
-            <div><div class="eyebrow">Resume readiness</div><h1>ATS keyword checklist</h1><p>Check only skills you can prove in a project, internship or job.</p></div>
-            <button class="btn" id="resetChecklist">Reset checklist</button>
-          </div>
-          <div class="ats-layout">
             <div>
-              <div class="check-groups" id="checkGroups"></div>
+              <div class="eyebrow">Verified Events</div>
+              <h1>Walk-in Recruitment Alerts</h1>
+              <p>100% verified, official walk-in recruitment drives for junior analytics roles with event-specific official evidence.</p>
             </div>
-            <aside class="progress-card">
-              <div class="eyebrow">Checklist progress</div>
-              <h3 id="progressTitle">Build a stronger resume</h3>
-              <p>Progress is stored in this browser.</p>
-              <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-              <div class="progress-line"><span id="progressText">0 of 0 checked</span><strong id="progressPct">0%</strong></div>
-              <div class="role-pack">
-                <label for="rolePackSelect">Tailored keyword pack</label>
-                <select id="rolePackSelect"></select>
-                <div class="role-keywords" id="roleKeywords"></div>
-                <button class="btn" id="copyKeywords">Copy keyword pack</button>
-              </div>
-            </aside>
+            <div class="walkin-feed-actions">
+              <a class="btn" href="./data/walkins.ics" download="walkins.ics">📅 Calendar feed (.ics)</a>
+              <a class="btn" href="./data/walkins.xml" target="_blank" rel="noopener">📡 RSS feed</a>
+            </div>
+          </div>
+
+          <div class="jobs-list" id="walkinsList">
+            <div class="empty-state" style="padding:40px 20px;text-align:center">
+              <div style="font-size:32px;margin-bottom:8px">🛡️</div>
+              <strong>Zero Unverified Walk-ins Active</strong>
+              <p style="max-width:540px;margin:8px auto 0;color:var(--muted);font-size:12.5px">
+                All walk-in alerts require explicit, date-aware official corporate evidence. Unsafe sample events and third-party registration links have been permanently removed.
+              </p>
+            </div>
           </div>
         </section>
 
-        <!-- 8. SCAN AUDIT VIEW -->
-        <section class="view" id="view-audit">
-          <div class="page-title"><div><div class="eyebrow">Evidence log</div><h1>Scan audit</h1><p>What was checked, what passed and why other leads were removed.</p></div></div>
+        <!-- 7. SCAN AUDIT VIEW -->
+        <section class="view" id="view-audit" aria-label="Scan Audit">
+          <div class="page-title">
+            <div>
+              <div class="eyebrow">Evidence &amp; Verification Log</div>
+              <h1>Scan Audit</h1>
+              <p>Transparent record of every gate checked, source status, and why jobs were kept or suppressed.</p>
+            </div>
+            <button class="btn primary" id="auditReloadScanBtn">Reload latest published scan</button>
+          </div>
+
+          <!-- Daily Scan Status Panel -->
+          <div class="panel" style="margin-bottom:20px;background:#f8faf9">
+            <div class="panel-title">
+              <div><h3>Daily Published Scan Status</h3><span>Asia/Kolkata Execution Log</span></div>
+              <span class="badge verified" id="auditScanStateBadge">Verified</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;font-size:12px">
+              <div><strong>Published Scan Date:</strong> <span id="auditScanDate">--</span></div>
+              <div><strong>Payload Age:</strong> <span id="auditScanAge">Fresh</span></div>
+              <div><strong>Next Scheduled Run:</strong> Daily at 08:30 IST</div>
+              <div><strong>Active Official Sources:</strong> Amazon, Accenture</div>
+              <div><strong>Configured Sources:</strong> 15 (Passing: 2, Idle/Zero Passing: 13)</div>
+              <div><strong>Duplicates Suppressed:</strong> <span id="auditSuppressedCount">0</span> unique clones</div>
+              <div><strong>Dead Links Removed:</strong> <span id="auditDeadLinksCount">0</span></div>
+            </div>
+          </div>
+
           <div class="audit-grid">
             <div class="panel">
-              <div class="panel-title"><div><h3>Verification protocol</h3><span>Required for every displayed job</span></div><span id="auditProtocolBadge">5/5 checks</span></div>
+              <div class="panel-title"><div><h3>Verification Protocol</h3><span>Checked for every displayed job</span></div><span id="auditProtocolBadge">5/5 checks</span></div>
               <div class="verification-list">
                 <div class="verify-row"><i class="verify-check">✓</i><strong>Official company job detail</strong><span id="auditDetailCount">--</span></div>
                 <div class="verify-row"><i class="verify-check">✓</i><strong>Explicit posting date in official data</strong><span id="auditDateCount">--</span></div>
-                <div class="verify-row"><i class="verify-check">✓</i><strong>Live official Apply flow</strong><span id="auditLinkCount">HTTP 200</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>Live official Apply flow (checked separately)</strong><span id="auditLinkCount">HTTP 200</span></div>
                 <div class="verify-row"><i class="verify-check">✓</i><strong>Minimum experience ≤ 2 years</strong><span id="auditExpCount">--</span></div>
                 <div class="verify-row"><i class="verify-check">✓</i><strong>At least two target analytics skills</strong><span id="auditSkillCount">--</span></div>
               </div>
             </div>
             <div class="panel">
-              <div class="panel-title"><div><h3>Source trail</h3><span id="auditSourceDate">Verified scan</span></div></div>
+              <div class="panel-title"><div><h3>Exclusion Criteria</h3><span>Aggregate Reasons</span></div></div>
               <div class="timeline" id="auditTimeline">
-                <div class="time-row"><i class="time-dot"></i><strong>Official Career Adapters</strong><p>Verified company endpoints supplied explicit dates, descriptions and direct Apply links.</p></div>
-                <div class="time-row reject"><i class="time-dot"></i><strong>Strict exclusions applied</strong><p>Closed, stale (>15d), senior, 3+ yr minimum, and dead/expired links were automatically suppressed.</p></div>
+                <div class="time-row"><i class="time-dot"></i><strong>Official Career Adapters</strong><p>Direct requisition queries from official career portal APIs.</p></div>
+                <div class="time-row reject"><i class="time-dot"></i><strong>Exclusions Applied</strong><p>Senior/experienced (&gt;2 yrs), stale (&gt;15 days), non-analytics titles, and dead links suppressed.</p></div>
               </div>
             </div>
           </div>
-          <div class="section-head"><div><div class="eyebrow">Coverage</div><h2 id="coverageTitle">Official career sources</h2></div></div>
-          <div class="panel"><div class="company-cloud" id="companyCloud"></div></div>
-          <div class="section-head"><div><div class="eyebrow">Audit log</div><h2>Verification & rejection examples</h2></div></div>
-          <div class="panel"><div class="rejection-list" id="rejectionList"></div></div>
-        </section>
 
-        <!-- 9. DEDUPE STATE VIEW -->
-        <section class="view" id="view-dedupe">
-          <div class="page-title"><div><div class="eyebrow">Persistent state</div><h1>Deduplication</h1><p>Use this state on the next scan to avoid showing the same jobs again.</p></div></div>
-          <div class="state-banner">
-            <div><strong>State initialized successfully</strong><p id="dedupeStateText">Active scan job IDs are reserved against future repeats.</p></div>
-            <div class="card-actions"><button class="btn" id="copyJson">Copy JSON</button><button class="btn primary" id="downloadJson">Download state</button></div>
+          <!-- Per Included Job Transparency Table -->
+          <div class="section-head" style="margin-top:24px">
+            <div><div class="eyebrow">Per Included Job Verification</div><h2>Why Each Displayed Job Passed</h2><p>Detail and Apply URLs verified separately. Requisition IDs and exact evidence sources.</p></div>
           </div>
-          <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
-            <div class="metric"><div class="metric-top"><span class="metric-label">Shown IDs saved</span></div><strong id="dedupeShownCount">--</strong><div class="metric-note">Primary dedupe keys</div></div>
-            <div class="metric amber"><div class="metric-top"><span class="metric-label">Duplicates suppressed</span></div><strong id="dedupeSuppressedCount">--</strong><div class="metric-note" id="dedupeClusterNote">Across clusters</div></div>
-            <div class="metric blue"><div class="metric-top"><span class="metric-label">Dead links removed</span></div><strong id="dedupeDeadCount">0</strong><div class="metric-note">Protected by live gate</div></div>
-          </div>
-          <div class="split">
-            <div>
-              <div class="section-head"><div><div class="eyebrow">Duplicate clusters</div><h2>Suppressed today</h2></div></div>
-              <div class="cluster-list" id="clusterList"></div>
-            </div>
-            <div>
-              <div class="section-head"><div><div class="eyebrow">Preview</div><h2>State JSON</h2></div></div>
-              <div class="json-preview" id="jsonPreview"></div>
-            </div>
+          <div class="panel" style="overflow-x:auto">
+            <table class="audit-details-table" id="auditJobsTable" aria-label="Audit jobs verification table">
+              <thead>
+                <tr>
+                  <th>Job Title &amp; Company</th>
+                  <th>Req ID</th>
+                  <th>Posting Date</th>
+                  <th>Location</th>
+                  <th>Exp</th>
+                  <th>Skills Matched</th>
+                  <th>Detail URL</th>
+                  <th>Apply URL</th>
+                  <th>Dedupe</th>
+                </tr>
+              </thead>
+              <tbody id="auditJobsTableBody"></tbody>
+            </table>
           </div>
         </section>
 
@@ -766,11 +845,138 @@
     </main>
   </div>
 
+  <!-- Non-blocking Apply Follow-up Toast -->
+  <div class="followup-toast" id="applyFollowupToast" hidden role="region" aria-label="Application submission prompt">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <strong style="color:var(--ink);font-size:13px">Did you submit this application?</strong>
+      <button class="btn ghost small" id="closeFollowupToastBtn" aria-label="Dismiss follow-up prompt">✕</button>
+    </div>
+    <p style="font-size:11.5px;color:var(--muted);margin:4px 0 12px">
+      We opened the official job portal in a new tab. Update your tracking status:
+    </p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary small" id="followupAppliedBtn">Yes — mark applied</button>
+      <button class="btn small" id="followupApplyingBtn">Still applying</button>
+      <button class="btn small" id="followupNotYetBtn">Not yet</button>
+    </div>
+  </div>
+
+  <!-- Application Detail Drawer -->
+  <div class="drawer-backdrop" id="appDetailDrawerBackdrop" hidden>
+    <div class="drawer-content" id="appDetailDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <span class="eyebrow" id="drawerEyebrow">Application Record</span>
+          <h2 id="drawerTitle" style="margin:2px 0 4px;font-size:20px">Job Title</h2>
+          <span id="drawerCompanySub" style="color:var(--muted);font-size:12.5px">Company · Location</span>
+        </div>
+        <button class="btn small" id="closeAppDrawerBtn" aria-label="Close drawer">✕</button>
+      </div>
+
+      <!-- Scan status alert -->
+      <div id="drawerScanStatusNotice" style="margin-bottom:16px;padding:8px 12px;border-radius:8px;font-size:12px"></div>
+
+      <!-- Action buttons row -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+        <a class="btn primary small" id="drawerApplyLink" href="#" target="_blank" rel="noopener noreferrer">View official posting ↗</a>
+        <button class="btn small" id="drawerUpdateStatusBtn">Update status</button>
+        <button class="btn small" id="drawerAtsChecklistBtn">ATS checklist</button>
+        <button class="btn small" id="drawerPrepareInterviewBtn">Prepare interview</button>
+        <button class="btn small" id="drawerArchiveBtn">Archive</button>
+        <button class="btn small" id="drawerDeleteBtn" style="color:var(--red)">Delete</button>
+      </div>
+
+      <!-- Status Timeline -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-title"><div><h3>Status Timeline</h3><span>Chronological progression</span></div></div>
+        <div class="timeline-track" id="drawerTimelineTrack"></div>
+      </div>
+
+      <!-- Next Action & Reminders -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-title"><div><h3>Next Action &amp; Due Date</h3></div></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input type="text" id="drawerNextActionInput" placeholder="e.g. Follow up on portal / prepare SQL questions" style="flex:2;font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:6px" />
+          <input type="date" id="drawerReminderDateInput" style="flex:1;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
+          <button class="btn small primary" id="drawerSaveReminderBtn">Save</button>
+        </div>
+      </div>
+
+      <!-- Recruiter / Contact Info -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-title"><div><h3>Recruiter / Contact Information</h3><span>Optional candidate notes</span></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label for="drawerRecruiterName" style="font-size:11px;color:var(--muted);font-weight:700">CONTACT NAME</label>
+            <input type="text" id="drawerRecruiterName" placeholder="e.g. Sarah Jenkins (Recruiter)" style="width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
+          </div>
+          <div>
+            <label for="drawerContactChannel" style="font-size:11px;color:var(--muted);font-weight:700">CHANNEL / LINK</label>
+            <input type="text" id="drawerContactChannel" placeholder="e.g. LinkedIn / recruiter@company.com" style="width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
+          </div>
+        </div>
+        <button class="btn small" id="drawerSaveContactBtn">Save contact</button>
+      </div>
+
+      <!-- User Notes -->
+      <div class="panel">
+        <div class="panel-title"><div><h3>Application Notes</h3></div></div>
+        <textarea id="drawerNotesText" rows="3" placeholder="Add interview feedback, salary discussions, referral info..." style="width:100%;font-size:12px;padding:8px;border:1px solid var(--line);border-radius:6px"></textarea>
+        <div style="margin-top:8px;text-align:right">
+          <button class="btn small primary" id="drawerSaveNotesBtn">Save note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mark Applied Modal (Date / Time picker) -->
+  <div class="modal-backdrop" id="markAppliedModal" hidden>
+    <div class="daily-modal" role="dialog" aria-modal="true" aria-labelledby="markAppliedTitle">
+      <div class="eyebrow">Application Submission</div>
+      <h2 id="markAppliedTitle">Confirm Applied Date</h2>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 14px">
+        Record the date you submitted this application. Defaults to today and can be corrected anytime.
+      </p>
+      <div class="field" style="margin-bottom:14px">
+        <label for="markAppliedDateInput">Date &amp; Time Applied *</label>
+        <input type="datetime-local" id="markAppliedDateInput" style="font-size:12px;padding:6px 10px;width:100%;border:1px solid var(--line);border-radius:6px" />
+      </div>
+      <div class="field" style="margin-bottom:16px">
+        <label for="markAppliedNoteInput">Submission Note (Optional)</label>
+        <input type="text" id="markAppliedNoteInput" placeholder="e.g. Submitted via Workday / Used Resume v2" style="font-size:12px;padding:6px 10px;width:100%;border:1px solid var(--line);border-radius:6px" />
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn primary" id="confirmMarkAppliedBtn" style="flex:1">Confirm Applied</button>
+        <button class="btn" id="cancelMarkAppliedBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Preview Modal -->
+  <div class="modal-backdrop" id="importPreviewModal" hidden>
+    <div class="daily-modal" role="dialog" aria-modal="true" aria-labelledby="importPreviewTitle">
+      <div class="eyebrow">Data Import &amp; Conflict Prevention</div>
+      <h2 id="importPreviewTitle">Import Applications Backup</h2>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 12px">
+        We inspected your backup file before applying any changes to local storage.
+      </p>
+      <div id="importPreviewStats" style="padding:10px 14px;background:#f3f6f3;border-radius:8px;font-size:12px;margin-bottom:14px;line-height:1.6"></div>
+      <div id="importConflictWarning" style="color:#b54708;font-size:11.5px;margin-bottom:14px" hidden>
+        ⚠️ <strong>Note:</strong> Some records exist with newer timestamps. We will preserve your newer local data unless you explicitly choose overwrite.
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn primary" id="executeImportMergeBtn" style="flex:1">Merge (Keep Newer)</button>
+        <button class="btn" id="executeImportOverwriteBtn">Overwrite</button>
+        <button class="btn" id="cancelImportBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- AI Consent Modal (Required before sending data to Puter.js) -->
   <div class="modal-backdrop" id="aiConsentModal" hidden>
     <div class="daily-modal" role="dialog" aria-modal="true" aria-labelledby="aiConsentTitle">
       <div class="modal-icon">🤖</div>
-      <div class="eyebrow">Privacy & Third-Party AI Consent</div>
+      <div class="eyebrow">Privacy &amp; Third-Party AI Consent</div>
       <h2 id="aiConsentTitle">Analyze with Optional AI?</h2>
       <p style="font-size:12px;line-height:1.55;color:var(--muted)">
         Analytics Job Scout uses the Puter.js browser SDK for optional keyless AI assistance.
@@ -782,7 +988,7 @@
         <br>• If you decline, you will immediately receive rich deterministic local rubric analysis without sending any data.
       </p>
       <div style="display:flex;gap:10px;margin-top:18px">
-        <button class="btn primary" id="aiConsentApproveBtn" style="flex:1">Approve & Analyze</button>
+        <button class="btn primary" id="aiConsentApproveBtn" style="flex:1">Approve &amp; Analyze</button>
         <button class="btn" id="aiConsentDeclineBtn">Decline (Use Offline Engine)</button>
       </div>
     </div>
@@ -807,17 +1013,6 @@
       <div class="research-disclaimer">
         <strong>⚠️ Community Research Notice:</strong>
         <br>Community reviews on Glassdoor, Reddit, and AmbitionBox are subjective third-party reports, not verified facts. Never rely solely on a few posts. Read several recent sources and verify details directly during the interview.
-      </div>
-
-      <div style="margin-top:16px">
-        <strong style="font-size:12px;display:block">Candidate Due Diligence Checklist:</strong>
-        <ul class="research-checklist">
-          <li>✓ Work-life balance and typical weekly hours for analytics teams</li>
-          <li>✓ Mentorship and structured onboarding for junior / fresher analysts</li>
-          <li>✓ Analytics tech stack (SQL vs Python vs Excel vs Power BI/Tableau)</li>
-          <li>✓ Return-to-office expectations (hybrid vs mandatory in-office)</li>
-          <li>✓ Business stability, growth stage, and recent layoff history</li>
-        </ul>
       </div>
     </div>
   </div>
@@ -865,4 +1060,3 @@
   <script src="./js/app.js"></script>
 </body>
 </html>
-
