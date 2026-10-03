@@ -98,13 +98,16 @@
 
   function normalizeStatus(rawStatus) {
     if (!rawStatus) return 'saved';
-    const s = String(rawStatus).trim().toLowerCase();
+    const s = String(rawStatus).trim().toLowerCase().replace(/[\s-]+/g, '_');
     if (APPLICATION_STATUSES.includes(s)) return s;
-    if (s === 'opened' || s === 'to apply' || s === 'in progress') return 'applying';
+    if (s === 'opened' || s === 'to_apply' || s === 'in_progress') return 'applying';
     if (s === 'submitted') return 'applied';
-    if (s === 'hr' || s === 'screen') return 'recruiter_screen';
-    if (s === 'test' || s === 'oa') return 'assessment';
-    if (s === 'declined') return 'rejected';
+    if (s === 'hr' || s === 'screen' || s === 'recruiter') return 'recruiter_screen';
+    if (s === 'test' || s === 'oa' || s === 'online_test') return 'assessment';
+    if (s === 'interviewing' || s === 'interview_round' || s === 'interviewed') return 'interview';
+    if (s === 'final' || s === 'final_round_interview') return 'final_round';
+    if (s === 'offered') return 'offer';
+    if (s === 'declined' || s === 'reject') return 'rejected';
     return 'saved';
   }
 
@@ -113,6 +116,7 @@
     KEYS: KEYS,
     SCHEMA_VERSION: SCHEMA_VERSION,
     APPLICATION_STATUSES: APPLICATION_STATUSES,
+    STATUS_ENUM: APPLICATION_STATUSES.reduce((acc, s) => { acc[s] = s; return acc; }, {}),
     STATUS_LABELS: STATUS_LABELS,
     getLocalDateIST: getLocalDateIST,
     makeCanonicalKey: makeCanonicalKey,
@@ -331,18 +335,26 @@
       }
 
       data.history = data.history || [];
+      const targetJobId = sessionSummary.jobId || sessionSummary.targetJobId || null;
+      const targetCompany = sessionSummary.company || sessionSummary.targetJobCompany || null;
+      const targetTitle = sessionSummary.title || sessionSummary.targetJobTitle || null;
+
       const sessionRecord = {
         id: sessionSummary.id || ('sess_' + Date.now()),
         date: today,
         timestamp: new Date().toISOString(),
         trackId: trackId,
         trackName: sessionSummary.trackName || trackId,
-        jobId: sessionSummary.jobId || null,
-        company: sessionSummary.company || null,
-        title: sessionSummary.title || null,
+        jobId: targetJobId,
+        targetJobId: targetJobId,
+        company: targetCompany,
+        targetJobCompany: targetCompany,
+        title: targetTitle,
+        targetJobTitle: targetTitle,
         durationMinutes: sessionSummary.durationMinutes || 5,
         questionsAnswered: sessionSummary.questionsAnswered || 0,
-        avgScore: Math.round(sessionSummary.avgScore || 0),
+        avgScore: Math.round(sessionSummary.avgScore || sessionSummary.overallScore || 0),
+        overallScore: Math.round(sessionSummary.overallScore || sessionSummary.avgScore || 0),
         stageScores: sessionSummary.stageScores || {},
         reportSummary: sessionSummary.reportSummary || null
       };
@@ -352,9 +364,9 @@
 
       Storage.set(KEYS.INTERVIEWS, data);
 
-      // If associated with a tracked application, link session
-      if (sessionSummary.jobId) {
-        Storage.addInterviewSession(sessionSummary.jobId, sessionRecord);
+      // If associated with a target job or application, link session
+      if (targetJobId) {
+        Storage.addInterviewSession(targetJobId, sessionRecord);
       }
 
       return data;
@@ -484,7 +496,26 @@
       const opts = options || {};
       const raw = Storage.get(KEYS.APPLICATIONS, []);
       if (!Array.isArray(raw)) return [];
-      let list = raw.filter(a => a && typeof a === 'object' && a.id);
+      let list = raw.filter(a => a && typeof a === 'object' && a.id).map(a => {
+        // Guarantee bidirectional property availability across legacy & UI naming
+        const applyUrl = a.official_apply_url || a.apply_url || a.apply || '#';
+        const detailUrl = a.official_detail_url || a.detail_url || a.detail || a.apply_url || '#';
+        const empType = a.employment_type || a.type || 'Full-time';
+        const reminderDate = a.next_action_due_date || a.reminder_date || null;
+        const recruiterContact = a.recruiter_contact || a.contact_channel || '';
+
+        a.apply_url = applyUrl;
+        a.official_apply_url = applyUrl;
+        a.detail_url = detailUrl;
+        a.official_detail_url = detailUrl;
+        a.type = empType;
+        a.employment_type = empType;
+        a.reminder_date = reminderDate;
+        a.next_action_due_date = reminderDate;
+        a.contact_channel = recruiterContact;
+        a.recruiter_contact = recruiterContact;
+        return a;
+      });
 
       if (!opts.includeArchived) {
         list = list.filter(a => !a.archived);
@@ -504,9 +535,15 @@
       const targetStr = String(idOrKey).toLowerCase().trim();
       return apps.find(a =>
         a.id.toLowerCase() === targetStr ||
+        ('app_' + String(a.requisition_id || '').toLowerCase()) === targetStr ||
+        ('app_' + String(a.id || '').toLowerCase()) === targetStr ||
+        (a.id.toLowerCase().replace(/^app_/, '')) === targetStr ||
         (a.canonical_key && a.canonical_key.toLowerCase() === targetStr) ||
         (a.requisition_id && a.requisition_id.toLowerCase() === targetStr) ||
-        (a.official_apply_url && a.official_apply_url.toLowerCase() === targetStr)
+        (a.official_apply_url && a.official_apply_url.toLowerCase() === targetStr) ||
+        (a.apply_url && a.apply_url.toLowerCase() === targetStr) ||
+        (a.official_detail_url && a.official_detail_url.toLowerCase() === targetStr) ||
+        (a.detail_url && a.detail_url.toLowerCase() === targetStr)
       ) || null;
     },
 
@@ -520,11 +557,16 @@
       let existing = apps.find(a =>
         a.canonical_key === canonicalKey ||
         a.id === reqId ||
+        a.id === ('app_' + reqId) ||
+        (a.requisition_id && a.requisition_id === reqId) ||
         (a.official_apply_url && a.official_apply_url === (job.apply || job.apply_url))
       );
 
       const now = new Date().toISOString();
       const statusToUse = normalizeStatus(initialStatus || 'saved');
+      const applyUrl = job.apply || job.apply_url || job.detail || '#';
+      const detailUrl = job.detail || job.detail_url || job.apply || '#';
+      const empType = job.type || job.employment_type || 'Full-time';
 
       if (!existing) {
         existing = {
@@ -534,9 +576,12 @@
           company: comp,
           title: job.title || 'Analytics Opportunity',
           location: job.location || 'India',
-          employment_type: job.type || 'Full-time',
-          official_detail_url: job.detail || job.apply || '#',
-          official_apply_url: job.apply || job.apply_url || '#',
+          employment_type: empType,
+          type: empType,
+          official_detail_url: detailUrl,
+          detail_url: detailUrl,
+          official_apply_url: applyUrl,
+          apply_url: applyUrl,
           link_status: 'live',
           last_link_checked_at: job.last_link_checked_at || now,
           date_saved: statusToUse === 'saved' ? now : null,
@@ -553,6 +598,7 @@
           ],
           next_action: statusToUse === 'saved' ? 'Review requirements & ATS checklist' : 'Prepare application submission',
           next_action_due_date: null,
+          reminder_date: null,
           application_deadline: null,
           resume_version: 'Default Local Resume',
           ats_checklist: {
@@ -564,6 +610,7 @@
           interview_sessions: [],
           recruiter_name: '',
           recruiter_contact: '',
+          contact_channel: '',
           notes: '',
           outcome_reason: '',
           archived: false,
@@ -575,8 +622,14 @@
         existing.in_latest_scan = true;
         if (job.title && job.title !== existing.title) existing.title = job.title;
         if (job.location && job.location !== existing.location) existing.location = job.location;
-        if (job.apply && job.apply !== existing.official_apply_url) existing.official_apply_url = job.apply;
-        if (job.detail && job.detail !== existing.official_detail_url) existing.official_detail_url = job.detail;
+        if (applyUrl && applyUrl !== '#') {
+          existing.official_apply_url = applyUrl;
+          existing.apply_url = applyUrl;
+        }
+        if (detailUrl && detailUrl !== '#') {
+          existing.official_detail_url = detailUrl;
+          existing.detail_url = detailUrl;
+        }
         if (job.last_link_checked_at) existing.last_link_checked_at = job.last_link_checked_at;
       }
 
@@ -596,11 +649,17 @@
       const canonicalKey = appData.canonical_key || makeCanonicalKey(comp, reqId || targetId);
 
       let existing = apps.find(a =>
-        (targetId && (String(a.id).toLowerCase() === targetId || String(a.requisition_id || '').toLowerCase() === targetId)) ||
+        (targetId && (String(a.id).toLowerCase() === targetId || String(a.requisition_id || '').toLowerCase() === targetId || ('app_' + String(a.requisition_id || '').toLowerCase()) === targetId)) ||
         (a.canonical_key && a.canonical_key === canonicalKey)
       );
 
       const now = new Date().toISOString();
+      const applyUrl = appData.official_apply_url || appData.apply_url || appData.apply || '#';
+      const detailUrl = appData.official_detail_url || appData.detail_url || appData.detail || '#';
+      const empType = appData.employment_type || appData.type || 'Full-time';
+      const reminderDue = appData.next_action_due_date !== undefined ? appData.next_action_due_date : (appData.reminder_date !== undefined ? appData.reminder_date : null);
+      const recContact = appData.recruiter_contact !== undefined ? appData.recruiter_contact : (appData.contact_channel !== undefined ? appData.contact_channel : '');
+
       if (!existing) {
         const status = normalizeStatus(appData.status || 'saved');
         existing = {
@@ -610,9 +669,12 @@
           company: comp,
           title: appData.title || 'Analytics Opportunity',
           location: appData.location || 'Bengaluru',
-          employment_type: appData.type || appData.employment_type || 'Full-time',
-          official_detail_url: appData.detail_url || appData.detail || '#',
-          official_apply_url: appData.apply_url || appData.apply || '#',
+          employment_type: empType,
+          type: empType,
+          official_detail_url: detailUrl,
+          detail_url: detailUrl,
+          official_apply_url: applyUrl,
+          apply_url: applyUrl,
           link_status: appData.link_status || 'live',
           last_link_checked_at: appData.last_link_checked_at || now,
           date_saved: appData.date_saved || (status === 'saved' ? now : null),
@@ -628,13 +690,15 @@
             }
           ],
           next_action: appData.next_action || (status === 'applied' ? 'Follow up with recruiter / team' : 'Review requirements & ATS checklist'),
-          next_action_due_date: appData.next_action_due_date || null,
+          next_action_due_date: reminderDue,
+          reminder_date: reminderDue,
           application_deadline: appData.application_deadline || null,
           resume_version: appData.resume_version || 'Default Local Resume',
           ats_checklist: appData.ats_checklist || { checkedItems: [], notes: {}, matchScore: 0, lastCheckedAt: null },
           interview_sessions: appData.interview_sessions || [],
           recruiter_name: appData.recruiter_name || '',
-          recruiter_contact: appData.recruiter_contact || '',
+          recruiter_contact: recContact,
+          contact_channel: recContact,
           notes: appData.notes || '',
           outcome_reason: appData.outcome_reason || '',
           archived: !!appData.archived,
@@ -653,20 +717,128 @@
         if (appData.applied_date) existing.applied_date = appData.applied_date;
         if (appData.notes !== undefined) existing.notes = appData.notes;
         if (appData.next_action !== undefined) existing.next_action = appData.next_action;
-        if (appData.next_action_due_date !== undefined) existing.next_action_due_date = appData.next_action_due_date;
+        if (reminderDue !== null && reminderDue !== undefined) {
+          existing.next_action_due_date = reminderDue;
+          existing.reminder_date = reminderDue;
+        }
         if (appData.recruiter_name !== undefined) existing.recruiter_name = appData.recruiter_name;
-        if (appData.recruiter_contact !== undefined) existing.recruiter_contact = appData.recruiter_contact;
+        if (recContact !== '') {
+          existing.recruiter_contact = recContact;
+          existing.contact_channel = recContact;
+        }
         if (appData.outcome_reason !== undefined) existing.outcome_reason = appData.outcome_reason;
         if (appData.archived !== undefined) existing.archived = !!appData.archived;
         if (appData.title) existing.title = appData.title;
         if (appData.location) existing.location = appData.location;
-        if (appData.apply_url || appData.apply) existing.official_apply_url = appData.apply_url || appData.apply;
-        if (appData.detail_url || appData.detail) existing.official_detail_url = appData.detail_url || appData.detail;
+        if (applyUrl && applyUrl !== '#') {
+          existing.official_apply_url = applyUrl;
+          existing.apply_url = applyUrl;
+        }
+        if (detailUrl && detailUrl !== '#') {
+          existing.official_detail_url = detailUrl;
+          existing.detail_url = detailUrl;
+        }
+        if (empType) {
+          existing.employment_type = empType;
+          existing.type = empType;
+        }
         existing.last_updated_at = now;
       }
 
       Storage.set(KEYS.APPLICATIONS, apps);
       return existing;
+    },
+
+    setApplicationReminder: function(idOrKey, nextAction, dueDate) {
+      const apps = Storage.getApplications({ includeArchived: true });
+      const targetStr = String(idOrKey).toLowerCase().trim();
+      const app = apps.find(a =>
+        a.id.toLowerCase() === targetStr ||
+        ('app_' + String(a.requisition_id || '').toLowerCase()) === targetStr ||
+        (a.id.toLowerCase().replace(/^app_/, '')) === targetStr ||
+        (a.canonical_key && a.canonical_key.toLowerCase() === targetStr) ||
+        (a.requisition_id && a.requisition_id.toLowerCase() === targetStr)
+      );
+      if (!app) return null;
+
+      const now = new Date().toISOString();
+      if (nextAction !== undefined) app.next_action = nextAction;
+      app.next_action_due_date = dueDate || null;
+      app.reminder_date = dueDate || null;
+      app.last_updated_at = now;
+
+      app.timeline = app.timeline || [];
+      app.timeline.unshift({
+        status: app.status,
+        changed_at: now,
+        note: `Set reminder: ${nextAction || 'Next action'} (due: ${dueDate || 'no date'})`
+      });
+
+      const idx = apps.findIndex(a => a.id === app.id);
+      if (idx >= 0) apps[idx] = app;
+      Storage.set(KEYS.APPLICATIONS, apps);
+      return app;
+    },
+
+    addApplicationNote: function(idOrKey, noteText) {
+      if (!noteText || !String(noteText).trim()) return null;
+      const apps = Storage.getApplications({ includeArchived: true });
+      const targetStr = String(idOrKey).toLowerCase().trim();
+      const app = apps.find(a =>
+        a.id.toLowerCase() === targetStr ||
+        ('app_' + String(a.requisition_id || '').toLowerCase()) === targetStr ||
+        (a.id.toLowerCase().replace(/^app_/, '')) === targetStr ||
+        (a.canonical_key && a.canonical_key.toLowerCase() === targetStr) ||
+        (a.requisition_id && a.requisition_id.toLowerCase() === targetStr)
+      );
+      if (!app) return null;
+
+      const now = new Date().toISOString();
+      const trimmedNote = String(noteText).trim();
+      if (app.notes) {
+        app.notes = app.notes + '\n\n' + trimmedNote;
+      } else {
+        app.notes = trimmedNote;
+      }
+      app.last_updated_at = now;
+
+      app.timeline = app.timeline || [];
+      app.timeline.unshift({
+        status: app.status,
+        changed_at: now,
+        note: trimmedNote
+      });
+
+      const idx = apps.findIndex(a => a.id === app.id);
+      if (idx >= 0) apps[idx] = app;
+      Storage.set(KEYS.APPLICATIONS, apps);
+      return app;
+    },
+
+    updateApplicationContact: function(idOrKey, recruiterName, contactChannel) {
+      const apps = Storage.getApplications({ includeArchived: true });
+      const targetStr = String(idOrKey).toLowerCase().trim();
+      const app = apps.find(a =>
+        a.id.toLowerCase() === targetStr ||
+        ('app_' + String(a.requisition_id || '').toLowerCase()) === targetStr ||
+        (a.id.toLowerCase().replace(/^app_/, '')) === targetStr ||
+        (a.canonical_key && a.canonical_key.toLowerCase() === targetStr) ||
+        (a.requisition_id && a.requisition_id.toLowerCase() === targetStr)
+      );
+      if (!app) return null;
+
+      const now = new Date().toISOString();
+      if (recruiterName !== undefined) app.recruiter_name = recruiterName;
+      if (contactChannel !== undefined) {
+        app.recruiter_contact = contactChannel;
+        app.contact_channel = contactChannel;
+      }
+      app.last_updated_at = now;
+
+      const idx = apps.findIndex(a => a.id === app.id);
+      if (idx >= 0) apps[idx] = app;
+      Storage.set(KEYS.APPLICATIONS, apps);
+      return app;
     },
 
     /**
@@ -795,7 +967,11 @@
     },
 
     updateJobAtsChecklist: function(jobId, checklistState) {
-      const app = Storage.getApplication(jobId);
+      let app = Storage.getApplication(jobId);
+      if (!app) {
+        // If application doesn't exist yet, ensure application
+        app = Storage.ensureApplicationFromJob({ id: jobId }, 'saved');
+      }
       if (!app) return null;
       app.ats_checklist = Object.assign({}, app.ats_checklist || {}, checklistState, {
         lastCheckedAt: new Date().toISOString()
@@ -809,7 +985,15 @@
     },
 
     addInterviewSession: function(jobId, sessionRecord) {
-      const app = Storage.getApplication(jobId);
+      let app = Storage.getApplication(jobId);
+      if (!app) {
+        // If not tracked yet, ensure application
+        app = Storage.ensureApplicationFromJob({
+          id: jobId,
+          company: sessionRecord.company || sessionRecord.targetJobCompany || 'Target Company',
+          title: sessionRecord.title || sessionRecord.targetJobTitle || 'Analytics Opportunity'
+        }, 'interview');
+      }
       if (!app) return null;
       app.interview_sessions = app.interview_sessions || [];
       app.interview_sessions.unshift(sessionRecord);
@@ -1181,6 +1365,16 @@
         const canonicalKey = item.canonical_key || makeCanonicalKey(item.company, item.requisition_id || item.id);
         item.canonical_key = canonicalKey;
         item.status = normalizeStatus(item.status);
+        item.apply_url = item.official_apply_url || item.apply_url || item.apply || '#';
+        item.official_apply_url = item.apply_url;
+        item.detail_url = item.official_detail_url || item.detail_url || item.detail || item.apply_url;
+        item.official_detail_url = item.detail_url;
+        item.employment_type = item.employment_type || item.type || 'Full-time';
+        item.type = item.employment_type;
+        item.reminder_date = item.next_action_due_date || item.reminder_date || null;
+        item.next_action_due_date = item.reminder_date;
+        item.recruiter_contact = item.recruiter_contact || item.contact_channel || '';
+        item.contact_channel = item.recruiter_contact;
         appMap.set(canonicalKey, item);
       });
 
@@ -1215,6 +1409,30 @@
       const mergedList = Array.from(appMap.values());
       Storage.set(KEYS.APPLICATIONS, mergedList);
       return true;
+    },
+
+    previewImportApplications: function(jsonStringOrObj) {
+      const preview = Storage.importApplicationsJSON(jsonStringOrObj);
+      if (!preview.success) throw new Error(preview.error || 'Failed to parse import');
+      preview.schema_version = preview.schemaVersion || 3;
+      preview.total_incoming = preview.totalIncoming || ((preview.toAdd ? preview.toAdd.length : 0) + (preview.toUpdate ? preview.toUpdate.length : 0) + (preview.conflicts ? preview.conflicts.length : 0));
+      preview.additions_count = preview.toAdd ? preview.toAdd.length : 0;
+      preview.updates_count = preview.toUpdate ? preview.toUpdate.length : 0;
+      preview.conflicts_count = preview.conflicts ? preview.conflicts.length : 0;
+      preview.raw = jsonStringOrObj;
+      return preview;
+    },
+
+    executeImportApplications: function(contentOrPreview, mode) {
+      let preview = contentOrPreview;
+      if (typeof preview === 'string' || !preview.toAdd) {
+        preview = Storage.previewImportApplications(contentOrPreview);
+      }
+      const overwrite = (mode === 'overwrite');
+      const success = Storage.commitImport(preview, overwrite);
+      const added = preview.toAdd ? preview.toAdd.length : 0;
+      const updated = (preview.toUpdate ? preview.toUpdate.length : 0) + (overwrite && preview.conflicts ? preview.conflicts.length : 0);
+      return { success, added, updated };
     },
 
     // ----------------------------------------------------

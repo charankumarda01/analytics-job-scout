@@ -29,6 +29,58 @@ class TestLinkVerifier(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(final_url, "https://account.amazon.jobs/jobs/10565269/apply")
 
+    def test_login_portal_recognized(self):
+        from unittest.mock import patch, MagicMock
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.url = "https://passport.amazon.jobs/ap/signin"
+        mock_resp.text = "<html><body>Sign in to your Amazon account</body></html>"
+
+        with patch("requests.Session.head", return_value=mock_resp):
+            ok, final_url, meta = verify_live_link(
+                "https://account.amazon.jobs/jobs/10565269/apply",
+                ["amazon.jobs"],
+                requisition_id="10565269",
+                check_http=True
+            )
+            self.assertTrue(ok)
+            self.assertTrue(meta.get("redirected_to_login"))
+            self.assertEqual(meta.get("status_label"), "Login Portal (HTTP 200)")
+
+    def test_generic_homepage_redirect_rejected(self):
+        from unittest.mock import patch, MagicMock
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.url = "https://www.amazon.jobs/en/"
+        mock_resp.text = "<html><body>Explore careers at Amazon</body></html>"
+
+        with patch("requests.Session.head", return_value=mock_resp):
+            ok, final_url, meta = verify_live_link(
+                "https://www.amazon.jobs/en/jobs/99999999",
+                ["amazon.jobs"],
+                requisition_id="99999999",
+                check_http=True
+            )
+            self.assertFalse(ok)
+            self.assertIn("generic homepage", meta["reason"])
+
+    def test_closed_phrase_detection(self):
+        from unittest.mock import patch, MagicMock
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.url = "https://www.amazon.jobs/en/jobs/10565269"
+        mock_resp.text = "<html><body>This position has been filled. We are no longer accepting applications.</body></html>"
+
+        with patch("requests.Session.head", return_value=mock_resp):
+            ok, final_url, meta = verify_live_link(
+                "https://www.amazon.jobs/en/jobs/10565269",
+                ["amazon.jobs"],
+                requisition_id="10565269",
+                check_http=True
+            )
+            self.assertFalse(ok)
+            self.assertIn("closed or expired", meta["reason"])
+
 
 if __name__ == "__main__":
     unittest.main()

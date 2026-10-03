@@ -146,4 +146,87 @@ const afterDeleteCount = Storage.getApplications({ includeArchived: true }).leng
 assert.strictEqual(afterDeleteCount, beforeDeleteCount - 1, 'deleteApplication must remove the record');
 console.log('✓ Deletion control works cleanly');
 
+// 13. previewImportApplications and executeImportApplications
+const backupPayload = {
+  schema_version: 3,
+  applications: [
+    {
+      id: 'app_IMPORT_TEST_01',
+      requisition_id: 'IMPORT_TEST_01',
+      company: 'Amazon',
+      title: 'Business Analyst I',
+      location: 'Bengaluru',
+      official_apply_url: 'https://amazon.jobs/apply/1',
+      status: 'saved',
+      timeline: []
+    }
+  ]
+};
+const pPreview = Storage.previewImportApplications(JSON.stringify(backupPayload));
+assert.strictEqual(pPreview.schema_version, 3);
+assert.strictEqual(pPreview.total_incoming, 1);
+assert.strictEqual(pPreview.additions_count, 1);
+const execResult = Storage.executeImportApplications(JSON.stringify(backupPayload), 'merge');
+assert.strictEqual(execResult.success, true);
+assert.strictEqual(execResult.added, 1);
+const importedApp = Storage.getApplication('IMPORT_TEST_01');
+assert(importedApp !== null, 'Imported app must exist in storage');
+assert.strictEqual(importedApp.company, 'Amazon');
+console.log('✓ previewImportApplications & executeImportApplications passed');
+
+// 14. Reminders, notes, and recruiter contacts
+Storage.setApplicationReminder('IMPORT_TEST_01', 'Follow up on referral', '2026-10-10');
+let refreshedApp = Storage.getApplication('IMPORT_TEST_01');
+assert.strictEqual(refreshedApp.next_action, 'Follow up on referral');
+assert.strictEqual(refreshedApp.next_action_due_date, '2026-10-10');
+assert.strictEqual(refreshedApp.reminder_date, '2026-10-10');
+
+Storage.addApplicationNote('IMPORT_TEST_01', 'Spoke to recruiter on LinkedIn');
+refreshedApp = Storage.getApplication('IMPORT_TEST_01');
+assert(refreshedApp.notes.includes('Spoke to recruiter on LinkedIn'));
+assert(refreshedApp.timeline.some(t => t.note === 'Spoke to recruiter on LinkedIn'));
+
+Storage.updateApplicationContact('IMPORT_TEST_01', 'John Doe', 'john.doe@amazon.com');
+refreshedApp = Storage.getApplication('IMPORT_TEST_01');
+assert.strictEqual(refreshedApp.recruiter_name, 'John Doe');
+assert.strictEqual(refreshedApp.recruiter_contact, 'john.doe@amazon.com');
+assert.strictEqual(refreshedApp.contact_channel, 'john.doe@amazon.com');
+console.log('✓ setApplicationReminder, addApplicationNote, and updateApplicationContact passed');
+
+// 15. Bidirectional property normalization
+assert(refreshedApp.apply_url && refreshedApp.official_apply_url, 'Both apply_url and official_apply_url must exist');
+assert.strictEqual(refreshedApp.apply_url, refreshedApp.official_apply_url);
+assert(refreshedApp.detail_url && refreshedApp.official_detail_url, 'Both detail_url and official_detail_url must exist');
+assert.strictEqual(refreshedApp.detail_url, refreshedApp.official_detail_url);
+assert(refreshedApp.type && refreshedApp.employment_type, 'Both type and employment_type must exist');
+assert.strictEqual(refreshedApp.type, refreshedApp.employment_type);
+console.log('✓ Bidirectional property normalization passed');
+
+// 16. ATS checklist interactive persistence
+Storage.updateJobAtsChecklist('IMPORT_TEST_01', {
+  checkedItems: ['SQL', 'Tableau'],
+  notes: { 'SQL': 'Completed LeetCode hard problems' },
+  matchScore: 85
+});
+refreshedApp = Storage.getApplication('IMPORT_TEST_01');
+assert.deepStrictEqual(refreshedApp.ats_checklist.checkedItems, ['SQL', 'Tableau']);
+assert.strictEqual(refreshedApp.ats_checklist.notes['SQL'], 'Completed LeetCode hard problems');
+assert.strictEqual(refreshedApp.ats_checklist.matchScore, 85);
+console.log('✓ ATS checklist interactive persistence passed');
+
+// 17. Interview session linked to target application
+Storage.saveInterviewSession({
+  targetJobId: 'IMPORT_TEST_01',
+  targetJobCompany: 'Amazon',
+  targetJobTitle: 'Business Analyst I',
+  questionsAnswered: 5,
+  avgScore: 90
+});
+refreshedApp = Storage.getApplication('IMPORT_TEST_01');
+assert(Array.isArray(refreshedApp.interview_sessions), 'Application must have interview_sessions array');
+assert.strictEqual(refreshedApp.interview_sessions.length, 1, 'Interview session must be linked to application');
+assert.strictEqual(refreshedApp.interview_sessions[0].avgScore, 90);
+assert.strictEqual(refreshedApp.interview_sessions[0].jobId, 'IMPORT_TEST_01');
+console.log('✓ Interview session linked to application passed');
+
 console.log('All Storage tests passed successfully!');

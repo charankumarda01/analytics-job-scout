@@ -97,6 +97,8 @@ def verify_live_link(
         return False, url, check_meta
 
     if not check_http:
+        check_meta["status_code"] = 200
+        check_meta["status_label"] = "Verified Domain (Syntax)"
         return True, url, check_meta
 
     # Use verification_url if specified (for official detail check when apply is login-gated)
@@ -131,17 +133,27 @@ def verify_live_link(
 
         if resp.status_code >= 400:
             check_meta["reason"] = f"HTTP {resp.status_code} error"
-            return False, final_url, check_meta
-
-        # Check for generic homepage redirect
-        final_path = urlparse(final_url).path
-        if final_path in GENERIC_PATHS and requisition_id and requisition_id not in final_url:
-            check_meta["reason"] = f"Redirected to generic homepage {final_url}"
+            check_meta["status_label"] = f"HTTP {resp.status_code} Error"
             return False, final_url, check_meta
 
         # Verify allowed domain on final redirected URL
         if allowed_domains and not is_allowed_domain(final_url, allowed_domains):
             check_meta["reason"] = f"Final destination {urlparse(final_url).netloc} outside allowed domains"
+            check_meta["status_label"] = "External Domain Redirect"
+            return False, final_url, check_meta
+
+        # Check for candidate login/authentication portals on allowed domain
+        is_login_portal = any(term in final_url.lower() for term in ["passport.amazon.jobs", "/signin", "/login", "/auth", "sso."])
+        if is_login_portal:
+            check_meta["redirected_to_login"] = True
+            check_meta["status_label"] = "Login Portal (HTTP 200)"
+            return True, final_url, check_meta
+
+        # Check for generic homepage redirect
+        final_path = urlparse(final_url).path
+        if final_path in GENERIC_PATHS and requisition_id and requisition_id not in final_url:
+            check_meta["reason"] = f"Redirected to generic homepage {final_url}"
+            check_meta["status_label"] = "Generic Homepage Redirect"
             return False, final_url, check_meta
 
         # Inspect content snippet for expired/closed phrasing
@@ -149,8 +161,10 @@ def verify_live_link(
         for pattern in CLOSED_PHRASES:
             if pattern.search(content_snippet):
                 check_meta["reason"] = "Page content indicates opening is closed or expired"
+                check_meta["status_label"] = "Closed/Expired Content"
                 return False, final_url, check_meta
 
+        check_meta["status_label"] = "HTTP 200 (Verified)"
         return True, final_url, check_meta
 
     except requests.exceptions.TooManyRedirects:

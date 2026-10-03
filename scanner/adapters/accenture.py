@@ -13,7 +13,8 @@ import requests
 
 from scanner.adapters.base import (
     clean_html, find_skills, experience_numbers, normalize_location,
-    role_matches, analytics_title_fit, score_job, fit_text, SENIOR_TITLE
+    role_matches, analytics_title_fit, score_job, fit_text, SENIOR_TITLE,
+    SENIOR_DESCRIPTION
 )
 
 ACCENTURE_SEARCH = "https://www.accenture.com/api/accenture/elastic/findjobs"
@@ -94,8 +95,12 @@ def scan_accenture_source(
         experience_tag = x.get("experienceTag") or x.get("experience") or ""
 
         # Junior fit checks
+        if SENIOR_TITLE.search(title) or SENIOR_DESCRIPTION.search(description + " " + qualification):
+            continue
         nums = experience_numbers(qualification + " " + description)
-        exp_min = min(nums) if nums else 0
+        if any(n > 2 for n in nums):
+            continue
+        exp_min = max(nums) if nums else 0
         if exp_min > 2:
             continue
 

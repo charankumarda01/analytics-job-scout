@@ -12,7 +12,8 @@ import requests
 
 from scanner.adapters.base import (
     clean_html, find_skills, experience_numbers, normalize_location,
-    role_matches, analytics_title_fit, score_job, fit_text, SENIOR_TITLE
+    role_matches, analytics_title_fit, score_job, fit_text, SENIOR_TITLE,
+    SENIOR_DESCRIPTION, is_junior_eligible
 )
 
 AMAZON_SEARCH = "https://www.amazon.jobs/en/search.json"
@@ -60,21 +61,23 @@ def scan_amazon_source(
             continue
 
         title = clean_html(x.get("title"))
-        if not title or SENIOR_TITLE.search(title):
-            continue
-
         basic = clean_html(x.get("basic_qualifications"))
         pref = clean_html(x.get("preferred_qualifications"))
         desc = clean_html(x.get("description"))
 
-        nums = experience_numbers(basic)
-        exp_min = min(nums) if nums else 0
-        if exp_min > 2:
-            continue
-
-        is_intern = bool(re_search := ("intern" in title.lower() or "intern" in (x.get("job_schedule_type") or "").lower()))
+        is_intern = bool("intern" in title.lower() or "intern" in (x.get("job_schedule_type") or "").lower())
         if (is_intern and "internships" not in types) or ((not is_intern) and "jobs" not in types):
             continue
+
+        if not is_intern:
+            eligible, exp_min, exp_label = is_junior_eligible(title, basic, desc)
+            if not eligible:
+                continue
+        else:
+            if SENIOR_TITLE.search(title) or SENIOR_DESCRIPTION.search(f"{title} {desc}"):
+                continue
+            exp_min = 0
+            exp_label = "Internship"
 
         full_text = " ".join((title, basic, pref, desc))
         skills = find_skills(full_text)
@@ -90,8 +93,6 @@ def scan_amazon_source(
         else:
             detail_url = f"https://www.amazon.jobs/en/jobs/{x.get('id_icims')}"
         apply_url = f"https://account.amazon.jobs/jobs/{x.get('id_icims')}/apply"
-
-        exp_label = "Internship" if is_intern else (f"{exp_min}+ years" if nums else "Junior scope")
         out.append({
             "id": str(x.get("id_icims") or x.get("id")),
             "company": "Amazon",

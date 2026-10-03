@@ -31,6 +31,10 @@ SENIOR_TITLE = re.compile(
     r"\banalyst\s+(?:ii|iii|iv)\b|\bdata scientist\s+(?:ii|iii|iv)\b"
 )
 
+SENIOR_DESCRIPTION = re.compile(
+    r"(?i)\b(this\s+(?:is\s+)?a\s+senior\s+role|senior\s+(?:level\s+)?(?:role|position)|senior\s+individual\s+contributor|leadership\s+role)\b"
+)
+
 ROLE_QUERIES = {
     "data-analyst": "data analyst",
     "sql": "SQL analyst",
@@ -70,7 +74,31 @@ def experience_numbers(text: str) -> list[int]:
         nums.append(int(m.group(1)))
     for m in re.finditer(r"\b(\d{1,2})\s*\+\s*(?:years?|yrs?)\s+of\b", text_no_ranges):
         nums.append(int(m.group(1)))
+    for m in re.finditer(r"\b(?:minimum|at\s+least)\s+(?:of\s+)?(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b", text_no_ranges):
+        nums.append(int(m.group(1)))
     return nums
+
+
+def is_junior_eligible(title: str, basic_text: str, desc: str = "") -> tuple[bool, int, str]:
+    """
+    Evaluates whether a role is junior:
+    - Title must not contain senior terms
+    - Description and basic quals must not contain senior role phrasing
+    - No mandatory experience requirement can exceed 2 years
+    """
+    if not title or SENIOR_TITLE.search(title):
+        return False, 0, ""
+    full_check = f"{title} {basic_text} {desc}"
+    if SENIOR_DESCRIPTION.search(full_check):
+        return False, 0, ""
+    nums = experience_numbers(basic_text)
+    if any(n > 2 for n in nums):
+        return False, 0, ""
+    exp_min = max(nums) if nums else 0
+    if exp_min > 2:
+        return False, 0, ""
+    exp_label = f"{exp_min}+ years" if nums else "Junior scope"
+    return True, exp_min, exp_label
 
 
 def normalize_location(raw: str) -> str | None:

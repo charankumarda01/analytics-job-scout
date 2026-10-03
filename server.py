@@ -493,8 +493,10 @@ def scan_only(output: str):
     }
     path = Path(output).resolve()
     from scanner.engine import run_full_scan
+    from scanner.walkins import build_walkin_artifacts
     data = run_full_scan(preferences=preferences, output_path=path, check_live_http=True)
-    print(f"Daily scan written to {path}")
+    build_walkin_artifacts([], path.parent)
+    print(f"Daily scan written to {path} and walk-in artifacts regenerated")
     print(json.dumps(data["summary"], indent=2))
 
 

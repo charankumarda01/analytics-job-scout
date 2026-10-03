@@ -13,8 +13,7 @@
   <!-- Pinned browser libraries for local file parsing (progressive enhancement) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
-  <!-- Puter.js Official Browser SDK for optional keyless AI -->
-  <script src="https://js.puter.com/v2/" async></script>
+  <!-- Puter.js is loaded strictly on-demand in ai-client.js upon explicit user consent -->
 </head>
 <body>
   <div class="app">
@@ -599,7 +598,7 @@
               <!-- Voice & Privacy Notice -->
               <div style="margin-top:14px;padding:10px 14px;background:#edf5f2;border-radius:8px;font-size:11.5px;color:#175244">
                 <strong>🎙️ Speech &amp; Audio Privacy:</strong>
-                Speech recognition uses your browser’s local SpeechRecognition API. Audio is never uploaded or saved. All text processing operates deterministically offline unless Puter AI is explicitly consented to.
+                Speech recognition uses your browser’s Web Speech API. Microphone audio handling depends on your browser and operating system vendor (which may process recognition on-device or via vendor cloud services). Analytics Job Scout itself never records, stores, or transmits your audio to external servers. All text scoring operates deterministically on-device unless optional AI is explicitly consented to.
               </div>
 
               <div style="margin-top:16px;display:flex;justify-content:flex-end">
@@ -790,8 +789,8 @@
               <div><strong>Published Scan Date:</strong> <span id="auditScanDate">--</span></div>
               <div><strong>Payload Age:</strong> <span id="auditScanAge">Fresh</span></div>
               <div><strong>Next Scheduled Run:</strong> Daily at 08:30 IST</div>
-              <div><strong>Active Official Sources:</strong> Amazon, Accenture</div>
-              <div><strong>Configured Sources:</strong> 15 (Passing: 2, Idle/Zero Passing: 13)</div>
+              <div><strong>Active Official Sources:</strong> <span id="auditActiveSources">Amazon</span></div>
+              <div><strong>Configured Sources:</strong> <span id="auditConfiguredSources">5 (Passing: 1, Zero Passing: 4)</span></div>
               <div><strong>Duplicates Suppressed:</strong> <span id="auditSuppressedCount">0</span> unique clones</div>
               <div><strong>Dead Links Removed:</strong> <span id="auditDeadLinksCount">0</span></div>
             </div>
@@ -879,6 +878,7 @@
       <!-- Action buttons row -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
         <a class="btn primary small" id="drawerApplyLink" href="#" target="_blank" rel="noopener noreferrer">View official posting ↗</a>
+        <a id="drawerOfficialLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none" aria-hidden="true"></a>
         <button class="btn small" id="drawerUpdateStatusBtn">Update status</button>
         <button class="btn small" id="drawerAtsChecklistBtn">ATS checklist</button>
         <button class="btn small" id="drawerPrepareInterviewBtn">Prepare interview</button>
@@ -896,9 +896,9 @@
       <div class="panel" style="margin-bottom:16px">
         <div class="panel-title"><div><h3>Next Action &amp; Due Date</h3></div></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <input type="text" id="drawerNextActionInput" placeholder="e.g. Follow up on portal / prepare SQL questions" style="flex:2;font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:6px" />
-          <input type="date" id="drawerReminderDateInput" style="flex:1;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
-          <button class="btn small primary" id="drawerSaveReminderBtn">Save</button>
+          <input type="text" id="drawerNextAction" placeholder="e.g. Follow up on portal / prepare SQL questions" style="flex:2;font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:6px" />
+          <input type="date" id="drawerDueDate" style="flex:1;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
+          <button class="btn small primary" id="saveReminderBtn" style="position:relative;z-index:2">Save</button>
         </div>
       </div>
 
@@ -911,19 +911,20 @@
             <input type="text" id="drawerRecruiterName" placeholder="e.g. Sarah Jenkins (Recruiter)" style="width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
           </div>
           <div>
-            <label for="drawerContactChannel" style="font-size:11px;color:var(--muted);font-weight:700">CHANNEL / LINK</label>
-            <input type="text" id="drawerContactChannel" placeholder="e.g. LinkedIn / recruiter@company.com" style="width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
+            <label for="drawerRecruiterContact" style="font-size:11px;color:var(--muted);font-weight:700">CHANNEL / LINK</label>
+            <input type="text" id="drawerRecruiterContact" placeholder="e.g. LinkedIn / recruiter@company.com" style="width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--line);border-radius:6px" />
           </div>
         </div>
-        <button class="btn small" id="drawerSaveContactBtn">Save contact</button>
+        <button class="btn small" id="saveContactBtn">Save contact</button>
       </div>
 
       <!-- User Notes -->
       <div class="panel">
         <div class="panel-title"><div><h3>Application Notes</h3></div></div>
-        <textarea id="drawerNotesText" rows="3" placeholder="Add interview feedback, salary discussions, referral info..." style="width:100%;font-size:12px;padding:8px;border:1px solid var(--line);border-radius:6px"></textarea>
+        <div id="drawerNotesList" style="margin-bottom:10px;font-size:12.5px;color:var(--fg);max-height:180px;overflow-y:auto"></div>
+        <textarea id="drawerNewNote" rows="3" placeholder="Add interview feedback, salary discussions, referral info..." style="width:100%;font-size:12px;padding:8px;border:1px solid var(--line);border-radius:6px"></textarea>
         <div style="margin-top:8px;text-align:right">
-          <button class="btn small primary" id="drawerSaveNotesBtn">Save note</button>
+          <button class="btn small primary" id="addNoteBtn">Add note</button>
         </div>
       </div>
     </div>
@@ -987,7 +988,11 @@
         <br>• We never promise third-party non-retention unless contractually verified.
         <br>• If you decline, you will immediately receive rich deterministic local rubric analysis without sending any data.
       </p>
-      <div style="display:flex;gap:10px;margin-top:18px">
+      <div class="field" style="margin-top:14px">
+        <label for="aiOutgoingPayloadPreview" style="font-size:11.5px;font-weight:600;pointer-events:none">Exact outgoing text to be sent to AI (you may edit or redact sensitive details below):</label>
+        <textarea id="aiOutgoingPayloadPreview" class="input" style="font-family:monospace;font-size:11px;min-height:90px;width:100%;margin-top:4px" placeholder="Outgoing text preview..."></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px;position:relative;z-index:1">
         <button class="btn primary" id="aiConsentApproveBtn" style="flex:1">Approve &amp; Analyze</button>
         <button class="btn" id="aiConsentDeclineBtn">Decline (Use Offline Engine)</button>
       </div>

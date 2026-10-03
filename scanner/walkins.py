@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+import requests
+
 TZ = ZoneInfo("Asia/Kolkata")
 
 # Suspicious keywords that automatically disqualify an event as an unverified/scam lead
@@ -49,7 +51,7 @@ GENERIC_CAREER_URL_PATTERNS = [
 ]
 
 
-def validate_walkin_event(event: dict[str, Any], today: date) -> tuple[bool, str]:
+def validate_walkin_event(event: dict[str, Any], today: date, check_http: bool = True) -> tuple[bool, str]:
     """
     Strict validation gate for walk-in recruitment events.
     Must have official company source, future date, 0-15 day posting age, junior fit, and verified link.
@@ -113,6 +115,25 @@ def validate_walkin_event(event: dict[str, Any], today: date) -> tuple[bool, str
     skills = event.get("skills", [])
     if len(skills) < 2:
         return False, "Event must match at least two target analytics skills"
+
+    # 6. Evidence-based HTTP and content verification
+    if check_http:
+        try:
+            headers = {"User-Agent": "AnalyticsJobScout/2.0"}
+            resp = requests.get(source_url, headers=headers, timeout=10)
+            if resp.status_code >= 400:
+                return False, f"Official source URL returned HTTP {resp.status_code}"
+
+            page_text = (resp.text or "").lower()
+            company_lower = event.get("company", "").lower()
+            if company_lower and company_lower not in page_text:
+                return False, f"Official source page does not mention company '{event.get('company')}'"
+
+            has_event_term = any(t in page_text for t in ["walk-in", "walkin", "drive", "recruitment", "interview", "careers", "event", "hiring"])
+            if not has_event_term:
+                return False, "Official source page content does not confirm recruitment event phrasing"
+        except Exception as exc:
+            return False, f"HTTP verification of official source URL failed: {str(exc)[:80]}"
 
     return True, "Passed all walk-in validation checks"
 
@@ -205,7 +226,7 @@ def generate_rss(events: list[dict[str, Any]], updated_at: datetime) -> str:
 </rss>"""
 
 
-def build_walkin_artifacts(events: list[dict[str, Any]], data_dir: Path) -> dict[str, Any]:
+def build_walkin_artifacts(events: list[dict[str, Any]], data_dir: Path, check_http: bool = True) -> dict[str, Any]:
     """Validate events, enrich with countdowns, and write json, ics, and xml."""
     now_ist = get_now_ist()
     today = now_ist.date()
@@ -214,7 +235,7 @@ def build_walkin_artifacts(events: list[dict[str, Any]], data_dir: Path) -> dict
     audit_log = []
 
     for ev in events:
-        ok, reason = validate_walkin_event(ev, today)
+        ok, reason = validate_walkin_event(ev, today, check_http=check_http)
         audit_log.append({
             "id": ev.get("id", "unknown"),
             "company": ev.get("company", "unknown"),
