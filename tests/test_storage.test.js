@@ -229,4 +229,59 @@ assert.strictEqual(refreshedApp.interview_sessions[0].avgScore, 90);
 assert.strictEqual(refreshedApp.interview_sessions[0].jobId, 'IMPORT_TEST_01');
 console.log('✓ Interview session linked to application passed');
 
+// 18. Defensive import schema validation (B6)
+// A. Unsupported schema version
+const badSchemaVer = Storage.importApplicationsJSON(JSON.stringify({ schema_version: 999, applications: [] }));
+assert.strictEqual(badSchemaVer.success, false, 'Unsupported schema_version 999 must be rejected');
+assert(badSchemaVer.error.includes('Unsupported schema_version'));
+
+// B. Missing applications field ({ foo: "bar" })
+const missingApps = Storage.importApplicationsJSON(JSON.stringify({ foo: 'bar' }));
+assert.strictEqual(missingApps.success, false, 'Missing applications field must be rejected');
+assert(missingApps.error.includes('missing required "applications" array'));
+
+// C. Non-array applications ({ schema_version: 3, applications: "bad" })
+const nonArrayApps = Storage.importApplicationsJSON(JSON.stringify({ schema_version: 3, applications: 'bad' }));
+assert.strictEqual(nonArrayApps.success, false, 'Non-array applications property must be rejected');
+
+// D. Root structure non-object (e.g., array or primitive string)
+const arrayRoot = Storage.importApplicationsJSON(JSON.stringify([{ id: '1' }]));
+assert.strictEqual(arrayRoot.success, false, 'Root array must be rejected as invalid backup structure');
+
+// E. Invalid records (missing title or company or unsafe URL)
+const mixedPayload = {
+  schema_version: 3,
+  applications: [
+    { id: 'VALID_01', company: 'Amazon', title: 'Data Scientist', status: 'saved' },
+    { id: 'INVALID_NO_TITLE', company: 'Amazon', status: 'saved' },
+    { id: 'INVALID_NO_COMPANY', title: 'Data Scientist', status: 'saved' },
+    { id: 'INVALID_UNSAFE_URL', company: 'Meta', title: 'Analyst', apply_url: 'javascript:alert(1)' }
+  ]
+};
+const mixedPreview = Storage.importApplicationsJSON(JSON.stringify(mixedPayload));
+assert.strictEqual(mixedPreview.success, true, 'Partially valid payload with valid records can be previewed');
+assert.strictEqual(mixedPreview.acceptedCount, 1, 'Only 1 record should be accepted');
+assert.strictEqual(mixedPreview.rejectedCount, 3, '3 invalid records should be rejected');
+assert.strictEqual(mixedPreview.rejections.length, 3);
+assert(mixedPreview.rejections.some(r => r.reason.includes('Missing required field: "title"')));
+assert(mixedPreview.rejections.some(r => r.reason.includes('Missing required field: "company"')));
+assert(mixedPreview.rejections.some(r => r.reason.includes('Unsafe URL scheme')));
+
+// F. Fail closed if all incoming records are invalid
+const allInvalidPayload = {
+  schema_version: 3,
+  applications: [
+    { company: 'Missing Title' },
+    { title: 'Missing Company' }
+  ]
+};
+const allInvalidPreview = Storage.importApplicationsJSON(JSON.stringify(allInvalidPayload));
+assert.strictEqual(allInvalidPreview.success, false, 'If all incoming records are invalid, preview must fail closed');
+assert.throws(() => {
+  Storage.previewImportApplications(JSON.stringify(allInvalidPayload));
+}, /Import validation failed/);
+
+console.log('✓ Defensive import schema validation passed');
+
 console.log('All Storage tests passed successfully!');
+

@@ -142,12 +142,14 @@ def verify_live_link(
             check_meta["status_label"] = "External Domain Redirect"
             return False, final_url, check_meta
 
-        # Check for candidate login/authentication portals on allowed domain
+        # Check for candidate login/authentication portals on allowed domain (B4)
         is_login_portal = any(term in final_url.lower() for term in ["passport.amazon.jobs", "/signin", "/login", "/auth", "sso."])
         if is_login_portal:
             check_meta["redirected_to_login"] = True
-            check_meta["status_label"] = "Login Portal (HTTP 200)"
-            return True, final_url, check_meta
+            check_meta["is_auth_gate"] = True
+            check_meta["status_label"] = "Official Authentication Gate (Login Required, Unverified Destination)"
+            check_meta["reason"] = "Redirects to generic candidate login gate rather than verified requisition-specific apply endpoint"
+            return False, final_url, check_meta
 
         # Check for generic homepage redirect
         final_path = urlparse(final_url).path

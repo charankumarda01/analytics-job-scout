@@ -581,9 +581,33 @@ a { color: inherit; }
   .job-actions .btn { width: auto; flex: 1; }
 }
 
+.btn-text-short { display: none; }
+.btn-text-full { display: inline; }
+
 @media (max-width: 560px) {
-  .topbar { height: 64px; }
+  .topbar {
+    height: auto;
+    min-height: 52px;
+    padding: 6px 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+    box-sizing: border-box;
+  }
+  .crumb { font-size: 11px; }
+  .top-actions {
+    gap: 6px;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
   .verified-pill { display: none; }
+  #suggestSourceTopBtn { display: none; }
+  .btn-text-full { display: none; }
+  .btn-text-short { display: inline; }
+  #runScanTop, #exportCsvTop {
+    padding: 6px 9px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
   .content { padding: 16px 12px 40px; }
   .hero { border-radius: 18px; }
   .hero h1 { font-size: 24px; }

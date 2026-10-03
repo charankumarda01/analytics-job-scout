@@ -43,9 +43,10 @@ class TestLinkVerifier(unittest.TestCase):
                 requisition_id="10565269",
                 check_http=True
             )
-            self.assertTrue(ok)
+            # A generic login portal is an official authentication gate, NOT a verified Apply destination (B4)
+            self.assertFalse(ok)
             self.assertTrue(meta.get("redirected_to_login"))
-            self.assertEqual(meta.get("status_label"), "Login Portal (HTTP 200)")
+            self.assertIn("Official Authentication Gate", meta.get("status_label"))
 
     def test_generic_homepage_redirect_rejected(self):
         from unittest.mock import patch, MagicMock

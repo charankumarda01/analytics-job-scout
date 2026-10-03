@@ -251,9 +251,25 @@ test.describe('Analytics Job Scout E2E Smoke Suite', () => {
     await page.goto('/');
     await navigateTo(page, '#nav-applications');
 
+    // First, test uploading invalid schema file (schema_version 999) (B6)
+    let dialogMessage = '';
+    page.once('dialog', async dialog => {
+      dialogMessage = dialog.message();
+      await dialog.dismiss();
+    });
+
+    await page.setInputFiles('#importAppsFileInput', {
+      name: 'bad_backup.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify({ schema_version: 999, applications: [] }))
+    });
+
+    await page.waitForTimeout(300);
+    expect(dialogMessage).toContain('Unsupported schema_version');
+
     // Prepare JSON payload to import
     const importPayload = {
-      version: '3.0.0',
+      schema_version: 3,
       exported_at: new Date().toISOString(),
       applications: [
         {
@@ -359,38 +375,42 @@ test.describe('Analytics Job Scout E2E Smoke Suite', () => {
     await expect(page.locator('#drawerNotesList')).toContainText('Spoke with hiring manager');
   });
 
-  test('ATS interactive checklist allows checking items and persists progress', async ({ page }) => {
+  test('ATS interactive checklist allows checking items and persists progress across reload', async ({ page }) => {
     await page.goto('/');
+    await expect(page.locator('#overviewTotal')).not.toHaveText('--', { timeout: 10000 });
 
-    await page.evaluate(() => {
-      if (window.AJSStorage) {
-        window.AJSStorage.saveApplication({
-          id: 'ats-job-1',
-          company: 'Amazon',
-          title: 'Business Analyst I',
-          status: 'applied'
-        });
-      }
-    });
+    // Open ATS checklist from first verified job card
+    await navigateTo(page, '#nav-jobs');
+    const firstJobCard = page.locator('.job-card').first();
+    await expect(firstJobCard).toBeVisible();
+    await firstJobCard.locator('[data-match-job]').click();
 
-    await navigateTo(page, '#nav-resume');
-
-    // Select job in target select if available
-    const targetSelect = page.locator('#targetJobSelect');
-    if (await targetSelect.isVisible()) {
-      await targetSelect.selectOption({ index: 1 });
+    // Check remember on device
+    const rememberCheckbox = page.locator('#resumeRememberDeviceCheckbox');
+    if (await rememberCheckbox.isVisible()) {
+      await rememberCheckbox.check();
     }
 
     // Enter resume text
-    await page.fill('#resumeRawText', 'Analyst with SQL, Power BI, Excel.');
+    await page.fill('#resumeRawText', 'Analyst with 2 years of experience in SQL, Power BI, Python, and statistical reporting.');
+    await page.waitForTimeout(500);
+
+    // Look for interactive checklist checkbox and verify persistence across reload
+    const firstCheckbox = page.locator('.ats-check-input').first();
+    await expect(firstCheckbox).toBeVisible({ timeout: 6000 });
+    await firstCheckbox.check();
+    await expect(firstCheckbox).toBeChecked();
+
+    // Reload page and verify checkbox remains checked after reload (persistence)
+    await page.reload();
+    await expect(page.locator('#overviewTotal')).not.toHaveText('--', { timeout: 10000 });
+    await navigateTo(page, '#nav-jobs');
+    await page.locator('.job-card').first().locator('[data-match-job]').click();
     await page.waitForTimeout(400);
 
-    // Look for interactive checklist checkbox
-    const firstCheckbox = page.locator('#atsChecklistWrap input[type="checkbox"]').first();
-    if (await firstCheckbox.isVisible()) {
-      await firstCheckbox.check();
-      await expect(firstCheckbox).toBeChecked();
-    }
+    const reloadedCheckbox = page.locator('.ats-check-input').first();
+    await expect(reloadedCheckbox).toBeVisible({ timeout: 6000 });
+    await expect(reloadedCheckbox).toBeChecked();
   });
 
   test('Completed interview session links directly to application', async ({ page }) => {
@@ -427,8 +447,8 @@ test.describe('Analytics Job Scout E2E Smoke Suite', () => {
     expect(app.interview_sessions[0].overallScore).toBe(85);
   });
 
-  test('Stale or malformed payload fails closed gracefully with aged payload', async ({ page }) => {
-    // Intercept latest.json to return old payload dated 2020-01-01
+  test('Stale or malformed payload fails closed gracefully with non-empty aged payload', async ({ page }) => {
+    // Intercept latest.json to return old payload dated 2020-01-01 containing a non-empty job (B3)
     await page.route('**/latest.json*', route => {
       route.fulfill({
         status: 200,
@@ -438,7 +458,17 @@ test.describe('Analytics Job Scout E2E Smoke Suite', () => {
           scanned_at: '2020-01-01T12:00:00+05:30',
           timezone: 'Asia/Kolkata',
           summary: { total: 1, fresh: 0, backup: 1, internships: 0 },
-          jobs: []
+          jobs: [
+            {
+              id: 'stale-job-999',
+              company: 'StaleCorp',
+              title: 'Stale Analyst',
+              location: 'Bengaluru',
+              date: '2020-01-01',
+              score: 95,
+              skills: ['SQL', 'Python']
+            }
+          ]
         })
       });
     });
@@ -452,20 +482,48 @@ test.describe('Analytics Job Scout E2E Smoke Suite', () => {
     // Scan age should indicate stale
     const dashAge = page.locator('#dashScanAge');
     await expect(dashAge).toContainText('Stale');
+
+    // Fail closed: overview total must be 0 and jobs list must be empty (0 cards rendered)
+    const overviewTotal = page.locator('#overviewTotal');
+    await expect(overviewTotal).toHaveText('0');
+
+    await navigateTo(page, '#nav-jobs');
+    const jobCards = page.locator('.job-card');
+    await expect(jobCards).toHaveCount(0);
+    const emptyState = page.locator('#jobsList .empty-state');
+    await expect(emptyState).toBeVisible();
   });
 
   test('Scan Audit renders truthful link checks and dynamic sources', async ({ page }) => {
     await page.goto('/');
     await navigateTo(page, '#nav-audit');
 
-    // Audit view should display dynamic sources and audit table
+    // Audit view should display dynamic sources, jobs table, and sources query table
     await expect(page.locator('#view-audit')).toBeVisible();
     const auditTable = page.locator('#auditJobsTableBody');
     await expect(auditTable).toBeVisible();
+    const sourcesTable = page.locator('#auditSourcesTableBody');
+    await expect(sourcesTable).toBeVisible();
 
     // Verify sources count is populated
     const activeSources = page.locator('#auditActiveSources');
     await expect(activeSources).not.toHaveText('0');
+  });
+
+  test('Mobile viewport layout fits within screen width without horizontal overflow (B7)', async ({ page }) => {
+    await page.goto('/');
+
+    // Check that document scrollWidth does not exceed window innerWidth
+    const overflow = await page.evaluate(() => {
+      return {
+        scrollWidth: document.documentElement.scrollWidth,
+        innerWidth: window.innerWidth,
+        bodyScrollWidth: document.body.scrollWidth
+      };
+    });
+
+    expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.innerWidth);
+    expect(overflow.bodyScrollWidth).toBeLessThanOrEqual(overflow.innerWidth);
   });
 
 });

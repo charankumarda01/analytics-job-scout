@@ -70,6 +70,14 @@ def normalize_url_canonical(url: str) -> str:
         return cleaned.lower().rstrip("/")
 
 
+def is_authoritative_req_id(req_id: str) -> bool:
+    """Return True if req_id is an explicit, non-synthetic official requisition identifier."""
+    if not req_id:
+        return False
+    r = str(req_id).strip().lower()
+    return not (r.startswith("gen_") or r.startswith("clone") or r.startswith("temp") or len(r) < 3)
+
+
 def deduplicate_jobs(
     jobs_list: list[dict[str, Any]],
     prior_shown_ids: set[str] | None = None
@@ -78,7 +86,7 @@ def deduplicate_jobs(
     Deduplicates a candidate job list using explicit ordered deduplication:
     1. Company + canonical requisition ID
     2. Canonical official detail/Apply URL
-    3. Conservative company/title/location/role fingerprint
+    3. Conservative company/title/location/role fingerprint (ONLY for records without authoritative requisition ID)
 
     Returns:
         unique_jobs: list of kept canonical jobs
@@ -105,6 +113,7 @@ def deduplicate_jobs(
     for job in jobs_list:
         comp = str(job.get("company", "")).strip().lower()
         req_id = extract_requisition_id(job).lower()
+        is_auth = is_authoritative_req_id(req_id)
         req_key = (comp, req_id) if comp and req_id else None
 
         apply_url = normalize_url_canonical(job.get("apply") or "")
@@ -129,8 +138,16 @@ def deduplicate_jobs(
         elif detail_url and detail_url in url_to_cluster:
             matched_cluster_idx = url_to_cluster[detail_url]
         # 3. Conservative company/title/location/role fingerprint
-        elif fingerprint and fingerprint in fingerprint_to_cluster:
-            matched_cluster_idx = fingerprint_to_cluster[fingerprint]
+        # STRICT RULE (B1): A non-empty official requisition ID is authoritative.
+        # Different requisition IDs with different canonical official URLs must remain separate.
+        # Fallback fingerprint ONLY applies if the candidate job DOES NOT have an authoritative requisition ID,
+        # AND the candidate cluster does not have an authoritative requisition ID.
+        elif not is_auth and fingerprint and fingerprint in fingerprint_to_cluster:
+            candidate_cluster_idx = fingerprint_to_cluster[fingerprint]
+            cluster_jobs = clusters[candidate_cluster_idx]
+            cluster_has_auth_id = any(is_authoritative_req_id(extract_requisition_id(cj)) for cj in cluster_jobs)
+            if not cluster_has_auth_id:
+                matched_cluster_idx = candidate_cluster_idx
 
         if matched_cluster_idx is not None:
             # Add to matched cluster
@@ -148,8 +165,9 @@ def deduplicate_jobs(
             url_to_cluster[apply_url] = matched_cluster_idx
         if detail_url:
             url_to_cluster[detail_url] = matched_cluster_idx
-        if fingerprint:
+        if fingerprint and not is_auth:
             fingerprint_to_cluster[fingerprint] = matched_cluster_idx
+
 
     unique_jobs: list[dict[str, Any]] = []
     duplicate_groups: list[dict[str, Any]] = []

@@ -69,8 +69,10 @@ def scan_amazon_source(
         if (is_intern and "internships" not in types) or ((not is_intern) and "jobs" not in types):
             continue
 
+        exp_snippet = None
+        exp_confidence = "High"
         if not is_intern:
-            eligible, exp_min, exp_label = is_junior_eligible(title, basic, desc)
+            eligible, exp_min, exp_label, exp_snippet, exp_confidence = is_junior_eligible(title, basic, desc)
             if not eligible:
                 continue
         else:
@@ -78,6 +80,8 @@ def scan_amazon_source(
                 continue
             exp_min = 0
             exp_label = "Internship"
+            exp_snippet = f'Internship posting: "{title}"'
+            exp_confidence = "High"
 
         full_text = " ".join((title, basic, pref, desc))
         skills = find_skills(full_text)
@@ -105,6 +109,8 @@ def scan_amazon_source(
             "score": score_job(skills, exp_min, days, title, is_intern),
             "type": "Internship" if is_intern else "Full-time",
             "exp": exp_label,
+            "exp_snippet": exp_snippet,
+            "exp_confidence": exp_confidence,
             "recruiter": "Not disclosed",
             "skills": skills,
             "fit": fit_text(skills, exp_label, is_intern),

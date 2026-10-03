@@ -212,7 +212,7 @@
       } else if (jobs.length > 0) {
         const topJob = jobs.find(j => j.priority) || jobs[0];
         titleEl.textContent = `Apply to ${topJob.company} · ${topJob.title}`;
-        subEl.textContent = `Verified junior fit posted ${topJob.days}d ago in ${topJob.location}. Live Apply endpoint verified.`;
+        subEl.textContent = `Verified junior fit posted ${topJob.days}d ago in ${topJob.location}. Official detail posting verified.`;
         primaryBtn.textContent = 'View Job Details →';
         primaryBtn.onclick = () => switchView('jobs');
       } else {
@@ -241,7 +241,7 @@
     // Application Pipeline numbers
     const appMetrics = Storage ? Storage.getApplicationMetrics(jobs) : {};
     const readyEl = document.getElementById('dashReadyCount');
-    if (readyEl) readyEl.textContent = appMetrics.ready_to_apply || (total - apps.length);
+    if (readyEl) readyEl.textContent = total > 0 ? (appMetrics.ready_to_apply || Math.max(0, total - apps.length)) : 0;
     const savedEl = document.getElementById('dashSavedCount');
     if (savedEl) savedEl.textContent = appMetrics.saved || 0;
     const applyingEl = document.getElementById('dashApplyingCount');
@@ -250,6 +250,22 @@
     if (appliedEl) appliedEl.textContent = appMetrics.applied || 0;
     const interviewEl = document.getElementById('dashInterviewCount');
     if (interviewEl) interviewEl.textContent = (appMetrics.assessment || 0) + (appMetrics.interviews || 0);
+
+    // Dynamic Scan Health facts (B5)
+    const dashActiveSources = document.getElementById('dashActiveSources');
+    if (dashActiveSources) {
+      const activeSources = Array.from(new Set(jobs.map(j => j.company).filter(Boolean)));
+      dashActiveSources.textContent = activeSources.join(', ') || 'None active';
+    }
+    const dashSuppressed = document.getElementById('dashSuppressedCount');
+    if (dashSuppressed && publishedScanMeta) {
+      const suppCount = publishedScanMeta.summary?.duplicates_suppressed ?? duplicateGroups.reduce((n, g) => n + (g.suppressed_job_ids || g.ids || []).length, 0);
+      dashSuppressed.textContent = suppCount;
+    }
+    const dashTimestamp = document.getElementById('dashScanTimestamp');
+    if (dashTimestamp && publishedScanMeta) {
+      dashTimestamp.textContent = publishedScanMeta.scanned_at || publishedScanMeta.scan_date || 'Today';
+    }
 
     // Follow-ups card
     const followupsCard = document.getElementById('dashboardFollowupsCard');
@@ -339,7 +355,7 @@
           <div class="card-actions">
             ${isApplied
               ? `<button class="btn primary" data-open-detail="${escapeHTML(existingApp.id)}">Update application</button>`
-              : `<button class="btn primary" data-apply-click="${escapeHTML(j.id)}">View &amp; apply officially ↗</button>`
+              : `<button class="btn primary" data-apply-click="${escapeHTML(j.id)}">View official job details ↗</button>`
             }
             <button class="btn" data-match-job="${escapeHTML(j.id)}">🎯 ATS checklist</button>
             <button class="btn" data-practice-job="${escapeHTML(j.id)}">🎤 Practice</button>
@@ -457,7 +473,7 @@
             <!-- Button Hierarchy: Primary Action -->
             ${isApplied
               ? `<button class="btn primary" data-open-detail="${escapeHTML(existingApp.id)}">Update application</button>`
-              : `<button class="btn primary" data-apply-click="${escapeHTML(j.id)}">View &amp; apply officially ↗</button>`
+              : `<button class="btn primary" data-apply-click="${escapeHTML(j.id)}">View official job details ↗</button>`
             }
 
             <!-- Secondary Actions -->
@@ -1043,11 +1059,20 @@
     // Actionable Tailoring Checklist (Interactive with Persistence)
     const chkContainer = document.getElementById('jobAtsChecklistContainer');
     if (chkContainer) {
-      const checklist = matchRes.checklist || [];
+      let checklist = (matchRes.checklist && matchRes.checklist.length) ? matchRes.checklist.slice() : [];
       const app = Storage ? Storage.getApplication(job.id || jobId) : null;
       const savedChecklist = (app && app.ats_checklist) ? app.ats_checklist : { checkedItems: [], notes: {} };
       const checkedSet = new Set(savedChecklist.checkedItems || []);
       const notesMap = Object.assign({}, savedChecklist.notes || {});
+
+      if (!checklist.length && savedChecklist.checkedItems && savedChecklist.checkedItems.length > 0) {
+        checklist = savedChecklist.checkedItems.map(it => ({
+          item: it,
+          done: true,
+          priority: 'saved',
+          guidance: 'Previously saved ATS requirement'
+        }));
+      }
 
       if (!checklist.length) {
         chkContainer.innerHTML = '<div style="font-size:12px;color:#168c73;padding:10px">✓ No major skill gaps detected for this role!</div>';
@@ -1066,10 +1091,10 @@
                   <input type="checkbox" class="ats-check-input" id="ats_chk_${idx}" data-item="${escapeHTML(item.item)}" ${isChecked ? 'checked' : ''} style="margin-top:3px;cursor:pointer;width:16px;height:16px" />
                   <div style="flex:1">
                     <div style="display:flex;justify-content:space-between;align-items:center">
-                      <label for="ats_chk_${idx}" style="font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;${isChecked ? 'text-decoration:line-through;color:var(--muted)' : ''}">${escapeHTML(item.item)}</label>
-                      <span class="badge ${item.priority === 'critical' ? 'danger' : (item.priority === 'useful' ? 'backup' : 'verified')}">${escapeHTML(item.priority.toUpperCase())}</span>
+                      <label for="ats_chk_${idx}" style="font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;${isChecked ? 'text-decoration:line-through;color:var(--muted)' : ''}">${escapeHTML(item.item || '')}</label>
+                      <span class="badge ${(item.priority || '').toLowerCase() === 'critical' ? 'danger' : ((item.priority || '').toLowerCase() === 'useful' ? 'backup' : 'verified')}">${escapeHTML((item.priority || 'guide').toUpperCase())}</span>
                     </div>
-                    <p style="margin:4px 0 8px;font-size:11.5px;color:var(--muted)">${escapeHTML(item.guidance)}</p>
+                    <p style="margin:4px 0 8px;font-size:11.5px;color:var(--muted)">${escapeHTML(item.guidance || '')}</p>
                     <div style="margin-top:6px">
                       <input type="text" class="ats-note-input input small" data-item="${escapeHTML(item.item)}" placeholder="Add personal note / project story for this requirement..." value="${escapeHTML(itemNote)}" style="width:100%;font-size:11px" />
                     </div>
@@ -1539,22 +1564,34 @@
   };
 
   // -------------------------------------------------------------
-  // 6. Scan Audit Controller (Transparency Table & Scan Status)
-  // -------------------------------------------------------------
-  function renderAudit(data) {
+    function renderAudit(data) {
     const list = jobs;
     const auditData = data?.audit || {};
 
+    // Dynamic verification counts based on actual evidence (B5)
+    const detailVerifiedCount = list.filter(j => j.detail_link_check?.verified === true).length;
+    const dateVerifiedCount = list.filter(j => !!j.date).length;
+    const expVerifiedCount = list.filter(j => !!j.exp_evidence?.snippet || !!j.exp).length;
+    const skillVerifiedCount = list.filter(j => Array.isArray(j.skills) && j.skills.length >= 2).length;
+
     const detailEl = document.getElementById('auditDetailCount');
-    if (detailEl) detailEl.textContent = `${list.length}/${list.length}`;
+    if (detailEl) detailEl.textContent = `${detailVerifiedCount}/${list.length}`;
     const dateEl = document.getElementById('auditDateCount');
-    if (dateEl) dateEl.textContent = `${list.length}/${list.length}`;
+    if (dateEl) dateEl.textContent = `${dateVerifiedCount}/${list.length}`;
     const expEl = document.getElementById('auditExpCount');
-    if (expEl) expEl.textContent = `${list.length}/${list.length}`;
+    if (expEl) expEl.textContent = `${expVerifiedCount}/${list.length}`;
     const skillEl = document.getElementById('auditSkillCount');
-    if (skillEl) skillEl.textContent = `${list.length}/${list.length}`;
+    if (skillEl) skillEl.textContent = `${skillVerifiedCount}/${list.length}`;
     const linkEl = document.getElementById('auditLinkCount');
-    if (linkEl) linkEl.textContent = 'HTTP 200';
+    if (linkEl) {
+      if (list.length === 0) {
+        linkEl.textContent = 'No jobs';
+      } else if (detailVerifiedCount === list.length) {
+        linkEl.textContent = '100% Verified (HTTP 200)';
+      } else {
+        linkEl.textContent = `${detailVerifiedCount}/${list.length} Verified`;
+      }
+    }
 
     // Daily Scan Status Panel
     const scanDateEl = document.getElementById('auditScanDate');
@@ -1567,16 +1604,19 @@
     const deadEl = document.getElementById('auditDeadLinksCount');
     if (deadEl) deadEl.textContent = data?.summary?.suppressed_dead_links ?? 0;
 
-    // Truthful Active & Configured Sources
+    // Truthful Active & Configured Sources (B5)
     const activeSources = Array.from(new Set(list.map(j => j.company).filter(Boolean)));
     const activeSourcesEl = document.getElementById('auditActiveSources');
     if (activeSourcesEl) activeSourcesEl.textContent = activeSources.join(', ') || 'None active';
 
     const configuredSourcesEl = document.getElementById('auditConfiguredSources');
     if (configuredSourcesEl) {
-      const companiesChecked = auditData.companies_checked || (data?.sources ? data.sources.length : 5);
+      const sourceStatsList = data?.source_stats || [];
+      const totalSources = data?.sources?.length || (sourceStatsList.length > 0 ? Array.from(new Set(sourceStatsList.map(s => s.source.split(' ')[0]))).length : 5);
+      const healthyAdapters = sourceStatsList.filter(s => !s.error).length;
+      const errorAdapters = sourceStatsList.filter(s => !!s.error).length;
       const activeCount = activeSources.length;
-      configuredSourcesEl.textContent = `${companiesChecked} (Passing: ${activeCount}, Zero Passing: ${Math.max(0, companiesChecked - activeCount)})`;
+      configuredSourcesEl.textContent = `${totalSources} Configured (${healthyAdapters} Query Passes, ${errorAdapters} Errors · ${activeCount} Yielding Displayed Jobs)`;
     }
 
     // Per Included Job Transparency Table
@@ -1584,55 +1624,82 @@
     if (tbody) {
       if (!list.length) {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">No verified jobs currently loaded.</td></tr>';
-        return;
-      }
+      } else {
+        tbody.innerHTML = list.map(j => {
+          const skillsFound = (j.skills || []).join(', ');
+          const detailCheck = j.detail_link_check;
+          const applyCheck = j.apply_link_check;
 
-      tbody.innerHTML = list.map(j => {
-        const skillsFound = (j.skills || []).join(', ');
-        const detailCheck = j.detail_link_check;
-        const applyCheck = j.apply_link_check;
-
-        // Truthful Detail Link Evidence
-        let detailStatusHtml = '<span class="badge verified">HTTP 200 Verified</span>';
-        if (detailCheck) {
-          detailStatusHtml = detailCheck.verified
-            ? `<span class="badge verified">HTTP ${detailCheck.status || 200} Verified</span>`
-            : `<span class="badge danger">Failed</span>`;
-        }
-
-        // Truthful Apply Link Evidence
-        let applyStatusHtml = '<span class="badge backup" title="Checked separately. Redirects to official authentication gate / passport login.">Login Portal (HTTP 200)</span>';
-        if (applyCheck) {
-          if (applyCheck.redirected_to_login) {
-            applyStatusHtml = `<span class="badge backup" title="Directs to official candidate login portal (passport.amazon.jobs)">Login Portal (HTTP 200)</span>`;
-          } else if (applyCheck.verified) {
-            applyStatusHtml = `<span class="badge verified">HTTP ${applyCheck.status || 200} Verified</span>`;
-          } else {
-            applyStatusHtml = `<span class="badge danger">Unverified</span>`;
+          // Truthful Detail Link Evidence (Never default missing to HTTP 200)
+          let detailStatusHtml = '<span class="badge" style="background:#e4e7ec;color:#475467">Not recorded</span>';
+          if (detailCheck) {
+            detailStatusHtml = detailCheck.verified
+              ? `<span class="badge verified">HTTP ${detailCheck.status || 200} Verified</span>`
+              : `<span class="badge danger">Failed</span>`;
           }
-        }
 
-        return `
-          <tr>
-            <td>
-              <strong>${escapeHTML(j.title)}</strong>
-              <div style="font-size:11px;color:var(--muted)">${escapeHTML(j.company)}</div>
-            </td>
-            <td><code>${escapeHTML(j.id)}</code></td>
-            <td>${fmtDate(j.date)}</td>
-            <td>${escapeHTML(j.location)}</td>
-            <td>${escapeHTML(j.exp || '≤2 yrs')}</td>
-            <td><span style="font-size:11px">${escapeHTML(skillsFound)}</span></td>
-            <td>${detailStatusHtml}</td>
-            <td>${applyStatusHtml}</td>
-            <td><span style="font-size:11px;color:var(--muted)">Unique canonical kept</span></td>
-          </tr>`;
-      }).join('');
+          // Truthful Apply Link Evidence (Never default missing to Login Portal)
+          let applyStatusHtml = '<span class="badge" style="background:#e4e7ec;color:#475467">Not recorded</span>';
+          if (applyCheck) {
+            if (applyCheck.is_auth_gate || applyCheck.redirected_to_login) {
+              applyStatusHtml = `<span class="badge backup" title="Directs to official candidate login portal (passport.amazon.jobs)">Auth Gate (${applyCheck.status_code || applyCheck.status || 200})</span>`;
+            } else if (applyCheck.verified) {
+              applyStatusHtml = `<span class="badge verified">HTTP ${applyCheck.status_code || applyCheck.status || 200} Verified</span>`;
+            } else {
+              applyStatusHtml = `<span class="badge danger">Unverified</span>`;
+            }
+          }
+
+          // Truthful parsed experience evidence with snippet and confidence (B11)
+          const expSnippet = j.exp_evidence?.snippet
+            ? `<div style="font-size:10px;color:var(--muted);margin-top:2px" title="Confidence: ${escapeHTML(j.exp_evidence.confidence || 'medium')}">“${escapeHTML(j.exp_evidence.snippet.slice(0, 50))}…”</div>`
+            : '';
+
+          return `
+            <tr>
+              <td>
+                <strong>${escapeHTML(j.title)}</strong>
+                <div style="font-size:11px;color:var(--muted)">${escapeHTML(j.company)}</div>
+              </td>
+              <td><code>${escapeHTML(j.id)}</code></td>
+              <td>${fmtDate(j.date)}</td>
+              <td>${escapeHTML(j.location)}</td>
+              <td>${escapeHTML(j.exp || '≤2 yrs')}${expSnippet}</td>
+              <td><span style="font-size:11px">${escapeHTML(skillsFound)}</span></td>
+              <td>${detailStatusHtml}</td>
+              <td>${applyStatusHtml}</td>
+              <td><span style="font-size:11px;color:var(--muted)">Unique canonical kept</span></td>
+            </tr>`;
+        }).join('');
+      }
+    }
+
+    // Source & Query Execution Table (B5)
+    const sourcesTbody = document.getElementById('auditSourcesTableBody');
+    if (sourcesTbody) {
+      const statsList = data?.source_stats || [];
+      if (!statsList.length) {
+        sourcesTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">No adapter query stats recorded.</td></tr>';
+      } else {
+        sourcesTbody.innerHTML = statsList.map(s => {
+          const statusBadge = s.error
+            ? `<span class="badge danger">${escapeHTML(s.error)}</span>`
+            : `<span class="badge verified">Passing (HTTP 200 OK)</span>`;
+          return `
+            <tr>
+              <td><strong>${escapeHTML(s.source)}</strong></td>
+              <td><code>${escapeHTML(s.query || 'Official Feed')}</code></td>
+              <td>${s.received ?? 0}</td>
+              <td>${s.eligible ?? 0}</td>
+              <td>${statusBadge}</td>
+            </tr>`;
+        }).join('');
+      }
     }
   }
 
   // -------------------------------------------------------------
-  // Data Loader & Fail-Closed Payload Handler
+  // Data Loader & Fail-Closed Payload Handler (B3)
   // -------------------------------------------------------------
   async function loadPublishedScan() {
     try {
@@ -1641,26 +1708,37 @@
       const data = await res.json();
 
       if (data && Array.isArray(data.jobs)) {
-        jobs = data.jobs;
-        duplicateGroups = data.duplicate_groups || [];
-        publishedScanMeta = data;
+        // Evaluate Scan Age for Stale Detection (Fail-Closed Safety Gate B3)
+        const scanIso = data.scanned_at || (data.scan_date ? `${data.scan_date}T00:00:00+05:30` : null);
+        let ageHours = Infinity;
+        let scanTime = NaN;
+        if (scanIso) {
+          scanTime = new Date(scanIso).getTime();
+          if (!isNaN(scanTime)) {
+            ageHours = (Date.now() - scanTime) / (1000 * 60 * 60);
+          }
+        }
+
+        // Stale if: timestamp absent, NaN, in future (> 1h ahead), or > 24 hours old
+        const isFutureInvalid = !isNaN(scanTime) && scanTime > (Date.now() + 3600000);
+        const isStale = !scanIso || isNaN(scanTime) || isFutureInvalid || ageHours > 24;
+
+        if (isStale) {
+          // B3 Fail-Closed: Suppress stale non-empty jobs, actions, ready counts, and filters
+          jobs = [];
+          duplicateGroups = [];
+          publishedScanMeta = Object.assign({}, data, { jobs: [], duplicate_groups: [] });
+        } else {
+          jobs = data.jobs;
+          duplicateGroups = data.duplicate_groups || [];
+          publishedScanMeta = data;
+        }
 
         // Reconcile with persistent application storage:
         // Preserves historical applications even when jobs leave latest.json!
         if (Storage) {
           Storage.reconcileWithScan(jobs);
         }
-
-        // Evaluate Scan Age for Stale Detection (Fail-Closed Visibility)
-        const scanIso = data.scanned_at || (data.scan_date ? `${data.scan_date}T00:00:00+05:30` : null);
-        let ageHours = Infinity;
-        if (scanIso) {
-          const scanTime = new Date(scanIso).getTime();
-          if (!isNaN(scanTime)) {
-            ageHours = (Date.now() - scanTime) / (1000 * 60 * 60);
-          }
-        }
-        const isStale = isNaN(ageHours) || ageHours > 24;
 
         // Populate company filters
         const compFilter = document.getElementById('companyFilter');
@@ -1678,16 +1756,16 @@
 
         // Update Scan Age indicators
         const dashScanAge = document.getElementById('dashScanAge');
-        if (dashScanAge) dashScanAge.textContent = isStale ? `Stale (${Math.round(ageHours)}h old)` : 'Fresh';
+        if (dashScanAge) dashScanAge.textContent = isStale ? (isFutureInvalid ? 'Invalid Future Date' : `Stale (${Math.round(ageHours)}h old)`) : 'Fresh';
         const auditScanAge = document.getElementById('auditScanAge');
-        if (auditScanAge) auditScanAge.textContent = isStale ? `Stale (${Math.round(ageHours)}h old)` : 'Fresh';
+        if (auditScanAge) auditScanAge.textContent = isStale ? (isFutureInvalid ? 'Invalid Future Date' : `Stale (${Math.round(ageHours)}h old)`) : 'Fresh';
 
         const staleBanner = document.getElementById('staleScanBanner');
         if (staleBanner) {
           if (isStale) {
             staleBanner.hidden = false;
             staleBanner.innerHTML = `
-              <span>⚠️ <strong>Stale scan payload:</strong> This dataset was scanned ${Math.round(ageHours)} hours ago (${escapeHTML(data.scan_date || data.scanned_at)}). Daily scan runs at 08:30 IST. Postings may have closed; verify live status before submitting.</span>
+              <span>⚠️ <strong>Stale scan payload (Fail-Closed):</strong> This dataset was scanned on ${escapeHTML(data.scanned_at || data.scan_date || 'Unknown Date')} and is expired (>24h or invalid). To prevent applying to expired requisitions, job listings and apply actions are suppressed until the next fresh scan at 08:30 IST. Your saved application tracking records remain intact below.</span>
             `;
           } else {
             staleBanner.hidden = true;
@@ -1802,7 +1880,7 @@
   }
 
   // -------------------------------------------------------------
-  // AI Suggestions Runner & Consent Handling (Fixed Decline Loop)
+  // AI Suggestions Runner & Consent Handling (B8 Exact Disclosure)
   // -------------------------------------------------------------
   async function runAIEnhancement(actionType) {
     const ai = window.AJSAIClient;
@@ -1813,21 +1891,39 @@
     const resumeText = getResumeFullText();
     const select = document.getElementById('compareJobSelect');
     const selectedJob = jobs.find(j => j.id === (select ? select.value : '')) || jobs[0];
-    const previewSnippet = `Target Role: ${selectedJob?.company || 'Company'} - ${selectedJob?.title || 'Role'}\n\nCandidate Resume:\n${resumeText.slice(0, 1200)}`;
+
+    // Construct the EXACT prompt to be sent to Puter (B8 Exact Disclosure)
+    let exactOutgoingPrompt = '';
+    let bullet = '';
+    if (actionType === 'recruiter_review') {
+      exactOutgoingPrompt = window.AJSResumeAgent.buildReviewPrompt(resumeText, selectedJob?.title);
+    } else if (actionType === 'cover_letter') {
+      exactOutgoingPrompt = window.AJSResumeAgent.buildCoverLetterPrompt(selectedJob, resumeText);
+    } else if (actionType === 'improve_bullet') {
+      bullet = prompt('Paste a resume project bullet point to optimize:', currentResumeData.projects?.[0]?.bullet || '');
+      if (!bullet) {
+        outputEl.innerHTML = '<div style="padding:15px;color:#63716d">No bullet point entered.</div>';
+        return;
+      }
+      exactOutgoingPrompt = window.AJSResumeAgent.buildBulletImprovementPrompt(bullet);
+    } else {
+      runLocalFallbackEnhancement(actionType);
+      return;
+    }
 
     if (ai && !ai.hasConsent()) {
       showAIConsentModal(
-        (redactedText) => executeAIWithText(actionType, redactedText || resumeText, selectedJob),
+        (approvedPrompt) => executeAIWithPrompt(actionType, approvedPrompt, selectedJob, resumeText),
         () => runLocalFallbackEnhancement(actionType),
-        previewSnippet
+        exactOutgoingPrompt
       );
       return;
     }
 
-    executeAIWithText(actionType, resumeText, selectedJob);
+    executeAIWithPrompt(actionType, exactOutgoingPrompt, selectedJob, resumeText);
   }
 
-  async function executeAIWithText(actionType, textToUse, selectedJob) {
+  async function executeAIWithPrompt(actionType, exactPromptToSend, selectedJob, resumeText) {
     const outputEl = document.getElementById('aiSuggestionsOutput');
     const statusEl = document.getElementById('aiStatusNotice');
     if (!outputEl) return;
@@ -1838,16 +1934,11 @@
     try {
       let result = null;
       if (actionType === 'recruiter_review') {
-        result = await window.AJSResumeAgent.generateAIReview(textToUse, selectedJob?.title);
+        result = await window.AJSResumeAgent.generateAIReview(resumeText, selectedJob?.title, exactPromptToSend);
       } else if (actionType === 'cover_letter') {
-        result = await window.AJSResumeAgent.generateAICoverLetter(selectedJob, textToUse);
+        result = await window.AJSResumeAgent.generateAICoverLetter(selectedJob, resumeText, exactPromptToSend);
       } else if (actionType === 'improve_bullet') {
-        const bullet = prompt('Paste a resume project bullet point to optimize:', currentResumeData.projects?.[0]?.bullet || '');
-        if (!bullet) {
-          outputEl.innerHTML = '<div style="padding:15px;color:#63716d">No bullet point entered.</div>';
-          return;
-        }
-        result = await window.AJSResumeAgent.generateAIBulletImprovement(bullet);
+        result = await window.AJSResumeAgent.generateAIBulletImprovement('', exactPromptToSend);
       } else {
         runLocalFallbackEnhancement(actionType);
         return;
@@ -1895,7 +1986,7 @@
   function showAIConsentModal(onApproved, onDeclined, outgoingText) {
     const modal = document.getElementById('aiConsentModal');
     const previewArea = document.getElementById('aiOutgoingPayloadPreview');
-    const textToPreview = outgoingText || getResumeFullText().slice(0, 1500) || 'No resume text loaded.';
+    const textToPreview = outgoingText || getResumeFullText() || 'No resume text loaded.';
 
     if (previewArea) {
       previewArea.value = textToPreview;
@@ -2103,19 +2194,31 @@
             const warn = document.getElementById('importConflictWarning');
 
             if (modal && stats) {
+              const accepted = preview.accepted_count !== undefined ? preview.accepted_count : (preview.additions_count + preview.updates_count + preview.conflicts_count);
+              const rejected = preview.rejected_count || 0;
+              const hasAccepted = accepted > 0;
+
               stats.innerHTML = `
                 <div><strong>Schema Version:</strong> ${preview.schema_version}</div>
                 <div><strong>Total in File:</strong> ${preview.total_incoming}</div>
+                <div><strong>Accepted Records:</strong> <span style="color:${hasAccepted ? '#027a48' : '#b42318'}">${accepted}</span></div>
+                ${rejected > 0 ? `<div style="color:#b42318"><strong>Rejected / Invalid:</strong> ${rejected} (${(preview.rejections || []).map(r => r.reason).slice(0, 3).join('; ')})</div>` : ''}
                 <div><strong>New Additions:</strong> ${preview.additions_count}</div>
                 <div><strong>Updates:</strong> ${preview.updates_count}</div>
-                <div><strong>Conflicts (Older timestamps):</strong> ${preview.conflicts_count}</div>
+                <div><strong>Conflicts:</strong> ${preview.conflicts_count}</div>
               `;
               if (warn) warn.hidden = preview.conflicts_count === 0;
+
+              const mergeBtn = document.getElementById('executeImportMergeBtn');
+              const overwriteBtn = document.getElementById('executeImportOverwriteBtn');
+              if (mergeBtn) mergeBtn.disabled = !hasAccepted;
+              if (overwriteBtn) overwriteBtn.disabled = !hasAccepted;
+
               modal.hidden = false;
             }
           }
         } catch (err) {
-          alert('Could not parse import file: ' + err.message);
+          alert('Import Rejected: ' + err.message);
         }
       };
       reader.readAsText(file);

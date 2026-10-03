@@ -86,11 +86,13 @@
           </button>
           <button class="btn primary" id="runScanTop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6"/></svg>
-            Reload latest published scan
+            <span class="btn-text-full">Reload latest published scan</span>
+            <span class="btn-text-short">Reload</span>
           </button>
           <button class="btn" id="exportCsvTop">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
-            Export CSV
+            <span class="btn-text-full">Export CSV</span>
+            <span class="btn-text-short">CSV</span>
           </button>
         </div>
       </header>
@@ -172,7 +174,7 @@
 
           <!-- Ready-to-apply jobs (Priority Grid) -->
           <div class="section-head" style="margin-top:24px">
-            <div><div class="eyebrow">Action queue</div><h2>Ready to apply</h2><p>Top junior roles verified for ≤2 years experience, explicit posting dates, and live apply endpoints.</p></div>
+            <div><div class="eyebrow">Action queue</div><h2>Ready to apply</h2><p>Top junior roles verified for ≤2 years experience, explicit posting dates, and verified official detail postings.</p></div>
             <button class="text-link" id="viewAllJobsLink" data-go="jobs">View all verified roles →</button>
           </div>
           <div class="priority-grid" id="priorityGrid"></div>
@@ -184,7 +186,7 @@
               <div style="font-size:12px;color:var(--muted);line-height:1.6">
                 <div><strong>Scan Timestamp:</strong> <span id="dashScanTimestamp">Today · Asia/Kolkata</span></div>
                 <div><strong>Payload Age:</strong> <span id="dashScanAge">Fresh</span></div>
-                <div><strong>Active Official Sources:</strong> Amazon Jobs (IN), Accenture India Careers</div>
+                <div><strong>Active Official Sources:</strong> <span id="dashActiveSources">Amazon Jobs (IN)</span></div>
                 <div><strong>Suppressed Clones &amp; Dead Links:</strong> <span id="dashSuppressedCount">0</span> duplicates suppressed</div>
               </div>
               <div style="margin-top:12px">
@@ -220,7 +222,7 @@
             <div>
               <div class="eyebrow">Verified Directory</div>
               <h1>Verified junior analytics roles</h1>
-              <p>Every role has an explicit date (0–15 days old), junior requirement (≤2 yrs), at least 2 analytics skills, and a live official Apply link.</p>
+              <p>Every role has an explicit date (0–15 days old), junior requirement (≤2 yrs), at least 2 analytics skills, and a verified official detail posting.</p>
             </div>
             <button class="btn" id="savedToggle">♡ Saved only <span>0</span></button>
           </div>
@@ -802,7 +804,7 @@
               <div class="verification-list">
                 <div class="verify-row"><i class="verify-check">✓</i><strong>Official company job detail</strong><span id="auditDetailCount">--</span></div>
                 <div class="verify-row"><i class="verify-check">✓</i><strong>Explicit posting date in official data</strong><span id="auditDateCount">--</span></div>
-                <div class="verify-row"><i class="verify-check">✓</i><strong>Live official Apply flow (checked separately)</strong><span id="auditLinkCount">HTTP 200</span></div>
+                <div class="verify-row"><i class="verify-check">✓</i><strong>Official job detail link verified</strong><span id="auditLinkCount">HTTP 200</span></div>
                 <div class="verify-row"><i class="verify-check">✓</i><strong>Minimum experience ≤ 2 years</strong><span id="auditExpCount">--</span></div>
                 <div class="verify-row"><i class="verify-check">✓</i><strong>At least two target analytics skills</strong><span id="auditSkillCount">--</span></div>
               </div>
@@ -836,6 +838,25 @@
                 </tr>
               </thead>
               <tbody id="auditJobsTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Source & Query Execution Audit Table (B5) -->
+          <div class="section-head" style="margin-top:24px">
+            <div><div class="eyebrow">Source &amp; Query Execution Audit</div><h2>Adapter Query Health &amp; Yield</h2><p>Received, eligible, error, and status evidence for every official adapter and search query.</p></div>
+          </div>
+          <div class="panel" style="overflow-x:auto">
+            <table class="audit-details-table" id="auditSourcesTable" aria-label="Audit source query execution table">
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Query / Target</th>
+                  <th>Raw Received</th>
+                  <th>Eligible</th>
+                  <th>Adapter Status</th>
+                </tr>
+              </thead>
+              <tbody id="auditSourcesTableBody"></tbody>
             </table>
           </div>
         </section>

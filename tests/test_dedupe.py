@@ -277,6 +277,36 @@ class TestDedupe(unittest.TestCase):
         self.assertEqual(len(unique), 1)
         self.assertEqual(unique[0]["id"], "EXISTING_JOB_1")
 
+    def test_distinct_amazon_requisitions_never_merged_as_duplicates(self):
+        """
+        Critical regression test (B1):
+        Distinct Amazon requisitions 10554403, 10554404, 10554405, 10554406, 10554407
+        share title, city, type, and skills, but each has an authoritative requisition ID
+        and separate official detail/apply paths. They must all be preserved as distinct jobs.
+        """
+        jobs = []
+        for req_id in ["10554403", "10554404", "10554405", "10554406", "10554407"]:
+            jobs.append({
+                "id": req_id,
+                "company": "Amazon",
+                "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+                "location": "Bengaluru",
+                "type": "Full-time",
+                "days": 5,
+                "score": 93,
+                "skills": ["SQL", "Power BI", "Tableau", "Python"],
+                "apply": f"https://account.amazon.jobs/jobs/{req_id}/apply",
+                "detail": f"https://www.amazon.jobs/en/jobs/{req_id}/business-analyst"
+            })
+
+        unique, groups, suppressed = deduplicate_jobs(jobs)
+        self.assertEqual(len(unique), 5, f"Expected all 5 distinct requisitions to be preserved, got {len(unique)}")
+        self.assertEqual(suppressed, 0, "No distinct requisitions should be suppressed")
+        self.assertEqual(len(groups), 0, "No duplicate groups should be created for distinct requisitions")
+        unique_ids = {j["id"] for j in unique}
+        self.assertEqual(unique_ids, {"10554403", "10554404", "10554405", "10554406", "10554407"})
+
 
 if __name__ == "__main__":
     unittest.main()
+

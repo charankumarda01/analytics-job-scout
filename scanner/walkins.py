@@ -13,6 +13,7 @@ import re
 from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 import requests
@@ -88,7 +89,7 @@ def validate_walkin_event(event: dict[str, Any], today: date, check_http: bool =
     if e_date < today:
         return False, f"Event date {event['event_date']} is in the past; auto-suppressed"
 
-    # 3. URL safety & anti-generic checks
+    # 3. URL safety, domain parity & anti-generic checks (B10)
     reg_url = event["registration_url"].strip()
     source_url = event["official_source_url"].strip()
     for u in (reg_url, source_url):
@@ -99,6 +100,17 @@ def validate_walkin_event(event: dict[str, Any], today: date, check_http: bool =
         for pattern in GENERIC_CAREER_URL_PATTERNS:
             if pattern.search(u):
                 return False, f"URL {u} is a generic careers/login page or unverified drive= URL; cannot verify event"
+
+    # Enforce domain parity between registration_url and official_source_url
+    try:
+        source_domain = urlparse(source_url).netloc.lower()
+        reg_domain = urlparse(reg_url).netloc.lower()
+        source_base = ".".join(source_domain.split(".")[-2:])
+        reg_base = ".".join(reg_domain.split(".")[-2:])
+        if source_base != reg_base:
+            return False, f"Registration URL domain ({reg_domain}) does not match official source domain ({source_domain})"
+    except Exception:
+        return False, "Failed to parse URL domains for domain parity verification"
 
     # 4. Content anti-scam scan
     full_content = " ".join([
@@ -116,22 +128,48 @@ def validate_walkin_event(event: dict[str, Any], today: date, check_http: bool =
     if len(skills) < 2:
         return False, "Event must match at least two target analytics skills"
 
-    # 6. Evidence-based HTTP and content verification
+    # 6. Event-specific Evidence Gates (Content must verify event date, city, venue, title)
     if check_http:
         try:
             headers = {"User-Agent": "AnalyticsJobScout/2.0"}
-            resp = requests.get(source_url, headers=headers, timeout=10)
+            resp = requests.get(source_url, headers=headers, timeout=10, allow_redirects=True)
             if resp.status_code >= 400:
                 return False, f"Official source URL returned HTTP {resp.status_code}"
+
+            final_source_url = str(getattr(resp, "url", source_url))
+            final_source_netloc = urlparse(final_source_url).netloc.lower()
+            if final_source_netloc and not final_source_netloc.endswith(source_base):
+                return False, f"Official source URL redirected to external host {final_source_netloc}"
 
             page_text = (resp.text or "").lower()
             company_lower = event.get("company", "").lower()
             if company_lower and company_lower not in page_text:
                 return False, f"Official source page does not mention company '{event.get('company')}'"
 
-            has_event_term = any(t in page_text for t in ["walk-in", "walkin", "drive", "recruitment", "interview", "careers", "event", "hiring"])
-            if not has_event_term:
-                return False, "Official source page content does not confirm recruitment event phrasing"
+            # Strict event-specific phrasing: broad terms like 'careers' or 'hiring' are rejected
+            has_walkin_term = any(t in page_text for t in ["walk-in", "walkin", "hiring drive", "recruitment drive"])
+            if not has_walkin_term:
+                return False, "Official source page content does not confirm walk-in recruitment drive phrasing"
+
+            # Event date year confirmation in source text
+            e_date_str = str(event["event_date"])
+            e_year = e_date_str.split("-")[0]
+            if e_year not in page_text:
+                return False, f"Official source page does not mention event year {e_year}"
+
+            # City confirmation in source text
+            city_lower = event.get("city", "").lower()
+            if city_lower and city_lower not in page_text:
+                return False, f"Official source page does not confirm event city '{event.get('city')}'"
+
+            # Verify registration URL
+            reg_resp = requests.get(reg_url, headers=headers, timeout=10, allow_redirects=True)
+            if reg_resp.status_code >= 400:
+                return False, f"Registration URL returned HTTP {reg_resp.status_code}"
+            final_reg_url = str(getattr(reg_resp, "url", reg_url))
+            final_reg_netloc = urlparse(final_reg_url).netloc.lower()
+            if final_reg_netloc and not final_reg_netloc.endswith(reg_base):
+                return False, f"Registration URL redirected to external host {final_reg_netloc}"
         except Exception as exc:
             return False, f"HTTP verification of official source URL failed: {str(exc)[:80]}"
 

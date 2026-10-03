@@ -1303,43 +1303,140 @@
       try {
         data = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
       } catch (err) {
-        return { success: false, error: 'Invalid JSON file: ' + err.message };
+        return {
+          success: false,
+          error: 'Invalid JSON file: ' + err.message,
+          totalIncoming: 0,
+          acceptedCount: 0,
+          rejectedCount: 0,
+          rejections: []
+        };
       }
 
-      if (!data || typeof data !== 'object') {
-        return { success: false, error: 'Empty or invalid backup payload' };
+      // 1. Root structure validation (B6)
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        return {
+          success: false,
+          error: 'Invalid backup structure: root must be a valid JSON object.',
+          totalIncoming: 0,
+          acceptedCount: 0,
+          rejectedCount: 0,
+          rejections: []
+        };
       }
 
-      const importedApps = Array.isArray(data.applications) ? data.applications : [];
+      // 2. Schema version validation (Supported versions: 1, 2, 3) (B6)
+      const SUPPORTED_SCHEMAS = [1, 2, 3];
+      if (data.schema_version !== undefined) {
+        const schemaVer = Number(data.schema_version);
+        if (!SUPPORTED_SCHEMAS.includes(schemaVer)) {
+          return {
+            success: false,
+            error: `Unsupported schema_version: ${data.schema_version}. Supported schema versions: 1, 2, 3.`,
+            totalIncoming: 0,
+            acceptedCount: 0,
+            rejectedCount: 0,
+            rejections: []
+          };
+        }
+      }
+
+      // 3. Applications field presence & type validation (B6)
+      if (!('applications' in data)) {
+        return {
+          success: false,
+          error: 'Invalid backup: missing required "applications" array.',
+          totalIncoming: 0,
+          acceptedCount: 0,
+          rejectedCount: 0,
+          rejections: []
+        };
+      }
+      if (!Array.isArray(data.applications)) {
+        return {
+          success: false,
+          error: 'Invalid backup: "applications" property must be a valid array.',
+          totalIncoming: 0,
+          acceptedCount: 0,
+          rejectedCount: 0,
+          rejections: []
+        };
+      }
+
+      const importedApps = data.applications;
       const currentApps = Storage.getApplications({ includeArchived: true });
       const currentMap = new Map(currentApps.map(a => [a.canonical_key || a.id, a]));
 
       const preview = {
         success: true,
-        schemaVersion: data.schema_version || 1,
+        schemaVersion: Number(data.schema_version) || 3,
         totalIncoming: importedApps.length,
+        acceptedCount: 0,
+        rejectedCount: 0,
+        rejections: [],
         toAdd: [],
         toUpdate: [],
         conflicts: []
       };
 
-      importedApps.forEach(item => {
-        if (!item || !item.company || !item.title) return;
-        const key = item.canonical_key || makeCanonicalKey(item.company, item.requisition_id || item.id);
+      const VALID_STATUSES = new Set(['saved', 'applying', 'applied', 'interviewing', 'offer', 'rejected', 'withdrawn', 'archived']);
+
+      importedApps.forEach((item, index) => {
+        // Record object type check
+        if (!item || typeof item !== 'object' || Array.isArray(item)) {
+          preview.rejections.push({ index, reason: 'Record must be a non-null JSON object' });
+          return;
+        }
+
+        // Required identity fields
+        const id = (item.id || item.requisition_id || '').toString().trim();
+        const company = (item.company || '').toString().trim();
+        const title = (item.title || '').toString().trim();
+
+        if (!company) {
+          preview.rejections.push({ index, record: item, reason: 'Missing required field: "company"' });
+          return;
+        }
+        if (!title) {
+          preview.rejections.push({ index, record: item, reason: 'Missing required field: "title"' });
+          return;
+        }
+        if (!id) {
+          preview.rejections.push({ index, record: item, reason: 'Missing required field: "id" or "requisition_id"' });
+          return;
+        }
+
+        // URL safety verification (Reject javascript: or malicious schemes)
+        const urlsToCheck = [item.apply_url, item.official_apply_url, item.detail_url, item.official_detail_url, item.apply, item.detail].filter(Boolean);
+        for (const u of urlsToCheck) {
+          if (typeof u === 'string') {
+            const trimmed = u.trim().toLowerCase();
+            if (trimmed.startsWith('javascript:') || trimmed.startsWith('data:') || trimmed.startsWith('vbscript:')) {
+              preview.rejections.push({ index, record: item, reason: `Unsafe URL scheme detected: "${u.slice(0, 30)}"` });
+              return;
+            }
+          }
+        }
+
+        // Status normalization
+        if (item.status && !VALID_STATUSES.has(item.status.toLowerCase())) {
+          item.status = normalizeStatus(item.status);
+        }
+
+        const key = item.canonical_key || makeCanonicalKey(company, item.requisition_id || id);
         const existing = currentMap.get(key);
 
         if (!existing) {
           preview.toAdd.push(item);
         } else {
-          // Check if there is conflict (different status or newer modification)
           const existingUpdated = new Date(existing.last_updated_at || 0).getTime();
           const incomingUpdated = new Date(item.last_updated_at || 0).getTime();
 
           if (existing.status !== item.status) {
             preview.conflicts.push({
               key: key,
-              company: item.company,
-              title: item.title,
+              company: company,
+              title: title,
               currentStatus: existing.status,
               incomingStatus: item.status,
               existingIsNewer: existingUpdated > incomingUpdated,
@@ -1351,6 +1448,15 @@
           }
         }
       });
+
+      preview.acceptedCount = preview.toAdd.length + preview.toUpdate.length + preview.conflicts.length;
+      preview.rejectedCount = preview.rejections.length;
+
+      // Fail closed if incoming records were present but all were rejected
+      if (importedApps.length > 0 && preview.acceptedCount === 0 && preview.rejectedCount > 0) {
+        preview.success = false;
+        preview.error = `Import validation failed: all ${preview.rejectedCount} incoming records were invalid.`;
+      }
 
       return preview;
     },
@@ -1419,6 +1525,9 @@
       preview.additions_count = preview.toAdd ? preview.toAdd.length : 0;
       preview.updates_count = preview.toUpdate ? preview.toUpdate.length : 0;
       preview.conflicts_count = preview.conflicts ? preview.conflicts.length : 0;
+      preview.accepted_count = preview.acceptedCount !== undefined ? preview.acceptedCount : (preview.additions_count + preview.updates_count + preview.conflicts_count);
+      preview.rejected_count = preview.rejectedCount || (preview.rejections ? preview.rejections.length : 0);
+      preview.rejections = preview.rejections || [];
       preview.raw = jsonStringOrObj;
       return preview;
     },

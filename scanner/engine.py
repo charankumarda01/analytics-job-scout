@@ -162,12 +162,13 @@ def run_full_scan(
             "status_label": detail_meta.get("status_label", "HTTP 200 (Verified Detail)" if detail_ok else "Detail Link Check Failed"),
             "checked_at": detail_meta.get("checked_at")
         }
+        is_apply_auth_gate = bool(apply_meta.get("redirected_to_login"))
         job["apply_link_check"] = {
             "status_code": apply_meta.get("status_code"),
-            "verified": apply_ok,
-            "redirected_to_login": bool(apply_meta.get("redirected_to_login")),
+            "verified": apply_ok and not is_apply_auth_gate,
+            "redirected_to_login": is_apply_auth_gate,
             "final_url": apply_final,
-            "status_label": apply_meta.get("status_label", "HTTP 200 (Verified)" if apply_ok else "Apply Link Check Failed"),
+            "status_label": "Official Authentication Gate (Login Required, Unverified Destination)" if is_apply_auth_gate else (apply_meta.get("status_label", "HTTP 200 (Verified Apply)") if apply_ok else "Apply Link Check Failed"),
             "checked_at": apply_meta.get("checked_at")
         }
 
@@ -178,9 +179,13 @@ def run_full_scan(
             "days_ago": days,
             "status": f"PASS ({'Fresh, <=5d' if days <= 5 else 'Backup, <=15d'})"
         }
+        exp_snippet = job.get("exp_snippet") or f"Requirement: {job.get('exp', 'Junior scope')} extracted from qualifications"
+        exp_conf = job.get("exp_confidence") or "High"
         job["experience_evidence"] = {
             "required": job.get("exp"),
-            "status": "PASS (Junior, <= 2 years)"
+            "source_snippet": exp_snippet,
+            "parser_confidence": exp_conf,
+            "status": f"PASS (Junior: {job.get('exp', '<=2 yrs')})"
         }
         job["skills_evidence"] = {
             "matched_count": len(job.get("skills", [])),
@@ -188,16 +193,17 @@ def run_full_scan(
             "status": "PASS (>= 2 target skills)"
         }
 
-        if not detail_ok and not apply_ok:
+        # Strict Verification Gate (B4): The official detail page MUST pass live-link verification!
+        if not detail_ok:
             suppressed_dead_link_count += 1
-            audit_rejected_reasons.append(f"{comp_name} ({job.get('id')}): Dead or expired link ({detail_meta.get('reason')})")
+            audit_rejected_reasons.append(f"{comp_name} ({job.get('id')}): Dead or unverified detail link ({detail_meta.get('reason')})")
             continue
 
-        # Passes both gates
+        # Passes official detail gate
         job["verified"] = True
         verified_jobs.append(job)
 
-    # Load shown jobs history to prevent repeating previously shown jobs
+    # Load shown jobs history to prevent repeating previously shown jobs (B2)
     shown_file = DATA_DIR / "shown_jobs.json"
     shown_state = {}
     prior_shown_ids = set()
@@ -208,28 +214,51 @@ def run_full_scan(
         except Exception:
             shown_state = {}
             prior_shown_ids = set()
+    elif check_live_http:
+        # Fallback to restore prior state from published Pages if not local
+        try:
+            resp = requests.get(
+                "https://charankumarda01.github.io/analytics-job-scout/data/shown_jobs.json",
+                timeout=5,
+                headers={"User-Agent": "AnalyticsJobScout/2.0"}
+            )
+            if resp.status_code == 200:
+                shown_state = resp.json()
+                prior_shown_ids = set(shown_state.get("shown_ids", []))
+        except Exception:
+            pass
 
-    # Cross-source Deduplication
-    unique_jobs, duplicate_groups, duplicates_suppressed = deduplicate_jobs(
+    # Cross-source Deduplication (Cluster matching across query hits)
+    unique_candidates, duplicate_groups, duplicates_suppressed = deduplicate_jobs(
         verified_jobs, prior_shown_ids=prior_shown_ids
     )
 
-    # Format Priorities & Mark previously shown
-    current_ids = []
+    # Exclude all previously shown requisitions from the published new-job feed (B2)
+    unique_jobs = []
+    suppressed_previously_shown = 0
     history = shown_state.get("history", {})
-    for i, j in enumerate(unique_jobs):
-        j["priority"] = (i < 3)
-        jid = str(j.get("id", ""))
+    new_shown_ids = []
+
+    for j in unique_candidates:
+        jid = str(j.get("id", "")).strip()
+        if jid and jid in prior_shown_ids:
+            suppressed_previously_shown += 1
+            continue
+        j["previously_shown"] = False
         if jid:
-            current_ids.append(jid)
-            j["previously_shown"] = (jid in prior_shown_ids)
+            new_shown_ids.append(jid)
             if jid not in history:
                 history[jid] = {"first_shown": today.isoformat(), "last_shown": today.isoformat()}
             else:
                 history[jid]["last_shown"] = today.isoformat()
+        unique_jobs.append(j)
 
-    # Update shown_jobs state
-    all_shown_ids = sorted(prior_shown_ids.union(current_ids))
+    # Format Priorities on fresh unique jobs
+    for i, j in enumerate(unique_jobs):
+        j["priority"] = (i < 3)
+
+    # Update shown_jobs state with all previously and newly shown jobs
+    all_shown_ids = sorted(prior_shown_ids.union(new_shown_ids))
     new_shown_state = {
         "updated_at": started_at.isoformat(timespec="seconds"),
         "total_tracked": len(all_shown_ids),
@@ -261,6 +290,7 @@ def run_full_scan(
             "backup": backup_count,
             "internships": internships_count,
             "duplicates_suppressed": duplicates_suppressed,
+            "previously_shown_suppressed": suppressed_previously_shown,
             "suppressed_dead_links": suppressed_dead_link_count,
             "suppressed_scam_leads": suppressed_scam_count
         },

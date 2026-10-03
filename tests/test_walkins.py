@@ -38,7 +38,8 @@ class TestWalkins(unittest.TestCase):
         from unittest.mock import patch, MagicMock
         mock_resp = MagicMock()
         mock_resp.status_code = 200
-        mock_resp.text = "<html><body><h1>Accenture Walk-in Recruitment Drive</h1><p>Bengaluru</p></body></html>"
+        mock_resp.url = "https://www.accenture.com/in-en/careers/jobdetails"
+        mock_resp.text = f"<html><body><h1>Accenture Walk-in Recruitment Drive {self.today.year}</h1><p>Bengaluru</p></body></html>"
         with patch("requests.get", return_value=mock_resp):
             ok, reason = validate_walkin_event(self.valid_event, self.today, check_http=True)
             self.assertTrue(ok, reason)

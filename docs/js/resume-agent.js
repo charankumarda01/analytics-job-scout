@@ -505,11 +505,11 @@
       level: 'optional'
     });
 
-    // Flat checklist array for backward compatibility
+    // Flat checklist array for backward compatibility and interactive ATS view
     const flatChecklist = [
-      ...criticalChecklist.map(c => ({ item: c.text, done: c.done })),
-      ...usefulChecklist.map(u => ({ item: u.text, done: u.done })),
-      ...optionalChecklist.map(o => ({ item: o.text, done: o.done }))
+      ...criticalChecklist.map(c => ({ item: c.text, done: c.done, priority: c.level, guidance: c.guidance })),
+      ...usefulChecklist.map(u => ({ item: u.text, done: u.done, priority: u.level, guidance: u.guidance })),
+      ...optionalChecklist.map(o => ({ item: o.text, done: o.done, priority: o.level, guidance: o.guidance }))
     ];
 
     const warnings = [];
@@ -739,19 +739,11 @@
     matchJob: matchJobWithResume,
     OfflineGenerators: OfflineGenerators,
 
-    // AI-Enhanced actions with graceful fallback
-    generateAIReview: async function(resumeText, targetRole) {
-      const ats = analyzeResumeATS(resumeText);
+    // Exact Outgoing Prompt Builders (B8 Exact Disclosure)
+    buildReviewPrompt: function(resumeText, targetRole) {
       const ai = window.AJSAIClient;
-
-      if (!ai || !ai.hasConsent()) {
-        return {
-          source: 'local_rule_engine',
-          markdown: OfflineGenerators.recruiterReview(ats, targetRole)
-        };
-      }
-
-      const prompt = [
+      if (!ai) return '';
+      const userPrompt = [
         `Role: Junior Analytics Recruiter reviewing candidate for "${targetRole || 'Junior Data Analyst'}".`,
         `Review the candidate's resume below. Provide:`,
         `1. 3 Top strengths for a junior analytics role.`,
@@ -761,30 +753,13 @@
         '',
         ai.wrapUntrusted('RESUME', resumeText)
       ].join('\n');
-
-      const res = await ai.chat('You are an expert junior analytics recruiter. Respond in structured Markdown.', prompt);
-      if (res.success && res.text) {
-        return { source: 'puter_ai', markdown: res.text };
-      }
-
-      return {
-        source: 'local_rule_engine_fallback',
-        markdown: OfflineGenerators.recruiterReview(ats, targetRole) + `\n\n*(Note: Live AI timed out or was offline. Local rule analysis was used.)*`
-      };
+      return ai.buildOutgoingPrompt('You are an expert junior analytics recruiter. Respond in structured Markdown.', userPrompt);
     },
 
-    generateAICoverLetter: async function(job, resumeText) {
-      const ats = analyzeResumeATS(resumeText);
+    buildCoverLetterPrompt: function(job, resumeText) {
       const ai = window.AJSAIClient;
-
-      if (!ai || !ai.hasConsent()) {
-        return {
-          source: 'local_rule_engine',
-          markdown: OfflineGenerators.draftCoverLetter(job, resumeText, ats.skillsFound)
-        };
-      }
-
-      const prompt = [
+      if (!ai) return '';
+      const userPrompt = [
         `Write a concise, professional 3-paragraph cover letter for a junior analytics applicant.`,
         `Job Title: ${job ? job.title : 'Data Analyst'}`,
         `Company: ${job ? job.company : 'Company'}`,
@@ -796,8 +771,60 @@
         '',
         ai.wrapUntrusted('RESUME', resumeText)
       ].join('\n');
+      return ai.buildOutgoingPrompt('You are a professional analytics career advisor.', userPrompt);
+    },
 
-      const res = await ai.chat('You are a professional analytics career advisor.', prompt);
+    buildBulletImprovementPrompt: function(bullet) {
+      const ai = window.AJSAIClient;
+      if (!ai) return '';
+      const userPrompt = [
+        `Improve the following analytics resume bullet point for a junior candidate.`,
+        `Apply Google's XYZ formula: Accomplished [X], as measured by [Y], by doing [Z].`,
+        `Provide 3 distinct strong variations: Impact-focused, Technical/Tool-focused, and Efficiency-focused.`,
+        `Never invent facts; use bracketed placeholders for metrics if missing.`,
+        '',
+        ai.wrapUntrusted('BULLET', bullet)
+      ].join('\n');
+      return ai.buildOutgoingPrompt('You are an expert technical resume editor.', userPrompt);
+    },
+
+    // AI-Enhanced actions with graceful fallback
+    generateAIReview: async function(resumeText, targetRole, preapprovedPrompt) {
+      const ats = analyzeResumeATS(resumeText);
+      const ai = window.AJSAIClient;
+
+      if (!ai || !ai.hasConsent()) {
+        return {
+          source: 'local_rule_engine',
+          markdown: OfflineGenerators.recruiterReview(ats, targetRole)
+        };
+      }
+
+      const finalPrompt = preapprovedPrompt || ResumeAgent.buildReviewPrompt(resumeText, targetRole);
+      const res = await ai.sendDirect(finalPrompt);
+      if (res.success && res.text) {
+        return { source: 'puter_ai', markdown: res.text };
+      }
+
+      return {
+        source: 'local_rule_engine_fallback',
+        markdown: OfflineGenerators.recruiterReview(ats, targetRole) + `\n\n*(Note: Live AI timed out or was offline. Local rule analysis was used.)*`
+      };
+    },
+
+    generateAICoverLetter: async function(job, resumeText, preapprovedPrompt) {
+      const ats = analyzeResumeATS(resumeText);
+      const ai = window.AJSAIClient;
+
+      if (!ai || !ai.hasConsent()) {
+        return {
+          source: 'local_rule_engine',
+          markdown: OfflineGenerators.draftCoverLetter(job, resumeText, ats.skillsFound)
+        };
+      }
+
+      const finalPrompt = preapprovedPrompt || ResumeAgent.buildCoverLetterPrompt(job, resumeText);
+      const res = await ai.sendDirect(finalPrompt);
       if (res.success && res.text) {
         return { source: 'puter_ai', markdown: res.text };
       }
@@ -808,22 +835,14 @@
       };
     },
 
-    generateAIBulletImprovement: async function(bullet) {
+    generateAIBulletImprovement: async function(bullet, preapprovedPrompt) {
       const ai = window.AJSAIClient;
       if (!ai || !ai.hasConsent()) {
         return { source: 'local_rule_engine', markdown: OfflineGenerators.improveBullet(bullet) };
       }
 
-      const prompt = [
-        `Improve the following analytics resume bullet point for a junior candidate.`,
-        `Apply Google's XYZ formula: Accomplished [X], as measured by [Y], by doing [Z].`,
-        `Provide 3 distinct strong variations: Impact-focused, Technical/Tool-focused, and Efficiency-focused.`,
-        `Never invent facts; use bracketed placeholders for metrics if missing.`,
-        '',
-        ai.wrapUntrusted('BULLET', bullet)
-      ].join('\n');
-
-      const res = await ai.chat('You are an expert technical resume editor.', prompt);
+      const finalPrompt = preapprovedPrompt || ResumeAgent.buildBulletImprovementPrompt(bullet);
+      const res = await ai.sendDirect(finalPrompt);
       if (res.success && res.text) {
         return { source: 'puter_ai', markdown: res.text };
       }

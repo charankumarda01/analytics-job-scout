@@ -1,68 +1,29 @@
 {
-  "scan_date": "2026-10-01",
-  "scanned_at": "2026-10-01T15:23:31+05:30",
+  "scan_date": "2026-10-03",
+  "scanned_at": "2026-10-03T22:10:43+05:30",
   "timezone": "Asia/Kolkata",
   "preferences": {
     "roles": [
-      "data-analyst",
-      "sql",
-      "power-bi",
-      "analytics",
-      "any-analyst",
-      "data-scientist"
+      "any-analyst"
     ],
     "locations": [
-      "Hyderabad",
-      "Bengaluru",
-      "Chennai",
-      "Remote India"
+      "Bengaluru"
     ],
     "types": [
-      "jobs",
-      "internships"
+      "jobs"
     ]
   },
   "summary": {
-    "total": 5,
-    "fresh": 3,
-    "backup": 2,
+    "total": 8,
+    "fresh": 2,
+    "backup": 6,
     "internships": 0,
-    "duplicates_suppressed": 4,
+    "duplicates_suppressed": 0,
+    "previously_shown_suppressed": 0,
     "suppressed_dead_links": 0,
     "suppressed_scam_leads": 0
   },
   "jobs": [
-    {
-      "id": "10565269",
-      "company": "Amazon",
-      "company_size": "Enterprise",
-      "title": "Business Intel Engineer I, AOP",
-      "location": "Hyderabad",
-      "date": "2026-09-30",
-      "days": 1,
-      "window": "fresh",
-      "score": 95,
-      "type": "Full-time",
-      "exp": "2+ years",
-      "recruiter": "Not disclosed",
-      "skills": [
-        "Excel",
-        "Power BI",
-        "Tableau",
-        "Python",
-        "Statistics",
-        "Visualization",
-        "ETL"
-      ],
-      "fit": "Junior fit (2+ years); verified keywords: Excel, Power BI, Tableau, Python, Statistics, Visualization.",
-      "detail": "https://www.amazon.jobs/en/jobs/10565269/business-intel-engineer-i-aop",
-      "apply": "https://account.amazon.jobs/jobs/10565269/apply",
-      "source": "Amazon Jobs official search",
-      "verified": true,
-      "source_confidence": "High",
-      "last_link_checked_at": "2026-10-01T15:24:02+05:30",
-      "priority": true
-    },
     {
       "id": "10563248",
       "company": "Amazon",
@@ -70,11 +31,13 @@
       "title": "Business Analyst Support, IN Supply Chain - Speed",
       "location": "Bengaluru",
       "date": "2026-09-29",
-      "days": 2,
+      "days": 4,
       "window": "fresh",
       "score": 98,
       "type": "Full-time",
       "exp": "1+ years",
+      "exp_snippet": "1+ years of data analytics or automation experience - bachelor's degree - knowledge of data pipelining and extraction using sql - knowledge of sql and excel at a moderate or advanced level - experience with data mining tools like sql, sas, spss, or similar",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
       "recruiter": "Not disclosed",
       "skills": [
         "SQL",
@@ -92,7 +55,48 @@
       "source": "Amazon Jobs official search",
       "verified": true,
       "source_confidence": "High",
-      "last_link_checked_at": "2026-10-01T15:24:04+05:30",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10563248/business-analyst-support-in-supply-chain-speed",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10563248/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-29",
+        "days_ago": 4,
+        "status": "PASS (Fresh, <=5d)"
+      },
+      "experience_evidence": {
+        "required": "1+ years",
+        "source_snippet": "1+ years of data analytics or automation experience - bachelor's degree - knowledge of data pipelining and extraction using sql - knowledge of sql and excel at a moderate or advanced level - experience with data mining tools like sql, sas, spss, or similar",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 1+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 8,
+        "skills": [
+          "SQL",
+          "Excel",
+          "Tableau",
+          "Statistics",
+          "Dashboards",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
       "priority": true
     },
     {
@@ -102,11 +106,13 @@
       "title": "Business Analyst I, CMT",
       "location": "Bengaluru",
       "date": "2026-09-28",
-      "days": 3,
+      "days": 5,
       "window": "fresh",
-      "score": 98,
+      "score": 95,
       "type": "Full-time",
-      "exp": "1+ years",
+      "exp": "2+ years",
+      "exp_snippet": "1+ years of tax, finance or a related analytical field experience - experience with sql or etl - experience defining requirements and using data and metrics to draw business insights - 2+ years of excel (including vba, pivot tables, array functions, power pivots, etc",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
       "recruiter": "Not disclosed",
       "skills": [
         "SQL",
@@ -119,13 +125,55 @@
         "Reporting",
         "ETL"
       ],
-      "fit": "Junior fit (1+ years); verified keywords: SQL, Excel, Power BI, Tableau, Statistics, Dashboards.",
+      "fit": "Junior fit (2+ years); verified keywords: SQL, Excel, Power BI, Tableau, Statistics, Dashboards.",
       "detail": "https://www.amazon.jobs/en/jobs/10561075/business-analyst-i-cmt",
       "apply": "https://account.amazon.jobs/jobs/10561075/apply",
       "source": "Amazon Jobs official search",
       "verified": true,
       "source_confidence": "High",
-      "last_link_checked_at": "2026-10-01T15:24:10+05:30",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10561075/business-analyst-i-cmt",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10561075/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-28",
+        "days_ago": 5,
+        "status": "PASS (Fresh, <=5d)"
+      },
+      "experience_evidence": {
+        "required": "2+ years",
+        "source_snippet": "1+ years of tax, finance or a related analytical field experience - experience with sql or etl - experience defining requirements and using data and metrics to draw business insights - 2+ years of excel (including vba, pivot tables, array functions, power pivots, etc",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 2+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 9,
+        "skills": [
+          "SQL",
+          "Excel",
+          "Power BI",
+          "Tableau",
+          "Statistics",
+          "Dashboards",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
       "priority": true
     },
     {
@@ -135,11 +183,13 @@
       "title": "Business Analyst, Catalog Support and Operations, GCO",
       "location": "Bengaluru",
       "date": "2026-09-23",
-      "days": 8,
+      "days": 10,
       "window": "backup",
-      "score": 93,
+      "score": 90,
       "type": "Full-time",
-      "exp": "1+ years",
+      "exp": "2+ years",
+      "exp_snippet": "1+ years of tax, finance or a related analytical field experience - 2+ years of excel or tableau (data manipulation, macros, charts and pivot tables) experience - experience defining requirements and using data and metrics to draw business insights - experience creating complex sql queries joining multiple datasets, etl dw concepts",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
       "recruiter": "Not disclosed",
       "skills": [
         "SQL",
@@ -152,14 +202,56 @@
         "Reporting",
         "ETL"
       ],
-      "fit": "Junior fit (1+ years); verified keywords: SQL, Excel, Tableau, Python, Statistics, Data cleaning.",
+      "fit": "Junior fit (2+ years); verified keywords: SQL, Excel, Tableau, Python, Statistics, Data cleaning.",
       "detail": "https://www.amazon.jobs/en/jobs/10557492/business-analyst-catalog-support-and-operations-gco",
       "apply": "https://account.amazon.jobs/jobs/10557492/apply",
       "source": "Amazon Jobs official search",
       "verified": true,
       "source_confidence": "High",
-      "last_link_checked_at": "2026-10-01T15:24:03+05:30",
-      "priority": false
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10557492/business-analyst-catalog-support-and-operations-gco",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10557492/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-23",
+        "days_ago": 10,
+        "status": "PASS (Backup, <=15d)"
+      },
+      "experience_evidence": {
+        "required": "2+ years",
+        "source_snippet": "1+ years of tax, finance or a related analytical field experience - 2+ years of excel or tableau (data manipulation, macros, charts and pivot tables) experience - experience defining requirements and using data and metrics to draw business insights - experience creating complex sql queries joining multiple datasets, etl dw concepts",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 2+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 9,
+        "skills": [
+          "SQL",
+          "Excel",
+          "Tableau",
+          "Python",
+          "Statistics",
+          "Data cleaning",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
+      "priority": true
     },
     {
       "id": "10554403",
@@ -168,11 +260,13 @@
       "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
       "location": "Bengaluru",
       "date": "2026-09-21",
-      "days": 10,
+      "days": 12,
       "window": "backup",
-      "score": 93,
+      "score": 89,
       "type": "Full-time",
       "exp": "1+ years",
+      "exp_snippet": "1+ years of experience in bi/technical support roles",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
       "recruiter": "Not disclosed",
       "skills": [
         "SQL",
@@ -190,101 +284,358 @@
       "source": "Amazon Jobs official search",
       "verified": true,
       "source_confidence": "High",
-      "last_link_checked_at": "2026-10-01T15:23:57+05:30",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10554403/business-analyst-global-solutions-risk-compliance-gsrc",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10554403/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-21",
+        "days_ago": 12,
+        "status": "PASS (Backup, <=15d)"
+      },
+      "experience_evidence": {
+        "required": "1+ years",
+        "source_snippet": "1+ years of experience in bi/technical support roles",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 1+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 8,
+        "skills": [
+          "SQL",
+          "Power BI",
+          "Tableau",
+          "Python",
+          "Data cleaning",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
+      "priority": false
+    },
+    {
+      "id": "10554404",
+      "company": "Amazon",
+      "company_size": "Enterprise",
+      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+      "location": "Bengaluru",
+      "date": "2026-09-21",
+      "days": 12,
+      "window": "backup",
+      "score": 89,
+      "type": "Full-time",
+      "exp": "1+ years",
+      "exp_snippet": "1+ years of experience in bi/technical support roles",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Python",
+        "Data cleaning",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Power BI, Tableau, Python, Data cleaning, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10554404/business-analyst-global-solutions-risk-compliance-gsrc",
+      "apply": "https://account.amazon.jobs/jobs/10554404/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true,
+      "source_confidence": "High",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10554404/business-analyst-global-solutions-risk-compliance-gsrc",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10554404/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-21",
+        "days_ago": 12,
+        "status": "PASS (Backup, <=15d)"
+      },
+      "experience_evidence": {
+        "required": "1+ years",
+        "source_snippet": "1+ years of experience in bi/technical support roles",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 1+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 8,
+        "skills": [
+          "SQL",
+          "Power BI",
+          "Tableau",
+          "Python",
+          "Data cleaning",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
+      "priority": false
+    },
+    {
+      "id": "10554405",
+      "company": "Amazon",
+      "company_size": "Enterprise",
+      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+      "location": "Bengaluru",
+      "date": "2026-09-21",
+      "days": 12,
+      "window": "backup",
+      "score": 89,
+      "type": "Full-time",
+      "exp": "1+ years",
+      "exp_snippet": "1+ years of experience in bi/technical support roles",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Python",
+        "Data cleaning",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Power BI, Tableau, Python, Data cleaning, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10554405/business-analyst-global-solutions-risk-compliance-gsrc",
+      "apply": "https://account.amazon.jobs/jobs/10554405/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true,
+      "source_confidence": "High",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10554405/business-analyst-global-solutions-risk-compliance-gsrc",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10554405/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-21",
+        "days_ago": 12,
+        "status": "PASS (Backup, <=15d)"
+      },
+      "experience_evidence": {
+        "required": "1+ years",
+        "source_snippet": "1+ years of experience in bi/technical support roles",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 1+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 8,
+        "skills": [
+          "SQL",
+          "Power BI",
+          "Tableau",
+          "Python",
+          "Data cleaning",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
+      "priority": false
+    },
+    {
+      "id": "10554406",
+      "company": "Amazon",
+      "company_size": "Enterprise",
+      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+      "location": "Bengaluru",
+      "date": "2026-09-21",
+      "days": 12,
+      "window": "backup",
+      "score": 89,
+      "type": "Full-time",
+      "exp": "1+ years",
+      "exp_snippet": "1+ years of experience in bi/technical support roles",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Python",
+        "Data cleaning",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Power BI, Tableau, Python, Data cleaning, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10554406/business-analyst-global-solutions-risk-compliance-gsrc",
+      "apply": "https://account.amazon.jobs/jobs/10554406/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true,
+      "source_confidence": "High",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10554406/business-analyst-global-solutions-risk-compliance-gsrc",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10554406/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-21",
+        "days_ago": 12,
+        "status": "PASS (Backup, <=15d)"
+      },
+      "experience_evidence": {
+        "required": "1+ years",
+        "source_snippet": "1+ years of experience in bi/technical support roles",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 1+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 8,
+        "skills": [
+          "SQL",
+          "Power BI",
+          "Tableau",
+          "Python",
+          "Data cleaning",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
+      "priority": false
+    },
+    {
+      "id": "10554407",
+      "company": "Amazon",
+      "company_size": "Enterprise",
+      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
+      "location": "Bengaluru",
+      "date": "2026-09-21",
+      "days": 12,
+      "window": "backup",
+      "score": 89,
+      "type": "Full-time",
+      "exp": "1+ years",
+      "exp_snippet": "1+ years of experience in bi/technical support roles",
+      "exp_confidence": "High (Explicit requirement snippet matched)",
+      "recruiter": "Not disclosed",
+      "skills": [
+        "SQL",
+        "Power BI",
+        "Tableau",
+        "Python",
+        "Data cleaning",
+        "Visualization",
+        "Reporting",
+        "ETL"
+      ],
+      "fit": "Junior fit (1+ years); verified keywords: SQL, Power BI, Tableau, Python, Data cleaning, Visualization.",
+      "detail": "https://www.amazon.jobs/en/jobs/10554407/business-analyst-global-solutions-risk-compliance-gsrc",
+      "apply": "https://account.amazon.jobs/jobs/10554407/apply",
+      "source": "Amazon Jobs official search",
+      "verified": true,
+      "source_confidence": "High",
+      "last_link_checked_at": "2026-10-03T22:10:56+05:30",
+      "detail_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "final_url": "https://www.amazon.jobs/en/jobs/10554407/business-analyst-global-solutions-risk-compliance-gsrc",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "apply_link_check": {
+        "status_code": 200,
+        "verified": true,
+        "redirected_to_login": false,
+        "final_url": "https://account.amazon.jobs/jobs/10554407/apply",
+        "status_label": "Verified Domain (Syntax)",
+        "checked_at": "2026-10-03T22:10:56+05:30"
+      },
+      "date_evidence": {
+        "posted_date": "2026-09-21",
+        "days_ago": 12,
+        "status": "PASS (Backup, <=15d)"
+      },
+      "experience_evidence": {
+        "required": "1+ years",
+        "source_snippet": "1+ years of experience in bi/technical support roles",
+        "parser_confidence": "High (Explicit requirement snippet matched)",
+        "status": "PASS (Junior: 1+ years)"
+      },
+      "skills_evidence": {
+        "matched_count": 8,
+        "skills": [
+          "SQL",
+          "Power BI",
+          "Tableau",
+          "Python",
+          "Data cleaning",
+          "Visualization",
+          "Reporting",
+          "ETL"
+        ],
+        "status": "PASS (>= 2 target skills)"
+      },
+      "previously_shown": false,
       "priority": false
     }
   ],
-  "duplicate_groups": [
-    {
-      "kept_job_id": "10554403",
-      "company": "Amazon",
-      "title": "Business Analyst, Global Solutions & Risk Compliance (GSRC)",
-      "location": "Bengaluru",
-      "suppressed_job_ids": [
-        "10554404",
-        "10554405",
-        "10554406",
-        "10554407"
-      ],
-      "reason": "Identical company, role scope, location, and analytical skills stack."
-    }
-  ],
+  "duplicate_groups": [],
   "source_stats": [
     {
       "source": "Amazon",
-      "query": "data analyst",
-      "received": 91,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Amazon",
-      "query": "SQL analyst",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Amazon",
-      "query": "Power BI analyst",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Amazon",
-      "query": "analytics reporting",
-      "received": 100,
-      "eligible": 5,
-      "error": null
-    },
-    {
-      "source": "Amazon",
       "query": "business analyst",
       "received": 100,
-      "eligible": 9,
-      "error": null
-    },
-    {
-      "source": "Amazon",
-      "query": "data scientist",
-      "received": 100,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Amazon",
-      "query": "data analytics intern",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Accenture",
-      "query": "data analyst",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Accenture",
-      "query": "SQL analyst",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Accenture",
-      "query": "Power BI analyst",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Accenture",
-      "query": "analytics reporting",
-      "received": 0,
-      "eligible": 0,
+      "eligible": 8,
       "error": null
     },
     {
@@ -293,38 +644,6 @@
       "received": 0,
       "eligible": 0,
       "error": null
-    },
-    {
-      "source": "Accenture",
-      "query": "data scientist",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Accenture",
-      "query": "data analytics intern",
-      "received": 0,
-      "eligible": 0,
-      "error": null
-    },
-    {
-      "source": "Swiggy (Greenhouse)",
-      "received": 0,
-      "eligible": 0,
-      "error": "404 Client Error: Not Found for url: https://boards-api.greenhouse.io/v1/boards/swiggy/jobs?content=true"
-    },
-    {
-      "source": "Razorpay (Lever)",
-      "received": 0,
-      "eligible": 0,
-      "error": "404 Client Error: Not Found for url: https://api.lever.co/v0/postings/razorpay?mode=json"
-    },
-    {
-      "source": "Zepto (Ashby)",
-      "received": 0,
-      "eligible": 0,
-      "error": "404 Client Error: Not Found for url: https://api.ashbyhq.com/posting-api/job-board/zepto"
     },
     {
       "source": "CRED (Lever)",
@@ -333,26 +652,14 @@
       "error": null
     },
     {
-      "source": "Postman (Greenhouse)",
-      "received": 0,
-      "eligible": 0,
-      "error": "404 Client Error: Not Found for url: https://boards-api.greenhouse.io/v1/boards/postman/jobs?content=true"
-    },
-    {
-      "source": "Groww (Lever)",
-      "received": 0,
-      "eligible": 0,
-      "error": "404 Client Error: Not Found for url: https://api.lever.co/v0/postings/groww?mode=json"
-    },
-    {
       "source": "InMobi (Greenhouse)",
-      "received": 71,
+      "received": 72,
       "eligible": 0,
       "error": null
     },
     {
       "source": "Freshworks (SmartRecruiters)",
-      "received": 29,
+      "received": 31,
       "eligible": 0,
       "error": null
     }
@@ -360,20 +667,15 @@
   "sources": [
     "Amazon",
     "Accenture",
-    "Swiggy",
-    "Razorpay",
-    "Zepto",
     "CRED",
-    "Postman",
-    "Groww",
     "InMobi",
     "Freshworks"
   ],
   "audit": {
-    "companies_checked": 10,
-    "total_received_raw": 499,
-    "total_eligible_before_gates": 14,
-    "passed_verification": 5,
+    "companies_checked": 5,
+    "total_received_raw": 211,
+    "total_eligible_before_gates": 8,
+    "passed_verification": 8,
     "rejected_samples": []
   },
   "policy": "Official company sources only; explicit dates 0–15 days; junior requirements (<=2 yrs); no senior titles; 2+ target skills; HTTP 200 live-link verified."

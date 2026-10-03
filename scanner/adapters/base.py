@@ -61,44 +61,82 @@ def find_skills(text: str) -> list[str]:
     return found
 
 
+def experience_numbers_with_snippet(text: str) -> tuple[list[int], str | None]:
+    """Extract experience numbers along with matched source quote snippet."""
+    text_clean = clean_html(text)
+    low = text_clean.lower()
+    nums: list[int] = []
+    matched_snippet: str | None = None
+
+    # Replace word numbers with digits for regex consistency
+    word_map = {
+        r"\bone\b": "1", r"\btwo\b": "2", r"\bthree\b": "3", r"\bfour\b": "4",
+        r"\bfive\b": "5", r"\bsix\b": "6", r"\bseven\b": "7", r"\beight\b": "8"
+    }
+    normalized = low
+    for pat, rep in word_map.items():
+        normalized = re.sub(pat, rep, normalized)
+
+    patterns = [
+        r"(\b\d{1,2}\s*(?:-|–|to)\s*\d{1,2}\s*(?:years?|yrs?)[^.;\n]*)",
+        r"(\b\d{1,2}\s*\+?\s*(?:years?|yrs?)(?:\s+of)?\s+(?:relevant\s+|professional\s+|work\s+)?experience[^.;\n]*)",
+        r"(\bexperience\s*(?::|of)?\s*\d{1,2}\s*\+?\s*(?:years?|yrs?)[^.;\n]*)",
+        r"(\b\d{1,2}\s*\+\s*(?:years?|yrs?)\s+of[^.;\n]*)",
+        r"(\b(?:minimum|at\s+least)\s+(?:of\s+)?\d{1,2}\s*\+?\s*(?:years?|yrs?)[^.;\n]*)"
+    ]
+
+    for pat in patterns:
+        for m in re.finditer(pat, normalized):
+            snippet = m.group(1).strip()
+            sub_nums = [int(n) for n in re.findall(r"\b(\d{1,2})\b", snippet)]
+            if sub_nums:
+                nums.extend(sub_nums)
+                if not matched_snippet:
+                    matched_snippet = snippet
+
+    return nums, matched_snippet
+
+
 def experience_numbers(text: str) -> list[int]:
     """Extract mandatory-looking lower bounds from a qualifications string."""
-    text = clean_html(text).lower()
-    nums: list[int] = []
-    for m in re.finditer(r"\b(\d{1,2})\s*(?:-|–|to)\s*(\d{1,2})\s*(?:years?|yrs?)\b", text):
-        nums.append(int(m.group(1)))
-    text_no_ranges = re.sub(r"\b\d{1,2}\s*(?:-|–|to)\s*\d{1,2}\s*(?:years?|yrs?)\b", "", text)
-    for m in re.finditer(r"\b(\d{1,2})\s*\+?\s*(?:years?|yrs?)(?:\s+of)?\s+(?:relevant\s+|professional\s+|work\s+)?experience\b", text_no_ranges):
-        nums.append(int(m.group(1)))
-    for m in re.finditer(r"\bexperience\s*(?::|of)?\s*(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b", text_no_ranges):
-        nums.append(int(m.group(1)))
-    for m in re.finditer(r"\b(\d{1,2})\s*\+\s*(?:years?|yrs?)\s+of\b", text_no_ranges):
-        nums.append(int(m.group(1)))
-    for m in re.finditer(r"\b(?:minimum|at\s+least)\s+(?:of\s+)?(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b", text_no_ranges):
-        nums.append(int(m.group(1)))
+    nums, _ = experience_numbers_with_snippet(text)
     return nums
 
 
-def is_junior_eligible(title: str, basic_text: str, desc: str = "") -> tuple[bool, int, str]:
+def is_junior_eligible(title: str, basic_text: str, desc: str = "") -> tuple[bool, int, str, str | None, str]:
     """
     Evaluates whether a role is junior:
     - Title must not contain senior terms
     - Description and basic quals must not contain senior role phrasing
     - No mandatory experience requirement can exceed 2 years
+    Returns: (eligible, exp_min, exp_label, source_snippet, confidence)
     """
     if not title or SENIOR_TITLE.search(title):
-        return False, 0, ""
+        return False, 0, "", None, "High"
     full_check = f"{title} {basic_text} {desc}"
     if SENIOR_DESCRIPTION.search(full_check):
-        return False, 0, ""
-    nums = experience_numbers(basic_text)
-    if any(n > 2 for n in nums):
-        return False, 0, ""
-    exp_min = max(nums) if nums else 0
+        return False, 0, "", None, "High"
+
+    nums_basic, snippet_basic = experience_numbers_with_snippet(basic_text)
+    nums_desc, snippet_desc = experience_numbers_with_snippet(desc)
+    all_nums = nums_basic + nums_desc
+    snippet = snippet_basic or snippet_desc
+
+    if any(n > 2 for n in all_nums):
+        return False, 0, "", snippet, "High"
+    exp_min = max(all_nums) if all_nums else 0
     if exp_min > 2:
-        return False, 0, ""
-    exp_label = f"{exp_min}+ years" if nums else "Junior scope"
-    return True, exp_min, exp_label
+        return False, 0, "", snippet, "High"
+
+    if all_nums:
+        exp_label = f"{exp_min}+ years"
+        confidence = "High (Explicit requirement snippet matched)"
+    else:
+        exp_label = "Junior scope"
+        confidence = "Medium (Inferred entry-level designation from title and scope)"
+        snippet = f'Title "{title}" and qualifications match junior analytics scope'
+
+    return True, exp_min, exp_label, snippet, confidence
 
 
 def normalize_location(raw: str) -> str | None:

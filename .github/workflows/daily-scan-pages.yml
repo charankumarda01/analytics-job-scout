@@ -62,9 +62,10 @@ jobs:
         run: |
           npm run test:node
 
-      - name: Run Playwright E2E tests
+      - name: Restore durable prior shown jobs state
         run: |
-          npx playwright test
+          mkdir -p docs/data
+          curl -s -f "https://charankumarda01.github.io/analytics-job-scout/data/shown_jobs.json" -o docs/data/shown_jobs.json || true
 
       - name: Run strict official-source scan
         run: python server.py --scan-only --output docs/data/latest.json
@@ -72,6 +73,10 @@ jobs:
       - name: Verify payload safety & schema
         run: |
           pytest tests/test_payload_schema.py
+
+      - name: Run Playwright E2E tests on fresh scan
+        run: |
+          npx playwright test
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
